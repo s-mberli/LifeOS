@@ -141,6 +141,57 @@ def _render_chat_body() -> None:
             except Exception:
                 pass  # auto_capture is best-effort
 
+            # Determine active target expert
+            target_expert = target_expert_dict_from_at_mention
+            if not target_expert and selected_scopes:
+                for scope in selected_scopes:
+                    item = options_map[scope]
+                    if item["type"] == "expert":
+                        target_expert = item["data"]
+                        break
+
+            # Pre-load context from selected scopes and expert core files
+            context_blocks: list[str] = []
+            loaded_paths: set[str] = set()
+
+            # 1. Load active expert core files (profile, playbook, principles, evidence)
+            if target_expert:
+                slug = target_expert["slug"]
+                for doc in ("profile.md", "playbook.md", "principles.md", "evidence.md"):
+                    doc_path = f"data/experts/{slug}/{doc}"
+                    full_path = ROOT / doc_path
+                    if full_path.exists():
+                        try:
+                            note_content = full_path.read_text(encoding="utf-8")[:15000]
+                            context_blocks.append(
+                                f"### Expert Core Profile ({doc})\n"
+                                f"Path: {doc_path}\n\n"
+                                f"{note_content}"
+                            )
+                            loaded_paths.add(doc_path)
+                        except Exception:
+                            pass
+
+            # 2. Load explicitly selected file scopes
+            if selected_scopes:
+                for scope in selected_scopes:
+                    item = options_map[scope]
+                    if item["type"] == "file":
+                        file_path = item["data"]["path"]
+                        if file_path not in loaded_paths:
+                            full_path = ROOT / file_path
+                            if full_path.exists():
+                                try:
+                                    note_content = full_path.read_text(encoding="utf-8")[:15000]
+                                    context_blocks.append(
+                                        f"### Selected Note: {item['title']}\n"
+                                        f"Path: {file_path}\n\n"
+                                        f"{note_content}"
+                                    )
+                                    loaded_paths.add(file_path)
+                                except Exception:
+                                    pass
+
             # FTS retrieval
             results = fts_search(
                 prompt,
@@ -149,32 +200,27 @@ def _render_chat_body() -> None:
                 require_insight_note=require_insight_note,
             )
 
-            # Build context blocks from retrieved notes
-            context_blocks: list[str] = []
+            # Append FTS results if not already loaded
             for title, path, snippet, _ in results:
-                full_path = ROOT / path
-                if full_path.exists():
-                    note_content = full_path.read_text(encoding="utf-8")[:15000]
-                else:
-                    note_content = snippet
-                context_blocks.append(
-                    f"### {title}\nPath: {path}\n\n{note_content}"
-                )
+                if path not in loaded_paths:
+                    full_path = ROOT / path
+                    if full_path.exists():
+                        try:
+                            note_content = full_path.read_text(encoding="utf-8")[:15000]
+                        except Exception:
+                            note_content = snippet
+                    else:
+                        note_content = snippet
+                    context_blocks.append(
+                        f"### {title}\nPath: {path}\n\n{note_content}"
+                    )
+                    loaded_paths.add(path)
 
             retrieved_context = (
                 "\n\n---\n\n".join(context_blocks)
                 if context_blocks
                 else "No relevant notes found in knowledge base."
             )
-
-            # Build system + user prompts
-            target_expert = target_expert_dict_from_at_mention
-            if not target_expert and selected_scopes:
-                for scope in selected_scopes:
-                    item = options_map[scope]
-                    if item["type"] == "expert":
-                        target_expert = item["data"]
-                        break
 
             if target_expert:
                 system_prompt = (
