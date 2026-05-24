@@ -1,0 +1,24 @@
+# Generate-Portfolio-Case-Study Skill Configuration
+
+skill_id: "generate-portfolio-case-study"
+version: "1.0.0"
+review_required: true
+
+default_folders:
+  evidence_source: "data/career/case-studies"
+  output_dir: "outputs/portfolio-case-studies"
+
+related_templates: []
+
+relevant_expert_mappings:
+  - expert_slug: "expert--ai-systems-architect"
+  - expert_slug: "expert--flow-temple-strategist"
+
+model_settings:
+  model: "gemini-2.5-flash"
+  temperature: 0.4
+  max_tokens: 4096
+
+safety_flags:
+  anonymize_sensitive_info: true
+  review_status_default: "draft"

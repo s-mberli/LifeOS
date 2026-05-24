@@ -1,0 +1,25 @@
+# Update-Expert Skill Configuration
+
+skill_id: "update-expert"
+version: "1.0.0"
+review_required: true
+
+default_folders:
+  updates_output: "outputs/expert-updates"
+  experts_root: "data/experts"
+
+related_templates: []
+
+relevant_expert_mappings:
+  - expert_slug: "expert--ai-systems-architect"
+  - expert_slug: "expert--body-practice"
+  - expert_slug: "expert--flow-temple-strategist"
+
+model_settings:
+  model: "gemini-2.5-flash"
+  temperature: 0.2
+  max_tokens: 4096
+
+safety_flags:
+  never_overwrite_profiles: true
+  review_status_default: "pending_review"

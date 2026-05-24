@@ -1,0 +1,17 @@
+# LifeOS Domain to Expert Slug Mapping
+# ===========================================
+# This file controls which expert gets auto-suggested when an insight
+# is ingested with a matching domain value in its frontmatter.
+#
+# Format:
+#   domain-key: expert--slug
+#
+# Domain keys come from the 'domain' field in insight YAML frontmatter.
+# Expert slugs must match directory names in data/experts/.
+# Add new entries here when creating new experts - no code changes needed.
+
+ai-platform: expert--ai-systems-architect
+body-practice: expert--body-practice
+flow-temple: expert--flow-temple-strategist
+moxa: expert--flow-temple-strategist
+wellness: expert--flow-temple-strategist

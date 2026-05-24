@@ -1,0 +1,27 @@
+# Save-Insight Skill Configuration
+
+skill_id: "save-insight"
+version: "1.0.0"
+review_required: false
+
+default_folders:
+  knowledge_output: "data/knowledge/ai-resources"
+  raw_transcript_output: "data/private/transcripts"
+
+related_templates:
+  - "templates/insight-note.md"
+
+relevant_expert_mappings:
+  - expert_slug: "expert--ai-systems-architect"
+    tags: ["ai", "systems", "architecture", "agentic"]
+  - expert_slug: "expert--flow-temple-strategist"
+    tags: ["focus", "productivity", "workflows"]
+
+model_settings:
+  model: "gemini-2.5-flash"
+  temperature: 0.1
+  max_tokens: 2048
+
+safety_flags:
+  preserve_raw_on_failure: true
+  prevent_overwrite_existing: true

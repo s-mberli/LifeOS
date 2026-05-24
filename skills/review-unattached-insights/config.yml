@@ -1,0 +1,24 @@
+# Review-Unattached-Insights Skill Configuration
+
+skill_id: "review-unattached-insights"
+version: "1.0.0"
+review_required: false
+
+default_folders:
+  knowledge_root: "data/knowledge"
+  experts_root: "data/experts"
+
+related_templates: []
+
+relevant_expert_mappings:
+  - expert_slug: "expert--ai-systems-architect"
+  - expert_slug: "expert--body-practice"
+  - expert_slug: "expert--flow-temple-strategist"
+
+model_settings:
+  model: "gemini-2.5-flash"
+  temperature: 0.0
+  max_tokens: 512
+
+safety_flags:
+  limit_suggestions_per_note: 2
