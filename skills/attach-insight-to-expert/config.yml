@@ -1,0 +1,20 @@
+# Attach-Insight-to-Expert Skill Configuration
+
+skill_id: "attach-insight-to-expert"
+version: "1.0.0"
+review_required: false
+
+default_folders:
+  experts_root: "data/experts"
+
+related_templates:
+  - "templates/creator-source-note.md"
+
+relevant_expert_mappings:
+  - expert_slug: "expert--ai-systems-architect"
+  - expert_slug: "expert--body-practice"
+  - expert_slug: "expert--flow-temple-strategist"
+
+safety_flags:
+  prevent_duplicate_refs: true
+  auto_rebuild_index: true

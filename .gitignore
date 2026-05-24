@@ -1,0 +1,82 @@
+# ============================================================
+# LifeOS .gitignore — Safe for public GitHub repo
+# ============================================================
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+.env.staging
+
+# Private/sensitive data
+data/private/
+
+# Logs & generated outputs (too large for git)
+logs/
+outputs/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Testing artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Streamlit secrets
+.streamlit/secrets.toml
+
+# macOS
+.DS_Store
+.AppleDouble
+Thumbs.db
+
+# Scratch / one-off dev scripts (never commit these)
+scratch/
+
+# SQLite indexes (rebuilt at startup)
+indexes/*.db
+
+# Raw transcripts (can be very large)
+data/knowledge/raw/
+
+# Raw inbox — unprocessed personal input
+data/inbox/raw/
+data/inbox/processed/raw/
+data/inbox/imports/
+data/inbox/voice/
+
+# Personal config (profile.yml contains real personal info)
+# Use profile.example.yml as the template instead
+config/profile.yml
+config/models.yml
+config/privacy.yml
+
+# ============================================================
+# Explicitly KEEP these (force-include reusable system files)
+# ============================================================
+!modes/
+!templates/
+!scripts/
+!config/profile.example.yml
+!config/domain_map.yaml
+!.env.example
+!README.md
+!AGENTS.md
+!data/README.md
