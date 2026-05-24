@@ -293,12 +293,47 @@ def parse_json_safely(raw_output):
         print(f"  [!] Failed to parse JSON: {e}")
         return None
 
+def load_user_profile():
+    import yaml
+    from pathlib import Path
+    base_dir = Path(__file__).resolve().parent.parent
+    profile_path = base_dir / "config" / "profile.yml"
+    if not profile_path.exists():
+        profile_path = base_dir / "config" / "profile.example.yml"
+    if profile_path.exists():
+        try:
+            with open(profile_path, 'r', encoding='utf-8') as f:
+                parsed = yaml.safe_load(f)
+                return parsed if isinstance(parsed, dict) else {}
+        except Exception:
+            pass
+    return {}
+
 def generate_resource_summary(title, source_url, domain, primary_mode, secondary_modes, raw_content):
+    profile = load_user_profile()
+    user_name = profile.get("name", "Markus")
+    user_role = profile.get("role", "AI Systems Builder & Wellness Entrepreneur")
+    user_prefs = profile.get("preferences", {})
+    comm_style = user_prefs.get("communication_style", "direct, structured, action-oriented")
+    
+    # Format domains for context
+    domains_focus = []
+    for d_entry in profile.get("core_domains", []):
+        d_name = d_entry.get("name", d_entry["id"])
+        d_focus = ", ".join(d_entry.get("focus", []))
+        domains_focus.append(f"- {d_name} ({d_entry['id']}): Focuses on {d_focus}")
+    domains_str = "\n".join(domains_focus) if domains_focus else "- General Life & Career Management"
+
     system_prompt = (
-        "You are LifeOS Research Resource Mode. You turn raw resources into useful structured notes for Markus. "
-        "Be concise, practical, and do not invent facts. Return valid JSON only.\n\n"
-        "CAVEMAN MODE ACTIVE: Keep all text ultra-compressed and technical. Drop articles (a/an/the), filler words, and pleasantries. "
-        "Use fragments. Example: 'Bug in auth' instead of 'There is a bug in the auth module'. Save tokens."
+        f"You are LifeOS Research Resource Mode. You turn raw transcripts, books, and articles into useful, deep, highly personalized structured notes for {user_name}.\n\n"
+        f"User Profile:\n"
+        f"- Name: {user_name}\n"
+        f"- Role: {user_role}\n"
+        f"- Core Domains & Focus Areas:\n{domains_str}\n\n"
+        f"Style & Preference Guidelines:\n"
+        f"- Style: {comm_style}\n"
+        f"- Formatting: Rich, deep, analytical, structured. No generic corporate speak or fluff. Be concrete and specific.\n"
+        f"- Do not invent facts. Return valid JSON only."
     )
     sec_modes_str = ", ".join(secondary_modes) if secondary_modes else "None"
     
@@ -333,7 +368,7 @@ def generate_resource_summary(title, source_url, domain, primary_mode, secondary
         combined_summaries = "\n\n---\n\n".join(f"Chunk {i+1} Summary:\n{s}" for i, s in enumerate(chunk_summaries))
         
         user_prompt = f"""
-Analyze this resource based on the combined chunk summaries:
+Analyze this resource in depth:
 Title: {title}
 URL: {source_url}
 Domain: {domain}
@@ -345,12 +380,18 @@ Combined Chunk Summaries:
 
 Return JSON only in this exact format:
 {{
-  "summary": "string",
-  "key_ideas": ["string"],
-  "why_this_matters_for_markus": ["string"],
+  "summary": "Detailed multi-paragraph summary of the resource's core arguments and worldview.",
+  "key_ideas": [
+    "Key concept 1: Actionable, rich description of what it is and how to apply it.",
+    "Key concept 2: Actionable, rich description..."
+  ],
+  "why_this_matters_for_markus": [
+    "Specific connection to Markus's projects/focus areas (e.g. Flow Temple, AI Brain, routines).",
+    "Specific connection..."
+  ],
   "suggested_tags": ["string"],
   "related_modes": ["string"],
-  "next_action": "string",
+  "next_action": "One concrete, step-by-step next action for Markus to implement (e.g., 'Stack this routine with...', 'Implement this agent workflow...').",
   "source_reliability": "string",
   "confidence": "low|medium|high"
 }}
@@ -358,6 +399,7 @@ Return JSON only in this exact format:
 Note:
 - In "suggested_tags", provide between 6 and 10 high-signal tags.
 - In "source_reliability", explain whether the note is based on video commentary, original paper, official docs, etc.
+- Avoid generic high-level statements. Make every bullet point specific, technical, and concrete.
 """
         final_res = try_providers(system_prompt, user_prompt, 1500)
         if final_res:
@@ -401,7 +443,7 @@ Note:
     else:
         # Single Pass Logic
         user_prompt = f"""
-Analyze this resource:
+Analyze this resource in depth:
 Title: {title}
 URL: {source_url}
 Domain: {domain}
@@ -413,12 +455,18 @@ Content:
 
 Return JSON only in this exact format:
 {{
-  "summary": "string",
-  "key_ideas": ["string"],
-  "why_this_matters_for_markus": ["string"],
+  "summary": "Detailed multi-paragraph summary of the resource's core arguments and worldview.",
+  "key_ideas": [
+    "Key concept 1: Actionable, rich description of what it is and how to apply it.",
+    "Key concept 2: Actionable, rich description..."
+  ],
+  "why_this_matters_for_markus": [
+    "Specific connection to Markus's projects/focus areas (e.g. Flow Temple, AI Brain, routines).",
+    "Specific connection..."
+  ],
   "suggested_tags": ["string"],
   "related_modes": ["string"],
-  "next_action": "string",
+  "next_action": "One concrete, step-by-step next action for Markus to implement (e.g., 'Stack this routine with...', 'Implement this agent workflow...').",
   "source_reliability": "string",
   "confidence": "low|medium|high"
 }}
