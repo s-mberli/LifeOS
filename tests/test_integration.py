@@ -8,13 +8,13 @@ import pytest
 
 # Ensure scripts directory is on sys.path
 ROOT = Path(__file__).resolve().parent.parent
-if str(ROOT / "scripts") not in sys.path:
-    sys.path.insert(0, str(ROOT / "scripts"))
+if str(ROOT / "src") not in sys.path:
+    sys.path.insert(0, str(ROOT / "src"))
 if str(ROOT / "apps" / "streamlit-chat") not in sys.path:
     sys.path.insert(0, str(ROOT / "apps" / "streamlit-chat"))
 
-from scripts.core.ingest import process_one_file
-from scripts.core.frontmatter import read_fm
+from src.core.ingest import process_one_file
+from src.core.frontmatter import read_fm
 from ui.helpers import fts_search, rebuild_search_index
 
 
@@ -59,18 +59,18 @@ def test_youtube_to_chat_e2e(tmp_project: Path):
     with patch("core.youtube.fetch_video_metadata", return_value=mock_metadata), \
          patch("core.youtube.fetch_transcript", return_value=mock_transcript), \
          patch("core.youtube.run_yt_dlp", return_value=MagicMock(returncode=0)), \
-         patch("classify_input.classify", return_value=mock_decision), \
-         patch("llm_client.call_llm", return_value="David Deida interview summary, polarity, sexual polarity."), \
-         patch("build_fts_index.BASE_DIR", tmp_project), \
-         patch("build_fts_index.DB_PATH", tmp_project / "indexes" / "lifeos.db"), \
-         patch("build_fts_index.DIRECTORIES_TO_INDEX", [
+         patch("src.core.classify_input.classify", return_value=mock_decision), \
+         patch("src.core.llm_client.call_llm", return_value="David Deida interview summary, polarity, sexual polarity."), \
+         patch("src.core.build_fts_index.BASE_DIR", tmp_project), \
+         patch("src.core.build_fts_index.DB_PATH", tmp_project / "indexes" / "lifeos.db"), \
+         patch("src.core.build_fts_index.DIRECTORIES_TO_INDEX", [
              tmp_project / "data" / "knowledge",
              tmp_project / "data" / "private",
              tmp_project / "data" / "experts",
          ]), \
          patch("ui.helpers.ROOT", tmp_project), \
          patch("ui.helpers.DB_PATH", tmp_project / "indexes" / "lifeos.db"), \
-         patch("scripts.core.ingest.ROOT", tmp_project):
+         patch("src.core.ingest.ROOT", tmp_project):
 
         # 1. Run the ingestion pipeline
         res = process_one_file(str(input_file), use_ai=True)

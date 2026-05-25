@@ -63,7 +63,7 @@ Use whenever the user reviews unattached insights and decides to assign a note t
 - Direct trigger from the Streamlit UI button clicks by the user.
 
 ## Related Existing Scripts/Functions
-- `scripts/ingest_resource.py` -> `assign_insight_to_expert`.
+- `src/ingest_resource.py` -> `assign_insight_to_expert`.
 - `apps/streamlit-chat/app.py` -> Attach button handlers.
 
 ## Test Ideas

@@ -2,7 +2,7 @@
 scripts/ingest_resource.py — Backwards-compatibility shim.
 
 All logic has been moved into ``scripts/core/``.  This file re-exports
-everything that existing callers depend on so that ``import ingest_resource``
+everything that existing callers depend on so that ``from src.core from src.core import ingest_resource``
 continues to work without modification.
 
 New code should import directly from the relevant ``scripts/core/*`` module.

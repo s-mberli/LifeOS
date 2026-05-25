@@ -1,5 +1,5 @@
 import pytest
-from scripts.core.youtube import extract_video_id, clean_youtube_url
+from src.core.youtube import extract_video_id, clean_youtube_url
 
 def test_extract_video_id_watch_url():
     assert extract_video_id("https://www.youtube.com/watch?v=dQw4w9WgXcQ") == "dQw4w9WgXcQ"

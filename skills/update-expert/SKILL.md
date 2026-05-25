@@ -47,7 +47,7 @@ Use when multiple new source references have been attached to an Expert and the 
 - Full human approval required before changes are written to the actual expert folder.
 
 ## Related Existing Scripts/Functions
-- `scripts/ingest_resource.py` -> `generate_expert_update_suggestion`.
+- `src/ingest_resource.py` -> `generate_expert_update_suggestion`.
 
 ## Test Ideas
 - Attach 2 new notes to an expert, run update-expert, check that an update candidate file is created under `outputs/expert-updates/` and the actual expert files are unchanged.

@@ -69,7 +69,7 @@ flowchart TB
 LifeOS operates on specialized **Experts** rather than a single monolithic chatbot. Each expert is a stateful persona grounded in specific subsets of your knowledge base.
 
 ### 1. Separation of Layers
-- **System Layer**: Code, system prompts, schemas, and configurations (`scripts/`, `apps/`, `config/`).
+- **System Layer**: Code, system prompts, schemas, and configurations (`src/`, `apps/`, `config/`).
 - **User Layer**: Your curated knowledge base, expert profiles, and private resources (`data/`). The application reads the User Layer to construct context but never overwrites human-written files without explicit approval.
 
 ### 2. Expert Routing
@@ -82,7 +82,7 @@ Queries are routed to experts based on declarative mapping (`config/domain_map.y
 | Path | Description |
 |------|-------------|
 | `apps/streamlit-chat/` | The main Streamlit UI. Contains the `app.py` orchestrator and modular `ui/` components (chat, sidebar, modals). |
-| `scripts/core/` | Pure Python business logic: `frontmatter.py`, `youtube.py`, `web.py`, `experts.py`, `ingest.py`. |
+| `src/core/` | Pure Python business logic: `frontmatter.py`, `youtube.py`, `web.py`, `experts.py`, `ingest.py`. |
 | `data/` | Your personal knowledge base. Separated into `knowledge/` (ingested notes), `experts/` (synthesized profiles), and `private/` (your backlog and sensitive data). |
 | `config/` | System configurations, domain maps, and model definitions. |
 | `.gemini/config/skills/` | Built-in interactive Agent Skills that allow AI coding assistants to interact with the LifeOS API. |

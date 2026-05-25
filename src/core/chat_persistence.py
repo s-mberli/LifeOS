@@ -11,7 +11,7 @@ import datetime
 import re
 from pathlib import Path
 
-# Project root — two levels up from scripts/core/chat_persistence.py
+# Project root — two levels up from src/core/chat_persistence.py
 ROOT = Path(__file__).resolve().parent.parent.parent
 
 
@@ -41,7 +41,7 @@ def append_to_daily_chat_log(
         log_dir.mkdir(parents=True, exist_ok=True)
         log_file = log_dir / f"chat-{date_str}.md"
 
-        from scripts.core.frontmatter import read_fm, write_fm
+        from src.core.frontmatter import read_fm, write_fm
 
         if not log_file.exists():
             fm = {
@@ -91,8 +91,8 @@ def save_message_as_insight(
         A tuple of (success, filepath_string).
     """
     try:
-        from scripts.core.frontmatter import write_fm
-        from scripts.core.experts import assign_insight_to_expert
+        from src.core.frontmatter import write_fm
+        from src.core.experts import assign_insight_to_expert
 
         # Derive a title from the user prompt
         first_line = user_prompt.split("\n")[0].strip()
@@ -152,7 +152,7 @@ def save_message_as_insight(
             )
 
         # Rebuild the FTS search index so it is immediately searchable
-        from build_fts_index import build_index
+        from src.core.build_fts_index import build_index
         build_index()
 
         return True, str(out_filepath)

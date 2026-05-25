@@ -10,11 +10,11 @@ from pathlib import Path
 
 import yaml
 
-# Project root — three levels up from scripts/core/ingest.py
+# Project root — three levels up from src/core/ingest.py
 ROOT = Path(__file__).resolve().parent.parent.parent
 
 # Ensure scripts/ is on the path so legacy modules can be imported
-_SCRIPTS_DIR = ROOT / "scripts"
+_SCRIPTS_DIR = ROOT / "src"
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
@@ -213,7 +213,7 @@ def _get_routing_decision(content: str, title: str, source_url: str, is_youtube:
         combined_text = f"{content} {title} {source_url}"
 
     try:
-        from classify_input import classify  # type: ignore
+        from src.core.classify_input import classify  # type: ignore
         decision = classify(combined_text, filepath=str(filepath))
     except Exception as exc:
         log(f"Warning: classify_input failed ({exc}), using fallback routing")
@@ -245,7 +245,7 @@ def _run_ai_summarisation(title: str, source_url: str, channel: str, transcript:
         else f"Content:\n{content}\n\nFetched Web Page Text:\n{fetched_web_text}"
     )
     try:
-        from llm_client import generate_resource_summary  # type: ignore
+        from src.core.llm_client import generate_resource_summary  # type: ignore
         ai_data = generate_resource_summary(
             title=title,
             source_url=source_url,
@@ -426,7 +426,7 @@ def process_one_file(source: str, use_ai: bool = False, status_callback=None) ->
 
     # 13. Rebuild FTS index
     try:
-        from build_fts_index import build_index  # type: ignore
+        from src.core.build_fts_index import build_index  # type: ignore
         idx_res = build_index()
         log(f"Auto-rebuilt search index: {idx_res.get('indexed', '?')} files indexed.")
     except Exception as exc:
@@ -509,8 +509,8 @@ def regenerate_insight_summary(insight_path: Path) -> dict:
     Returns:
         Dict with keys ``success`` (bool), ``error`` (str on failure).
     """
-    from scripts.core.frontmatter import read_fm, write_fm
-    from scripts.llm_client import generate_resource_summary  # type: ignore
+    from src.core.frontmatter import read_fm, write_fm
+    from src.core.llm_client import generate_resource_summary  # type: ignore
 
     try:
         if not insight_path.exists():
@@ -657,7 +657,7 @@ def regenerate_insight_summary(insight_path: Path) -> dict:
 
         # 6. Rebuild FTS index
         try:
-            from build_fts_index import build_index  # type: ignore
+            from src.core.build_fts_index import build_index  # type: ignore
             build_index()
         except Exception:
             pass
@@ -674,5 +674,5 @@ if __name__ == '__main__':
     parser.add_argument("--rebuild-index", action="store_true")
     args = parser.parse_args()
     if args.rebuild_index:
-        from build_fts_index import build_index
+        from src.core.build_fts_index import build_index
         build_index()

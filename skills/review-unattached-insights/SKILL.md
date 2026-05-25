@@ -47,7 +47,7 @@ Use when reviewing the library state, triaging newly processed resources, or doi
 - Full human control in the UI. No notes are attached to experts without explicit approval.
 
 ## Related Existing Scripts/Functions
-- `scripts/ingest_resource.py` -> `scan_unattached_insights`.
+- `src/ingest_resource.py` -> `scan_unattached_insights`.
 - `apps/streamlit-chat/app.py` -> Triage buttons.
 
 ## Test Ideas

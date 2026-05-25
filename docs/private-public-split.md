@@ -11,7 +11,7 @@ These folders contain the structural framework, code, and curated knowledge grap
 - `README.md`
 - `docs/` — Architectural documentation and roadmap.
 - `templates/` — Markdown templates used by the ingestion pipeline.
-- `scripts/` — Core Python backend logic.
+- `src/` — Core Python backend logic.
 - `apps/` — Streamlit UI code.
 - `.env.example` — A blank template showing what keys are needed.
 - `config/profile.example.yml` — A dummy profile config if needed.

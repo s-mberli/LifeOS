@@ -9,13 +9,13 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock
 import pytest
 
-from scripts.core.chat_persistence import append_to_daily_chat_log, save_message_as_insight
-from scripts.core.frontmatter import read_fm
+from src.core.chat_persistence import append_to_daily_chat_log, save_message_as_insight
+from src.core.frontmatter import read_fm
 
 
 def test_append_to_daily_chat_log(tmp_project: Path):
     """Test that chat logs are appended correctly and write valid frontmatter."""
-    with patch("scripts.core.chat_persistence.ROOT", tmp_project):
+    with patch("src.core.chat_persistence.ROOT", tmp_project):
         success = append_to_daily_chat_log(
             user_prompt="Who is David Deida?",
             assistant_response="He is a spiritual teacher.",
@@ -57,9 +57,9 @@ def test_save_message_as_insight(tmp_project: Path):
     expert_dir.mkdir(parents=True, exist_ok=True)
     (expert_dir / "profile.md").write_text("# Profile", encoding="utf-8")
 
-    with patch("scripts.core.chat_persistence.ROOT", tmp_project), \
-         patch("scripts.core.experts.ROOT", tmp_project), \
-         patch("build_fts_index.build_index", return_value={"indexed": 1, "skipped": 0}):
+    with patch("src.core.chat_persistence.ROOT", tmp_project), \
+         patch("src.core.experts.ROOT", tmp_project), \
+         patch("src.core.build_fts_index.build_index", return_value={"indexed": 1, "skipped": 0}):
 
         success, out_path_str = save_message_as_insight(
             user_prompt="Explain intimacy practices",
@@ -95,8 +95,8 @@ def test_save_message_as_insight(tmp_project: Path):
 
 def test_save_message_as_insight_empty_history(tmp_project: Path):
     """Test that saving a message works even if user question is empty/blank."""
-    with patch("scripts.core.chat_persistence.ROOT", tmp_project), \
-         patch("build_fts_index.build_index", return_value={"indexed": 1, "skipped": 0}):
+    with patch("src.core.chat_persistence.ROOT", tmp_project), \
+         patch("src.core.build_fts_index.build_index", return_value={"indexed": 1, "skipped": 0}):
 
         success, out_path_str = save_message_as_insight(
             user_prompt="",
@@ -115,8 +115,8 @@ def test_save_message_as_insight_empty_history(tmp_project: Path):
 
 def test_save_message_as_insight_write_error(tmp_project: Path):
     """Test that saving handles file write errors gracefully by returning success=False."""
-    with patch("scripts.core.chat_persistence.ROOT", tmp_project), \
-         patch("scripts.core.frontmatter.write_fm", side_effect=OSError("Disk full")):
+    with patch("src.core.chat_persistence.ROOT", tmp_project), \
+         patch("src.core.frontmatter.write_fm", side_effect=OSError("Disk full")):
 
         success, out_path_str = save_message_as_insight(
             user_prompt="Write error test",

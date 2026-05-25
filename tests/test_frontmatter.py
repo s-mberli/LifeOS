@@ -1,6 +1,6 @@
 import pytest
 from pathlib import Path
-from scripts.core.frontmatter import read_fm, write_fm, update_fm
+from src.core.frontmatter import read_fm, write_fm, update_fm
 
 def test_read_fm_with_frontmatter(tmp_path):
     p = tmp_path / "test.md"

@@ -12,8 +12,8 @@ from pathlib import Path
 # Resolve the project root (3 levels up from this file).
 ROOT = Path(__file__).resolve().parent.parent.parent
 
-# scripts/ must be on sys.path so ui/ modules can import project scripts.
-sys.path.insert(0, str(ROOT / "scripts"))
+# src/ must be on sys.path so ui/ modules can import project scripts.
+sys.path.insert(0, str(ROOT))
 
 # Add this file's directory so that `from ui.xxx import …` resolves correctly
 # whether the app is launched from the project root or from this directory.
@@ -40,55 +40,10 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-st.markdown(
-    """
-    <style>
-    /* Center the main app block to 850px */
-    .block-container {
-        max-width: 850px !important;
-        padding-top: 3rem !important;
-        padding-bottom: 5rem !important;
-    }
-
-    /* Subtle typography improvements */
-    p, div, span, label, li {
-        line-height: 1.6;
-    }
-
-    /* Pill and Button hover animations */
-    .stSegmentedControl label, .stButton button {
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-    .stSegmentedControl label:hover, .stButton button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
-    }
-
-    /* Glassmorphic Chat Input */
-    [data-testid="stChatInput"] {
-        background: rgba(30, 41, 59, 0.75) !important;
-        backdrop-filter: blur(12px) !important;
-        border-radius: 20px !important;
-        border: 1px solid rgba(255,255,255,0.05) !important;
-    }
-
-    /* Chat message bubbles */
-    [data-testid="stChatMessage"] {
-        background: #1E293B !important;
-        border-radius: 12px !important;
-        padding: 1.5rem !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
-        margin-bottom: 1rem !important;
-        border: 1px solid rgba(255,255,255,0.05) !important;
-    }
-
-    /* Hide default streamlit branding in footer */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+css_path = Path(__file__).parent / "ui" / "assets" / "style.css"
+if css_path.exists():
+    with open(css_path, "r", encoding="utf-8") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # ── Render ────────────────────────────────────────────────────────────────────
 render_sidebar()

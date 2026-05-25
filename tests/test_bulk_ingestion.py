@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock
 import pytest
 
-from scripts.core.ingest import process_directory
+from src.core.ingest import process_directory
 
 
 def test_process_directory(tmp_project: Path):
@@ -43,9 +43,9 @@ def test_process_directory(tmp_project: Path):
     # Ensure target storage location exists in tmp_project
     (tmp_project / "data" / "knowledge" / "general").mkdir(parents=True, exist_ok=True)
 
-    with patch("scripts.core.ingest.ROOT", tmp_project), \
-         patch("classify_input.classify", return_value=mock_decision), \
-         patch("build_fts_index.build_index", return_value={"indexed": 3, "skipped": 0}):
+    with patch("src.core.ingest.ROOT", tmp_project), \
+         patch("src.core.classify_input.classify", return_value=mock_decision), \
+         patch("src.core.build_fts_index.build_index", return_value={"indexed": 3, "skipped": 0}):
 
         res = process_directory(src_dir, use_ai=False)
 
@@ -107,9 +107,9 @@ def test_process_directory_mixed_extensions(tmp_project: Path):
     }
     (tmp_project / "data" / "knowledge" / "general").mkdir(parents=True, exist_ok=True)
 
-    with patch("scripts.core.ingest.ROOT", tmp_project), \
-         patch("classify_input.classify", return_value=mock_decision), \
-         patch("build_fts_index.build_index", return_value={"indexed": 1, "skipped": 0}):
+    with patch("src.core.ingest.ROOT", tmp_project), \
+         patch("src.core.classify_input.classify", return_value=mock_decision), \
+         patch("src.core.build_fts_index.build_index", return_value={"indexed": 1, "skipped": 0}):
 
         res = process_directory(src_dir, use_ai=False)
 

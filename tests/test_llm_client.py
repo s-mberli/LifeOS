@@ -19,7 +19,7 @@ import pytest
 # Ensure scripts/ is importable
 # ---------------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parent.parent
-SCRIPTS_DIR = ROOT / "scripts"
+SCRIPTS_DIR = ROOT / "src"
 
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
@@ -59,7 +59,7 @@ class TestCallLlmPlainStringPrompt:
 
     def test_returns_string_content(self):
         """When try_providers succeeds, call_llm must return just the text string."""
-        with patch("llm_client.try_providers", return_value=_FAKE_RESULT) as mock_tp:
+        with patch("src.core.llm_client.try_providers", return_value=_FAKE_RESULT) as mock_tp:
             from llm_client import call_llm
 
             result = call_llm("Tell me about AI.")
@@ -70,7 +70,7 @@ class TestCallLlmPlainStringPrompt:
 
     def test_passes_prompt_to_try_providers(self):
         """call_llm must forward the user prompt string to try_providers."""
-        with patch("llm_client.try_providers", return_value=_FAKE_RESULT) as mock_tp:
+        with patch("src.core.llm_client.try_providers", return_value=_FAKE_RESULT) as mock_tp:
             from llm_client import call_llm
 
             call_llm("Hello, world!")
@@ -81,7 +81,7 @@ class TestCallLlmPlainStringPrompt:
 
     def test_default_system_prompt_used(self):
         """call_llm must use its default system prompt when none is provided."""
-        with patch("llm_client.try_providers", return_value=_FAKE_RESULT) as mock_tp:
+        with patch("src.core.llm_client.try_providers", return_value=_FAKE_RESULT) as mock_tp:
             from llm_client import call_llm
 
             call_llm("Any question")
@@ -95,7 +95,7 @@ class TestCallLlmPlainStringPrompt:
     def test_custom_system_prompt_forwarded(self):
         """A custom system_prompt kwarg must be forwarded to try_providers."""
         custom_sys = "You are a pirate."
-        with patch("llm_client.try_providers", return_value=_FAKE_RESULT) as mock_tp:
+        with patch("src.core.llm_client.try_providers", return_value=_FAKE_RESULT) as mock_tp:
             from llm_client import call_llm
 
             call_llm("Hello", system_prompt=custom_sys)
@@ -123,7 +123,7 @@ class TestCallLlmMessagesFormat:
             {"role": "system", "content": "You are helpful."},
             {"role": "user", "content": "What is 2+2?"},
         ]
-        with patch("llm_client.try_providers", return_value=_FAKE_RESULT):
+        with patch("src.core.llm_client.try_providers", return_value=_FAKE_RESULT):
             from llm_client import call_llm
 
             # call_llm's first positional arg is `prompt`; passing a list
@@ -141,7 +141,7 @@ class TestCallLlmMessagesFormat:
     def test_messages_list_returns_content_string_if_supported(self):
         """If the implementation forwards the list, the returned value is a str."""
         messages = [{"role": "user", "content": "Summarise AI trends."}]
-        with patch("llm_client.try_providers", return_value=_FAKE_RESULT):
+        with patch("src.core.llm_client.try_providers", return_value=_FAKE_RESULT):
             from llm_client import call_llm
 
             try:
@@ -162,7 +162,7 @@ class TestCallLlmAllProvidersFail:
 
     def test_returns_none_on_total_failure(self):
         """If try_providers returns None, call_llm must propagate None."""
-        with patch("llm_client.try_providers", return_value=None):
+        with patch("src.core.llm_client.try_providers", return_value=None):
             from llm_client import call_llm
 
             result = call_llm("This will fail.")
@@ -171,7 +171,7 @@ class TestCallLlmAllProvidersFail:
 
     def test_try_providers_called_even_on_failure(self):
         """try_providers must still be invoked (not short-circuited) on failure."""
-        with patch("llm_client.try_providers", return_value=None) as mock_tp:
+        with patch("src.core.llm_client.try_providers", return_value=None) as mock_tp:
             from llm_client import call_llm
 
             call_llm("fail test")
@@ -180,7 +180,7 @@ class TestCallLlmAllProvidersFail:
 
     def test_no_exception_raised_on_total_failure(self):
         """call_llm must swallow provider failures gracefully (no exception)."""
-        with patch("llm_client.try_providers", return_value=None):
+        with patch("src.core.llm_client.try_providers", return_value=None):
             from llm_client import call_llm
 
             try:
@@ -191,9 +191,9 @@ class TestCallLlmAllProvidersFail:
 
     def test_individual_providers_all_return_none(self):
         """Simulate each provider function returning None; try_providers must return None."""
-        with patch("llm_client.call_azure", return_value=None), \
-             patch("llm_client.call_gemini", return_value=None), \
-             patch("llm_client.call_openrouter", return_value=None):
+        with patch("src.core.llm_client.call_azure", return_value=None), \
+             patch("src.core.llm_client.call_gemini", return_value=None), \
+             patch("src.core.llm_client.call_openrouter", return_value=None):
             from llm_client import try_providers
 
             result = try_providers("system prompt", "user prompt", 500)

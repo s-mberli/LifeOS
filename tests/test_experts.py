@@ -5,7 +5,7 @@ Covers:
 - ``slugify_expert_name`` (currently in ``scripts/ingest_resource.py``)
 - ``get_existing_experts`` (planned in ``scripts/core/experts.py``)
 
-All tests for the future ``scripts.core.experts`` module are guarded with
+All tests for the future ``src.core.experts`` module are guarded with
 ``pytest.mark.skipif`` so the suite remains green while that module is absent.
 """
 import importlib
@@ -17,10 +17,10 @@ import pytest
 # ---------------------------------------------------------------------------
 # Optional import of the future core.experts module
 # ---------------------------------------------------------------------------
-_CORE_EXPERTS_AVAILABLE = importlib.util.find_spec("scripts.core.experts") is not None
+_CORE_EXPERTS_AVAILABLE = importlib.util.find_spec("src.core.experts") is not None
 
 ROOT = Path(__file__).resolve().parent.parent
-SCRIPTS_DIR = ROOT / "scripts"
+SCRIPTS_DIR = ROOT / "src"
 
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
@@ -86,16 +86,16 @@ class TestSlugifyExpertName:
 
 
 # ---------------------------------------------------------------------------
-# Tests: get_existing_experts (future scripts.core.experts)
+# Tests: get_existing_experts (future src.core.experts)
 # ---------------------------------------------------------------------------
 
 
 @pytest.mark.skipif(
     not _CORE_EXPERTS_AVAILABLE,
-    reason="scripts.core.experts not yet implemented",
+    reason="src.core.experts not yet implemented",
 )
 class TestGetExistingExperts:
-    """Tests for ``scripts.core.experts.get_existing_experts``.
+    """Tests for ``src.core.experts.get_existing_experts``.
 
     The real API signature is: ``get_existing_experts(root: Path) -> list[dict]``
     where each dict has keys ``slug``, ``display_name``, and ``path``.
@@ -104,7 +104,7 @@ class TestGetExistingExperts:
     @pytest.fixture(autouse=True)
     def _import_core(self):
         """Import the core experts module."""
-        import scripts.core.experts as experts_mod  # noqa: F401
+        import src.core.experts as experts_mod  # noqa: F401
 
         self._mod = experts_mod
         self._fn = experts_mod.get_existing_experts
@@ -150,15 +150,15 @@ class TestGetExistingExperts:
 
 @pytest.mark.skipif(
     not _CORE_EXPERTS_AVAILABLE,
-    reason="scripts.core.experts not yet implemented",
+    reason="src.core.experts not yet implemented",
 )
 class TestCreateEmptyExpert:
-    """Tests for ``scripts.core.experts.create_empty_expert``."""
+    """Tests for ``src.core.experts.create_empty_expert``."""
 
     @pytest.fixture(autouse=True)
     def _import_core(self):
         """Import the core experts module."""
-        import scripts.core.experts as experts_mod
+        import src.core.experts as experts_mod
         self._mod = experts_mod
         self._fn = experts_mod.create_empty_expert
 
@@ -180,7 +180,7 @@ class TestCreateEmptyExpert:
             assert (expert_dir / "evidence.md").exists()
             
             # Verify profile metadata
-            from scripts.core.frontmatter import read_fm
+            from src.core.frontmatter import read_fm
             profile_fm, profile_body = read_fm(expert_dir / "profile.md")
             assert profile_fm["expert"] == "Jane Doe"
             assert profile_fm["expert_slug"] == "expert--jane-doe"
