@@ -419,3 +419,88 @@ def construct_chat_prompts(
 
     return system_prompt, user_prompt
 
+
+def execute_agent_search_loop(
+    system_prompt: str,
+    user_prompt: str,
+    history: Optional[list] = None,
+    allowed_paths: Optional[set] = None,
+    max_turns: int = 3,
+) -> tuple[str, list[tuple[str, str]]]:
+    """Execute an agentic loop allowing the LLM to call the FTS search tool.
+
+    Uses a robust, provider-agnostic XML format:
+    <call:fts_search>search query</call:fts_search>
+
+    Args:
+        system_prompt: The initial system prompt.
+        user_prompt:   The user prompt / question.
+        history:       Conversation history.
+        allowed_paths: Optional filter paths for FTS search.
+        max_turns:     Max number of tool call iterations.
+
+    Returns:
+        A tuple of (final_response_text, list_of_tool_calls_made).
+        Each tool call is a tuple of (search_query, formatted_results).
+    """
+    import re
+
+    # Inject tool-use instructions into the system prompt
+    tool_instructions = (
+        "\n\n=== Tool Access ===\n"
+        "You have access to a search tool: fts_search.\n"
+        "If you need to query the database/vault for specific facts, insights, or details "
+        "not present in your active context, output an XML tag exactly like this:\n"
+        "<call:fts_search>your query here</call:fts_search>\n"
+        "Do not explain the call, do not output any other text when calling a tool.\n"
+        "After you output the tag, the system will execute it and provide the results.\n"
+    )
+    augmented_system = system_prompt + tool_instructions
+    
+    current_history = list(history) if history else []
+    calls_made = []
+
+    for _ in range(max_turns):
+        response = ask_llm_chat(augmented_system, user_prompt, history=current_history)
+        if not response:
+            break
+
+        # Check for tool call pattern
+        match = re.search(r"<call:fts_search>(.*?)</call:fts_search>", response, re.DOTALL)
+        if not match:
+            # No tool call; return this as final response
+            return response, calls_made
+
+        # We found a tool call! Extract query and execute it
+        query = match.group(1).strip()
+        
+        # Execute FTS search
+        results = fts_search(query, limit=3, allowed_paths=allowed_paths)
+        
+        # Format results
+        if results:
+            formatted_list = []
+            for r_title, r_path, r_snippet, _ in results:
+                formatted_list.append(f"{r_title} ({r_path}):\n{r_snippet}")
+            results_str = "\n\n".join(formatted_list)
+        else:
+            results_str = "No results found in knowledge base."
+
+        # Record the call
+        calls_made.append((query, results_str))
+
+        # Append assistant's tool invocation and user's tool response to history
+        current_history.append({"role": "assistant", "content": response})
+        current_history.append({
+            "role": "user",
+            "content": (
+                f"<response:fts_search>\n{results_str}\n</response:fts_search>\n"
+                f"Use the above search results to complete your answer."
+            )
+        })
+
+    # Fallback/exhausted turns: get final answer
+    final_response = ask_llm_chat(augmented_system, user_prompt, history=current_history)
+    return final_response, calls_made
+
+
