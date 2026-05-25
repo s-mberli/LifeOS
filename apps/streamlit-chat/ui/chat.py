@@ -197,7 +197,18 @@ def _render_chat_body() -> None:
             # Provide the last 5 prior messages as conversation history
             history = st.session_state.get("messages", [])[-6:-1]
 
-            answer_text = ask_llm_chat(system_prompt, user_prompt, history=history)
+            from .helpers import execute_agent_search_loop
+            answer_text, calls_made = execute_agent_search_loop(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                history=history,
+                allowed_paths=allowed_paths if allowed_paths else None,
+            )
+
+            # Show visual indicators of agent searches
+            if calls_made:
+                for q, _ in calls_made:
+                    st.toast(f"🔍 Agent searched: '{q}'")
 
             if answer_text and not answer_text.startswith("[LLM Error]"):
                 st.write(answer_text)
