@@ -46,11 +46,37 @@ def _render_chat_body() -> None:
     # ── Session state initialisation ────────────────────────────────────────
     if "messages" not in st.session_state:
         st.session_state.messages = []
+    if "saved_msg_indices" not in st.session_state:
+        st.session_state.saved_msg_indices = set()
 
     # ── Message history ──────────────────────────────────────────────────────
     messages_container = st.container()
-    for msg in st.session_state.messages:
-        messages_container.chat_message(msg["role"]).write(msg["content"])
+    for idx, msg in enumerate(st.session_state.messages):
+        with messages_container.chat_message(msg["role"]):
+            st.write(msg["content"])
+            if msg["role"] == "assistant" and not msg["content"].startswith("[LLM Error]"):
+                if idx in st.session_state.saved_msg_indices:
+                    st.caption("✅ Saved to Library")
+                else:
+                    user_prompt = ""
+                    for prev_idx in range(idx - 1, -1, -1):
+                        if st.session_state.messages[prev_idx]["role"] == "user":
+                            user_prompt = st.session_state.messages[prev_idx]["content"]
+                            break
+                    if st.button("💾 Save Insight to Library", key=f"save_insight_{idx}"):
+                        from core.chat_persistence import save_message_as_insight
+                        success, file_path = save_message_as_insight(
+                            user_prompt=user_prompt,
+                            assistant_response=msg["content"],
+                            expert_slug=msg.get("expert_slug"),
+                            expert_name=msg.get("expert_name"),
+                        )
+                        if success:
+                            st.session_state.saved_msg_indices.add(idx)
+                            st.success("Saved as insight note!")
+                            st.rerun()
+                        else:
+                            st.error("Failed to save insight.")
 
     # ── Context Selection ────────────────────────────────────────────────────
     existing_experts = get_existing_experts()
@@ -150,48 +176,6 @@ def _render_chat_body() -> None:
                         target_expert = item["data"]
                         break
 
-            # Pre-load context from selected scopes and expert core files
-            context_blocks: list[str] = []
-            loaded_paths: set[str] = set()
-
-            # 1. Load active expert core files (profile, playbook, principles, evidence)
-            if target_expert:
-                slug = target_expert["slug"]
-                for doc in ("profile.md", "playbook.md", "principles.md", "evidence.md"):
-                    doc_path = f"data/experts/{slug}/{doc}"
-                    full_path = ROOT / doc_path
-                    if full_path.exists():
-                        try:
-                            note_content = full_path.read_text(encoding="utf-8")[:15000]
-                            context_blocks.append(
-                                f"### Expert Core Profile ({doc})\n"
-                                f"Path: {doc_path}\n\n"
-                                f"{note_content}"
-                            )
-                            loaded_paths.add(doc_path)
-                        except Exception:
-                            pass
-
-            # 2. Load explicitly selected file scopes
-            if selected_scopes:
-                for scope in selected_scopes:
-                    item = options_map[scope]
-                    if item["type"] == "file":
-                        file_path = item["data"]["path"]
-                        if file_path not in loaded_paths:
-                            full_path = ROOT / file_path
-                            if full_path.exists():
-                                try:
-                                    note_content = full_path.read_text(encoding="utf-8")[:15000]
-                                    context_blocks.append(
-                                        f"### Selected Note: {item['title']}\n"
-                                        f"Path: {file_path}\n\n"
-                                        f"{note_content}"
-                                    )
-                                    loaded_paths.add(file_path)
-                                except Exception:
-                                    pass
-
             # FTS retrieval
             results = fts_search(
                 prompt,
@@ -200,50 +184,14 @@ def _render_chat_body() -> None:
                 require_insight_note=require_insight_note,
             )
 
-            # Append FTS results if not already loaded
-            for title, path, snippet, _ in results:
-                if path not in loaded_paths:
-                    full_path = ROOT / path
-                    if full_path.exists():
-                        try:
-                            note_content = full_path.read_text(encoding="utf-8")[:15000]
-                        except Exception:
-                            note_content = snippet
-                    else:
-                        note_content = snippet
-                    context_blocks.append(
-                        f"### {title}\nPath: {path}\n\n{note_content}"
-                    )
-                    loaded_paths.add(path)
-
-            retrieved_context = (
-                "\n\n---\n\n".join(context_blocks)
-                if context_blocks
-                else "No relevant notes found in knowledge base."
-            )
-
-            if target_expert:
-                system_prompt = (
-                    f"You are LifeOS operating as "
-                    f"{target_expert['display_name']}."
-                )
-            else:
-                system_prompt = (
-                    "You are LifeOS, a local-first personal AI operating system."
-                )
-
-            system_prompt += (
-                "\n\nYour job:\n"
-                "- Answer the user's question using the retrieved notes as context.\n"
-                "- Be concise and practical.\n"
-                "- Do NOT invent facts.\n"
-                "- If the context contains a summary rather than the full raw transcript, answer based on the summary. Do NOT ask the user to provide the link or transcript to you."
-            )
-
-            user_prompt = (
-                f"Question: {prompt}\n\n"
-                f"Relevant Notes from Knowledge Base:\n{retrieved_context}\n\n"
-                "Please answer based on the above context."
+            from .helpers import construct_chat_prompts
+            system_prompt, user_prompt = construct_chat_prompts(
+                target_expert=target_expert,
+                prompt=prompt,
+                selected_scopes=selected_scopes,
+                options_map=options_map,
+                fts_results=results,
+                root_dir=ROOT,
             )
 
             # Provide the last 5 prior messages as conversation history
@@ -253,9 +201,22 @@ def _render_chat_body() -> None:
 
             if answer_text and not answer_text.startswith("[LLM Error]"):
                 st.write(answer_text)
-                st.session_state.messages.append(
-                    {"role": "assistant", "content": answer_text}
-                )
+                assistant_msg = {"role": "assistant", "content": answer_text}
+                if target_expert:
+                    assistant_msg["expert_slug"] = target_expert["slug"]
+                    assistant_msg["expert_name"] = target_expert["display_name"]
+                st.session_state.messages.append(assistant_msg)
+
+                # Auto-log to daily chat logs
+                try:
+                    from core.chat_persistence import append_to_daily_chat_log
+                    append_to_daily_chat_log(
+                        user_prompt=prompt,
+                        assistant_response=answer_text,
+                        expert_slug=target_expert["slug"] if target_expert else None,
+                    )
+                except Exception as log_exc:
+                    print(f"Auto-log failed: {log_exc}")
 
                 # Source attribution popover
                 if results:

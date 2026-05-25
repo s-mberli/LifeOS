@@ -295,3 +295,127 @@ def auto_route_prompt(prompt: str) -> dict:
         return route_input(prompt)
     except Exception as exc:  # pragma: no cover
         return {"domain": "general", "error": str(exc)}
+
+
+def construct_chat_prompts(
+    target_expert: Optional[dict],
+    prompt: str,
+    selected_scopes: list,
+    options_map: dict,
+    fts_results: list[tuple],
+    root_dir: Path,
+) -> tuple[str, str]:
+    """Build the system_prompt and user_prompt separating Hot vs Vault memory.
+
+    Tier 1 (Hot Memory) -> system_prompt (Expert profile, playbook, principles).
+    Tier 2 (Vault Memory) -> user_prompt (Expert evidence, selected files, FTS results).
+    """
+    # ── Hot Memory: Expert Persona/Playbook/Principles ────────────────────────
+    expert_instructions = []
+    if target_expert:
+        slug = target_expert["slug"]
+        for doc in ("profile.md", "playbook.md", "principles.md"):
+            doc_path = root_dir / "data" / "experts" / slug / doc
+            if doc_path.exists():
+                try:
+                    note_content = doc_path.read_text(encoding="utf-8")[:10000]
+                    expert_instructions.append(
+                        f"=== Expert {doc.split('.')[0].upper()} ===\n"
+                        f"{note_content}"
+                    )
+                except Exception:
+                    pass
+
+    if target_expert:
+        system_prompt = (
+            f"You are LifeOS operating as the expert: {target_expert['display_name']}.\n\n"
+        )
+        if expert_instructions:
+            system_prompt += (
+                "Adopt the persona, values, and guidelines defined in your expert profile:\n"
+                + "\n\n".join(expert_instructions) + "\n\n"
+            )
+    else:
+        system_prompt = (
+            "You are LifeOS, a local-first personal AI operating system."
+        )
+
+    system_prompt += (
+        "\n\nYour job:\n"
+        "- Answer the user's question using the retrieved notes as context.\n"
+        "- Be concise and practical.\n"
+        "- Do NOT invent facts.\n"
+        "- Adopt the style, tone, and directives of the active expert profile (if loaded).\n"
+        "- If the context contains a summary rather than the full raw transcript, answer based on the summary. Do NOT ask the user to provide the link or transcript to you."
+    )
+
+    # ── Vault Memory: Facts and Context ───────────────────────────────────────
+    context_blocks: list[str] = []
+    loaded_paths: set[str] = set()
+
+    # 1. Load active expert evidence (Tier 2 Vault, NOT Hot memory instructions)
+    if target_expert:
+        slug = target_expert["slug"]
+        evidence_path = root_dir / "data" / "experts" / slug / "evidence.md"
+        if evidence_path.exists():
+            try:
+                note_content = evidence_path.read_text(encoding="utf-8")[:15000]
+                context_blocks.append(
+                    f"### Expert Core Profile (evidence.md)\n"
+                    f"Path: data/experts/{slug}/evidence.md\n\n"
+                    f"{note_content}"
+                )
+                loaded_paths.add(f"data/experts/{slug}/evidence.md")
+            except Exception:
+                pass
+
+    # 2. Load explicitly selected file scopes
+    if selected_scopes:
+        for scope in selected_scopes:
+            item = options_map.get(scope)
+            if item and item["type"] == "file":
+                file_path = item["data"]["path"]
+                if file_path not in loaded_paths:
+                    full_path = root_dir / file_path
+                    if full_path.exists():
+                        try:
+                            note_content = full_path.read_text(encoding="utf-8")[:15000]
+                            context_blocks.append(
+                                f"### Selected Note: {item['data'].get('title', file_path)}\n"
+                                f"Path: {file_path}\n\n"
+                                f"{note_content}"
+                            )
+                            loaded_paths.add(file_path)
+                        except Exception:
+                            pass
+
+    # 3. Append FTS results
+    for title, path, snippet, _ in fts_results:
+        if path not in loaded_paths:
+            full_path = root_dir / path
+            if full_path.exists():
+                try:
+                    note_content = full_path.read_text(encoding="utf-8")[:15000]
+                except Exception:
+                    note_content = snippet
+            else:
+                note_content = snippet
+            context_blocks.append(
+                f"### {title}\nPath: {path}\n\n{note_content}"
+            )
+            loaded_paths.add(path)
+
+    retrieved_context = (
+        "\n\n---\n\n".join(context_blocks)
+        if context_blocks
+        else "No relevant notes found in knowledge base."
+    )
+
+    user_prompt = (
+        f"Question: {prompt}\n\n"
+        f"Relevant Notes from Knowledge Base:\n{retrieved_context}\n\n"
+        "Please answer based on the above context."
+    )
+
+    return system_prompt, user_prompt
+
