@@ -19,7 +19,7 @@ ROOT: Path = Path(__file__).resolve().parent.parent.parent.parent
 DB_PATH: Path = ROOT / "indexes" / "lifeos.db"
 
 # Ensure scripts/ is on the path so we can import project scripts.
-_SCRIPTS_DIR = str(ROOT / "scripts")
+_SCRIPTS_DIR = str(ROOT)
 if _SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, _SCRIPTS_DIR)
 
@@ -230,7 +230,7 @@ def rebuild_search_index() -> dict:
         includes keys such as ``indexed``, ``skipped``, and optionally
         ``error``.
     """
-    import build_fts_index  # noqa: PLC0415 – imported here to keep module-level imports clean
+    from src.core import build_fts_index  # noqa: PLC0415 – imported here to keep module-level imports clean
 
     return build_fts_index.build_index()
 
@@ -259,7 +259,7 @@ def ask_llm_chat(
         failure.
     """
     try:
-        from llm_client import call_llm  # noqa: PLC0415
+        from src.core.llm_client import call_llm  # noqa: PLC0415
 
         messages: list[dict] = [{"role": "system", "content": system_prompt}]
 
@@ -290,7 +290,7 @@ def auto_route_prompt(prompt: str) -> dict:
         Falls back to ``{"domain": "general", "error": str(exc)}`` on failure.
     """
     try:
-        from auto_router import route_input  # noqa: PLC0415
+        from src.core.classify_input import route_input  # noqa: PLC0415
 
         return route_input(prompt)
     except Exception as exc:  # pragma: no cover

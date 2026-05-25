@@ -14,8 +14,8 @@ import pytest
 # Ensure scripts and ui folders are in python path
 ROOT = Path(__file__).resolve().parent.parent
 UI_DIR = ROOT / "apps" / "streamlit-chat"
-if str(ROOT / "scripts") not in sys.path:
-    sys.path.insert(0, str(ROOT / "scripts"))
+if str(ROOT / "src") not in sys.path:
+    sys.path.insert(0, str(ROOT / "src"))
 if str(UI_DIR) not in sys.path:
     sys.path.insert(0, str(UI_DIR))
 

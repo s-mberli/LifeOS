@@ -66,7 +66,7 @@ Use whenever the user wants to consult their local expert network on a specific 
 
 ## Related Existing Scripts/Functions
 - `apps/streamlit-chat/app.py` -> `fts_search` and chat execution flow.
-- `scripts/llm_client.py` -> LLM API calls.
+- `src/llm_client.py` -> LLM API calls.
 
 ## Test Ideas
 - Query an expert with a question whose answer is present in a single attached source. Verify the answer is generated and includes the citation.

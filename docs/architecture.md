@@ -62,8 +62,8 @@ The codebase maps to the paradigm as follows:
 - **`data/knowledge/`**: The Knowledge base.
 - **`data/experts/`**: The Expert profiles.
 - **`skills/`**: Stateless Skill declarations for `save-insight`, `attach-insight-to-expert`, `ask-expert`, `update-expert`, `review-unattached-insights`, and `generate-portfolio-case-study`.
-- **`scripts/` & `apps/streamlit-chat/`**: Realizations of Skills, Connectors, and Triggers.
+- **`src/` & `apps/streamlit-chat/`**: Realizations of Skills, Connectors, and Triggers.
   - `apps/streamlit-chat/app.py` is the main **UI Trigger** and executes UI portions of `ask-expert`, `attach-insight-to-expert`, and `review-unattached-insights`.
-  - `scripts/ingest_resource.py` is the execution engine for `save-insight`, `update-expert`, and backend portions of `review-unattached-insights`.
+  - `src/ingest_resource.py` is the execution engine for `save-insight`, `update-expert`, and backend portions of `review-unattached-insights`.
 - **`config/`**: System-wide profiles and configurations.
 

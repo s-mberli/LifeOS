@@ -19,7 +19,7 @@ Use whenever the user inputs a new YouTube link, article URL, or raw text chunk 
 
 ### Outputs
 - **Insight Note**: Created at `data/knowledge/insights/` or matching domain subfolders.
-- **Raw Transcript / Source**: Saved to `data/private/transcripts/` or raw subfolders.
+- **Raw Transcript / Source**: Saved to `data/private/transrc/` or raw subfolders.
 - **Search Index Update**: Appends/rebuilds FTS5 search index database.
 
 ---
@@ -56,9 +56,9 @@ Use whenever the user inputs a new YouTube link, article URL, or raw text chunk 
 - The user reviews the generated Insight Note under "Search Library" or "Review Unattached Insights" tabs. No expert files or cognitive profiles are modified automatically.
 
 ## Related Existing Scripts/Functions
-- `scripts/ingest_resource.py` -> `process_one_file` and parser helpers.
-- `scripts/llm_client.py` -> LLM API calls.
-- `scripts/build_fts_index.py` -> FTS search index rebuilds.
+- `src/ingest_resource.py` -> `process_one_file` and parser helpers.
+- `src/llm_client.py` -> LLM API calls.
+- `src/build_fts_index.py` -> FTS search index rebuilds.
 
 ## Test Ideas
 - Run ingestion script with a known YouTube URL containing a valid transcript. Check that the generated note has `type: insight_note` and the transcript is in the raw subfolder.

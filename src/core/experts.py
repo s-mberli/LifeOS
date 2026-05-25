@@ -43,7 +43,7 @@ def _load_domain_map() -> dict[str, str]:
 def _read_insight_fm(insight_path: Path) -> dict:
     """Read frontmatter from an insight note.  Returns empty dict on failure."""
     # Local import to avoid circular dependency at module level
-    from scripts.core.frontmatter import read_fm  # type: ignore
+    from src.core.frontmatter import read_fm  # type: ignore
 
     try:
         fm, _ = read_fm(insight_path)
@@ -130,7 +130,7 @@ def assign_insight_to_expert(
         Dict with keys ``success`` (bool), ``expert_dir`` (str on success),
         and ``error`` (str on failure).
     """
-    from scripts.core.frontmatter import read_fm, write_fm, update_fm  # type: ignore
+    from src.core.frontmatter import read_fm, write_fm, update_fm  # type: ignore
 
     try:
         expert_dir = ROOT / "data" / "experts" / expert_slug
@@ -285,10 +285,10 @@ def assign_insight_to_expert(
 
         # ── 6. Rebuild FTS index ──────────────────────────────────────────────
         try:
-            _scripts_dir = ROOT / "scripts"
+            _scripts_dir = ROOT / "src"
             if str(_scripts_dir) not in sys.path:
                 sys.path.insert(0, str(_scripts_dir))
-            from build_fts_index import build_index  # type: ignore
+            from src.core.build_fts_index import build_index  # type: ignore
 
             build_index()
             print("  [+] Rebuilt search index.")
@@ -315,7 +315,7 @@ def scan_unattached_insights(root: Path, limit: int = 50) -> list[dict]:
         List of dicts with keys ``path``, ``title``, ``domain``, ``tags``,
         ``created_at``, ``review_status``, and ``suggested_experts``.
     """
-    from scripts.core.frontmatter import read_fm  # type: ignore
+    from src.core.frontmatter import read_fm  # type: ignore
 
     knowledge_dir = root / "data" / "knowledge"
     results: list[dict] = []
@@ -386,7 +386,7 @@ def generate_expert_update_suggestion(expert_slug: str, root: Path) -> dict:
         Dict with keys ``success`` (bool), ``output_path`` (str on success),
         and ``error`` (str on failure).
     """
-    from scripts.core.frontmatter import read_fm  # type: ignore
+    from src.core.frontmatter import read_fm  # type: ignore
 
     expert_dir = root / "data" / "experts" / expert_slug
     sources_dir = expert_dir / "sources"
@@ -448,10 +448,10 @@ def generate_expert_update_suggestion(expert_slug: str, root: Path) -> dict:
 
     suggestion_text: str
     try:
-        _scripts_dir = root / "scripts"
+        _scripts_dir = root / "src"
         if str(_scripts_dir) not in sys.path:
             sys.path.insert(0, str(_scripts_dir))
-        from llm_client import call_llm  # type: ignore
+        from src.core.llm_client import call_llm  # type: ignore
 
         suggestion_text = call_llm(prompt) or "LLM returned no content."
     except Exception as exc:
@@ -492,11 +492,11 @@ def synthesize_creator_persona(creator_name: str, transcript_text: str) -> dict:
     """
     import sys
 
-    _scripts_dir = ROOT / "scripts"
+    _scripts_dir = ROOT / "src"
     if str(_scripts_dir) not in sys.path:
         sys.path.insert(0, str(_scripts_dir))
 
-    from llm_client import call_llm  # type: ignore
+    from src.core.llm_client import call_llm  # type: ignore
 
     prompt = f"""
 You are an expert behavioral analyst and copywriter.
@@ -608,15 +608,15 @@ def create_empty_expert(expert_name: str) -> dict:
             "## Playbook\n"
             "![[playbook]]\n\n"
         )
-        from scripts.core.frontmatter import write_fm
+        from src.core.frontmatter import write_fm
         write_fm(profile_path, profile_fm, profile_body)
 
         # Rebuild FTS index
         try:
-            _scripts_dir = ROOT / "scripts"
+            _scripts_dir = ROOT / "src"
             if str(_scripts_dir) not in sys.path:
                 sys.path.insert(0, str(_scripts_dir))
-            from build_fts_index import build_index  # type: ignore
+            from src.core.build_fts_index import build_index  # type: ignore
             build_index()
         except Exception as exc:
             print(f"  [-] Failed to rebuild index automatically: {exc}")

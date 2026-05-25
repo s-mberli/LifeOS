@@ -19,8 +19,8 @@ APP_PATH = str(ROOT / "apps" / "streamlit-chat" / "app.py")
 def test_ui_render_default(tmp_project: Path):
     """Test that the Streamlit app loads and renders elements correctly in default state."""
     # Ensure sys.path includes necessary directories for the runner
-    if str(ROOT / "scripts") not in sys.path:
-        sys.path.insert(0, str(ROOT / "scripts"))
+    if str(ROOT / "src") not in sys.path:
+        sys.path.insert(0, str(ROOT / "src"))
     if str(ROOT / "apps" / "streamlit-chat") not in sys.path:
         sys.path.insert(0, str(ROOT / "apps" / "streamlit-chat"))
 
@@ -52,8 +52,8 @@ def test_ui_render_default(tmp_project: Path):
 
 def test_ui_submit_url_form(tmp_project: Path):
     """Test that submitting a URL in the sidebar form triggers the ingestion pipeline."""
-    if str(ROOT / "scripts") not in sys.path:
-        sys.path.insert(0, str(ROOT / "scripts"))
+    if str(ROOT / "src") not in sys.path:
+        sys.path.insert(0, str(ROOT / "src"))
     if str(ROOT / "apps" / "streamlit-chat") not in sys.path:
         sys.path.insert(0, str(ROOT / "apps" / "streamlit-chat"))
 
@@ -84,8 +84,8 @@ def test_ui_submit_url_form(tmp_project: Path):
 
 def test_ui_chat_input_flow(tmp_project: Path):
     """Test typing into chat input streams response and updates message list."""
-    if str(ROOT / "scripts") not in sys.path:
-        sys.path.insert(0, str(ROOT / "scripts"))
+    if str(ROOT / "src") not in sys.path:
+        sys.path.insert(0, str(ROOT / "src"))
     if str(ROOT / "apps" / "streamlit-chat") not in sys.path:
         sys.path.insert(0, str(ROOT / "apps" / "streamlit-chat"))
 

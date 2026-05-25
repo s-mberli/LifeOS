@@ -5,8 +5,8 @@ from pathlib import Path
 import pytest
 from unittest.mock import patch
 
-from scripts.core.ingest import regenerate_insight_summary
-import scripts.core.ingest as ingest_mod
+from src.core.ingest import regenerate_insight_summary
+import src.core.ingest as ingest_mod
 
 
 def test_regenerate_insight_summary_success(tmp_project: Path, sample_insight: Path):
@@ -49,12 +49,12 @@ def test_regenerate_insight_summary_success(tmp_project: Path, sample_insight: P
     }
 
     try:
-        with patch("scripts.llm_client.generate_resource_summary", return_value=fake_ai_data):
+        with patch("src.core.llm_client.generate_resource_summary", return_value=fake_ai_data):
             res = regenerate_insight_summary(sample_insight)
             assert res["success"] is True
 
         # Read back frontmatter and body
-        from scripts.core.frontmatter import read_fm
+        from src.core.frontmatter import read_fm
         fm, body = read_fm(sample_insight)
 
         # Tags should be merged

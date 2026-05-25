@@ -20,7 +20,7 @@ def tmp_project(tmp_path: Path) -> Path:
     (tmp_path / "data" / "inbox" / "raw").mkdir(parents=True)
     (tmp_path / "indexes").mkdir()
     (tmp_path / "config").mkdir()
-    (tmp_path / "scripts" / "core").mkdir(parents=True)
+    (tmp_path / "src" / "core").mkdir(parents=True)
     return tmp_path
 
 
