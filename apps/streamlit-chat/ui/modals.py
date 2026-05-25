@@ -86,21 +86,20 @@ def _enforce_single_checkbox() -> None:
     if "library_editor" not in st.session_state:
         return
     state = st.session_state["library_editor"].get("edited_rows", {})
-    currently_checked = [idx for idx, row in state.items() if row.get("View") is True]
-
-    last_viewed = st.session_state.get("last_viewed_id")
     
-    if len(currently_checked) > 1:
-        newly_checked = [idx for idx in currently_checked if idx != last_viewed]
-        active_idx = newly_checked[0] if newly_checked else currently_checked[0]
-        for idx in currently_checked:
-            if idx != active_idx:
-                state[idx]["View"] = False
-        st.session_state["last_viewed_id"] = active_idx
-    elif len(currently_checked) == 1:
-        st.session_state["last_viewed_id"] = currently_checked[0]
-    else:
-        st.session_state["last_viewed_id"] = None
+    for idx_str, row in list(state.items()):
+        if "View" in row:
+            idx = int(idx_str)
+            if row["View"] is True:
+                st.session_state["last_viewed_id"] = idx
+            elif row["View"] is False:
+                if st.session_state.get("last_viewed_id") == idx:
+                    st.session_state["last_viewed_id"] = None
+            
+            # Clear View from edited_rows so it doesn't stick
+            del state[idx_str]["View"]
+            if not state[idx_str]:
+                del state[idx_str]
 
 @st.dialog("📚 Knowledge Library", width="large")
 def library_modal() -> None:
@@ -152,7 +151,7 @@ def _library_modal_body() -> None:
 
         data.append({
             "_id": i,
-            "View": False,
+            "View": (st.session_state.get("last_viewed_id") == i),
             "Title": fm.get("title", f.name),
             "Domain": fm.get("domain", "Unknown"),
             "Expert": expert_col,
@@ -180,6 +179,19 @@ def _library_modal_body() -> None:
             key="library_editor",
             on_change=_enforce_single_checkbox,
         )
+        
+        with st.expander("➕ Create New Expert", expanded=False):
+            new_expert_name = st.text_input("Expert Name", key="new_expert_name_input")
+            if st.button("Create Expert", key="create_expert_btn"):
+                if new_expert_name.strip():
+                    from core.experts import create_empty_expert
+                    res = create_empty_expert(new_expert_name.strip())
+                    if res.get("success"):
+                        st.success(f"Expert '{new_expert_name}' created successfully!")
+                    else:
+                        st.error(f"Error: {res.get('error')}")
+                else:
+                    st.warning("Please enter a valid expert name.")
 
     with col2:
         st.subheader("📖 Insight Viewer")
@@ -188,8 +200,50 @@ def _library_modal_body() -> None:
             file_path = path_map[view_id]
             content = Path(file_path).read_text(encoding="utf-8")
             st.caption(f"**Path:** `{Path(file_path).relative_to(ROOT)}`")
+            
+            # Button for regenerating summary
+            if st.button("🔄 Regenerate AI Summary", key=f"regen_summary_{view_id}"):
+                with st.spinner("Regenerating AI Summary..."):
+                    from core.ingest import regenerate_insight_summary
+                    res = regenerate_insight_summary(Path(file_path))
+                    if res.get("success"):
+                        st.success("Summary regenerated successfully!")
+                    else:
+                        st.error(f"Error: {res.get('error')}")
+            
             with st.container(height=500):
-                st.markdown(content)
+                import re
+                parts = re.split(r"^---\s*$", content, maxsplit=2, flags=re.MULTILINE)
+                if len(parts) >= 3:
+                    body = parts[2]
+                else:
+                    body = content
+                
+                summary_part = body
+                raw_part = ""
+                
+                match = re.search(r"\n(## Original Content|## AI Raw Output|### Raw User Input)", body)
+                if match:
+                    summary_part = body[:match.start()]
+                    raw_part = body[match.start() + 1:]
+                
+                tab1, tab2, tab3 = st.tabs(["📝 Summary & Insights", "📄 Source & Raw", "⚙️ Metadata"])
+                
+                with tab1:
+                    st.markdown(summary_part)
+                    
+                with tab2:
+                    if raw_part:
+                        st.markdown(raw_part)
+                    else:
+                        st.info("No raw data sections found.")
+                        
+                with tab3:
+                    # fm is available in the loop scope, but wait, fm is from the loop which is the LAST file!
+                    # We need to parse it for the CURRENT file_path!
+                    fm_current = read_insight_frontmatter(Path(file_path))
+                    st.json(fm_current)
+
         else:
             st.info("Check the '📖 View' box on any note to read its contents here.")
 
@@ -232,6 +286,8 @@ def _library_modal_body() -> None:
 
         if changes_made:
             st.success("Changes saved! They will be reflected in the Library.")
+            # Clear edits so we don't re-save them on every rerun
+            st.session_state["library_editor"]["edited_rows"] = {}
 
 
 # ── Creator / YouTube expert modal ────────────────────────────────────────────
@@ -280,6 +336,8 @@ def _creator_expert_modal_body() -> None:
         st.info("Single video detected. We will clone the persona from this specific video.")
     else:
         max_videos = st.number_input("How many recent videos?", min_value=1, max_value=10, value=5)
+
+    run_ai_summaries = st.checkbox("Run AI Summarization on all videos (Takes longer)", value=False)
 
     if "channel_meta" not in st.session_state:
         st.session_state.channel_meta = None
@@ -334,7 +392,7 @@ def _creator_expert_modal_body() -> None:
                     for i, vid_url in enumerate(video_urls):
                         status_text.text(f"Processing ({i + 1}/{len(video_urls)}): {vid_url}")
                         try:
-                            res = process_url_directly(vid_url, use_ai=False)
+                            res = process_url_directly(vid_url, use_ai=run_ai_summaries)
                             if res.get("success") and res.get("out_filepath"):
                                 assign_insight_to_expert(
                                     insight_path=Path(res["out_filepath"]),

@@ -36,94 +36,158 @@ def render_sidebar() -> None:
 def _render_sidebar_body() -> None:
     """Inner implementation of the sidebar (no error boundary here)."""
     import os  # noqa: PLC0415
+    import re  # noqa: PLC0415
     import tempfile  # noqa: PLC0415
+    from pathlib import Path  # noqa: PLC0415
 
     with st.sidebar:
         st.title("🧭 Quick Actions")
-        st.markdown("Drop a URL here to ingest it in the background.")
+        st.markdown("Ingest URLs, files, or raw text transcripts into your library.")
 
-        with st.form("ingest_form", clear_on_submit=True):
-            url_input = st.text_input("Resource URL (YouTube or Article)")
+        # Ingest uploader and text area side-by-side
+        col_left, col_right = st.columns(2)
+        with col_left:
+            uploaded_files = st.file_uploader(
+                "Drag & drop files (.txt, .md):",
+                accept_multiple_files=True,
+                type=["txt", "md"],
+                key="bulk_uploader",
+            )
+        with col_right:
+            pasted_text = st.text_area(
+                "Or paste URL, raw text, or transcript:",
+                height=150,
+                key="unified_text",
+            ).strip()
 
-            col1, col2 = st.columns(2)
-            with col1:
-                submit_ingest = st.form_submit_button(
-                    "Save Insight", use_container_width=True
-                )
-            with col2:
-                submit_expert = st.form_submit_button(
-                    "🪄 Build Expert", use_container_width=True
-                )
+        # Check if the pasted text looks like a single-line YouTube URL
+        is_yt_url = False
+        if pasted_text:
+            is_yt_url = (
+                ("youtube.com" in pasted_text or "youtu.be" in pasted_text)
+                and "\n" not in pasted_text
+            )
 
-            if (submit_ingest or submit_expert) and url_input.strip():
-                is_youtube = (
-                    "youtube.com" in url_input or "youtu.be" in url_input
-                )
-                is_channel = False
-                if is_youtube:
-                    is_channel = (
-                        "/watch" not in url_input
-                        and "/shorts" not in url_input
-                        and (
-                            "@" in url_input
-                            or "/c/" in url_input
-                            or "/channel/" in url_input
-                            or "/user/" in url_input
-                        )
-                    )
+        use_ai_bulk = st.checkbox("Run AI Summaries (slow)", value=False, key="use_ai_bulk")
+        st.markdown(
+            "ℹ️ *AI summaries generate searchable metadata (tags, key ideas, next actions) "
+            "for the library. Skip if you only want raw content immediately available for chat search.*"
+        )
 
-                if submit_expert and is_youtube:
-                    # Trigger the creator expert builder modal
-                    st.session_state.pending_channel_url = url_input
-                    st.session_state.channel_meta = None
-                    st.session_state.build_done = False
-                    st.rerun()
+        # Action Buttons
+        has_input = bool(pasted_text or uploaded_files)
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            submit_ingest = st.button(
+                "Save Insight(s)",
+                use_container_width=True,
+                disabled=not has_input,
+                type="primary",
+            )
+        with col2:
+            submit_expert = st.button(
+                "🪄 Build Expert",
+                use_container_width=True,
+                disabled=not is_yt_url,
+            )
 
-                elif is_channel and not submit_expert:
-                    # Auto-trigger creator expert modal for channel URLs
-                    st.session_state.pending_channel_url = url_input
-                    st.session_state.channel_meta = None
-                    st.session_state.build_done = False
-                    st.rerun()
+        # Logic handler
+        if submit_expert and is_yt_url:
+            st.session_state.pending_channel_url = pasted_text
+            st.session_state.channel_meta = None
+            st.session_state.build_done = False
+            st.rerun()
 
-                else:
-                    # Synchronous ingestion path
-                    with st.status("Ingesting resource...", expanded=True) as status:
-                        st.write(f"Downloading: {url_input}")
+        elif submit_ingest and has_input:
+            with st.status("Ingesting resource(s)...", expanded=True) as status:
+                success_count = 0
+                failed_count = 0
+
+                # Process pasted URL or text
+                if pasted_text:
+                    is_url = re.match(r"^https?://[^\s]+$", pasted_text) is not None
+                    if is_url:
+                        st.write(f"Downloading URL: {pasted_text}")
+                    else:
+                        st.write("Processing pasted text/transcript...")
+
+                    try:
                         try:
-                            from ingest_resource import process_one_file  # noqa: PLC0415
+                            from core.ingest import process_one_file
+                        except ImportError:
+                            from ingest_resource import process_one_file  # Fallback
 
+                        # Write the URL or raw text to a temp file
+                        with tempfile.NamedTemporaryFile(
+                            mode="w", delete=False, suffix=".txt", encoding="utf-8"
+                        ) as tmp:
+                            tmp.write(pasted_text)
+                            tmp_path = tmp.name
+
+                        res = process_one_file(tmp_path, use_ai=use_ai_bulk)
+                        try:
+                            os.remove(tmp_path)
+                        except FileNotFoundError:
+                            pass
+
+                        if res.get("success"):
+                            st.success(
+                                f"Saved: {res.get('out_filepath', res.get('file_path', 'unknown'))}"
+                            )
+                            success_count += 1
+                        else:
+                            st.error(res.get("error"))
+                            failed_count += 1
+                    except Exception as exc:
+                        st.error(str(exc))
+                        failed_count += 1
+
+                # Process Uploaded Files
+                if uploaded_files:
+                    try:
+                        from core.ingest import process_one_file
+                    except ImportError:
+                        from ingest_resource import process_one_file  # Fallback
+                    
+                    st.write(f"Processing {len(uploaded_files)} uploaded files...")
+                    for up_file in uploaded_files:
+                        try:
+                            suffix = Path(up_file.name).suffix
                             with tempfile.NamedTemporaryFile(
-                                mode="w", delete=False, suffix=".txt"
+                                mode="wb", delete=False, suffix=suffix
                             ) as tmp:
-                                tmp.write(url_input)
+                                tmp.write(up_file.read())
                                 tmp_path = tmp.name
 
-                            res = process_one_file(tmp_path, use_ai=False)
-                            try:
-                                os.remove(tmp_path)
-                            except FileNotFoundError:
-                                pass
+                            tmp_dir = Path(tempfile.gettempdir()) / "bulk_ingest"
+                            tmp_dir.mkdir(parents=True, exist_ok=True)
+                            target_tmp_file = tmp_dir / up_file.name
+                            import shutil
+                            shutil.move(tmp_path, target_tmp_file)
 
+                            st.write(f"Ingesting: {up_file.name}")
+                            res = process_one_file(str(target_tmp_file), use_ai=use_ai_bulk)
                             if res.get("success"):
-                                rebuild_search_index()
-                                status.update(
-                                    label="Insight saved & Index rebuilt!",
-                                    state="complete",
-                                    expanded=False,
-                                )
-                                st.success(f"Saved: {res.get('file_path')}")
+                                success_count += 1
                             else:
-                                status.update(
-                                    label="Ingestion failed", state="error"
-                                )
-                                st.error(res.get("error"))
+                                st.error(f"Failed {up_file.name}: {res.get('error')}")
+                                failed_count += 1
+                        except Exception as up_exc:
+                            st.error(f"Failed {up_file.name}: {up_exc}")
+                            failed_count += 1
 
-                        except Exception as exc:
-                            status.update(
-                                label="Ingestion failed", state="error"
-                            )
-                            st.error(str(exc))
+                st.write("Rebuilding search index...")
+                rebuild_search_index()
+                
+                status.update(
+                    label=f"Ingestion complete. {success_count} succeeded, {failed_count} failed.",
+                    state="complete",
+                )
+                if success_count > 0:
+                    st.success(f"Successfully processed {success_count} item(s)!")
+                if failed_count > 0:
+                    st.warning(f"Failed to process {failed_count} item(s). Check logs for details.")
 
         # Show the creator expert modal if a pending URL is set
         if st.session_state.get("pending_channel_url"):

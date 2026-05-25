@@ -146,3 +146,60 @@ class TestGetExistingExperts:
         assert "slug" in result[0]
         assert "display_name" in result[0]
         assert "path" in result[0]
+
+
+@pytest.mark.skipif(
+    not _CORE_EXPERTS_AVAILABLE,
+    reason="scripts.core.experts not yet implemented",
+)
+class TestCreateEmptyExpert:
+    """Tests for ``scripts.core.experts.create_empty_expert``."""
+
+    @pytest.fixture(autouse=True)
+    def _import_core(self):
+        """Import the core experts module."""
+        import scripts.core.experts as experts_mod
+        self._mod = experts_mod
+        self._fn = experts_mod.create_empty_expert
+
+    def test_creates_empty_expert_scaffold(self, tmp_project: Path):
+        """Must create expert directory and empty profile, playbook, principles, and evidence files."""
+        original_root = self._mod.ROOT
+        self._mod.ROOT = tmp_project
+        try:
+            res = self._fn("Jane Doe")
+            assert res["success"] is True
+            expert_slug = res["expert_slug"]
+            assert expert_slug == "expert--jane-doe"
+
+            expert_dir = tmp_project / "data" / "experts" / expert_slug
+            assert expert_dir.exists()
+            assert (expert_dir / "profile.md").exists()
+            assert (expert_dir / "playbook.md").exists()
+            assert (expert_dir / "principles.md").exists()
+            assert (expert_dir / "evidence.md").exists()
+            
+            # Verify profile metadata
+            from scripts.core.frontmatter import read_fm
+            profile_fm, profile_body = read_fm(expert_dir / "profile.md")
+            assert profile_fm["expert"] == "Jane Doe"
+            assert profile_fm["expert_slug"] == "expert--jane-doe"
+            assert profile_fm["insight_count"] == 0
+        finally:
+            self._mod.ROOT = original_root
+
+    def test_fails_if_expert_already_exists(self, tmp_project: Path):
+        """Must fail if the expert directory already exists."""
+        original_root = self._mod.ROOT
+        self._mod.ROOT = tmp_project
+        try:
+            # Create pre-existing expert
+            expert_dir = tmp_project / "data" / "experts" / "expert--jane-doe"
+            expert_dir.mkdir(parents=True)
+
+            res = self._fn("Jane Doe")
+            assert res["success"] is False
+            assert "already exists" in res["error"]
+        finally:
+            self._mod.ROOT = original_root
+
