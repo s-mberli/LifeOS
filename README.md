@@ -1,70 +1,72 @@
-# LifeOS — Personal Expert Network
+# 🧭 LifeOS — Personal Expert Network
 
-LifeOS is a **local-first personal knowledge OS** that turns YouTube videos, articles, and raw notes into structured expert insights. It routes your questions to curated AI experts built from your own knowledge library — no cloud databases, no vector stores, no amnesia.
+LifeOS is a **local-first personal knowledge operating system** that converts YouTube videos, web articles, and raw markdown notes into structured expert insights. It routes your natural language questions to curated AI experts built dynamically from your own knowledge library—with zero cloud databases, zero vector stores, and zero data amnesia.
 
-All data persists as Markdown files with YAML frontmatter in `data/`. Search is powered by SQLite FTS5.
-
-![LifeOS UI Screenshot](/Users/markus/.gemini/antigravity/scratch/lifeos/docs/screenshot.png)
+All data persists locally as Markdown files with YAML frontmatter under `data/`. Search and retrieval are powered by a local SQLite FTS5 (Full-Text Search) index.
 
 ---
 
-## Architecture
+## 🛠️ Architecture
 
-- **`scripts/core/`** — Pure Python business logic (ingestion, experts, YAML, YouTube)
-- **`apps/streamlit-chat/`** — Streamlit UI, split into modular `ui/` sub-modules
-- **`data/knowledge/`** — Insight notes (Markdown + YAML frontmatter)
-- **`data/experts/`** — Expert profiles, playbooks, and principles
-- **`config/`** — Declarative config files (domain map, profile, models)
-- **`indexes/`** — SQLite FTS5 search index (auto-rebuilt, not committed)
+- **`scripts/core/`** — Pure Python business logic (ingestion pipeline, expert profile synthesis, YAML frontmatter parser, YouTube metadata & transcript downloader).
+- **`apps/streamlit-chat/`** — Clean, modular Streamlit UI.
+- **`data/knowledge/`** — Curated, structured insight notes (Markdown + YAML frontmatter).
+- **`data/experts/`** — Synthesized expert profiles, playbooks, and principles.
+- **`config/`** — Declarative system configurations (domain-to-expert mapping, models, profile templates).
+- **`indexes/`** — Local SQLite FTS5 search index (automatically rebuilt at startup, gitignored).
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
+### 1. Clone and Install
 ```bash
-# 1. Clone and install
-git clone <your-repo-url>
-cd lifeos
+git clone https://github.com/s-mberli/LifeOS.git
+cd LifeOS
 pip install -r requirements.txt
+```
 
-# 2. Configure environment
+### 2. Configure Environment
+```bash
 cp .env.example .env
 cp config/profile.example.yml config/profile.yml
-# Edit .env and add your OpenRouter / Azure OpenAI API key
+```
+Edit the `.env` file and add your `OPENROUTER_API_KEY` or `AZURE_OPENAI_API_KEY`.
 
-# 3. Run the app
+### 3. Run the App
+```bash
 streamlit run apps/streamlit-chat/app.py
 ```
 
 ---
 
-## Project Structure
+## 📂 Project Structure
 
 ```
-lifeos/
+LifeOS/
 ├── apps/
 │   └── streamlit-chat/
-│       ├── app.py              # Main Streamlit entry point
+│       ├── app.py              # Streamlit entry point
 │       └── ui/
-│           ├── helpers.py      # Pure Python helpers (no st.* calls)
-│           ├── modals.py       # @st.dialog modal definitions
-│           ├── sidebar.py      # Sidebar rendering and URL form
-│           └── chat.py         # Chat loop, expert routing, attribution
+│           ├── helpers.py      # Pure Python UI helpers (no Streamlit imports)
+│           ├── modals.py       # Modal dialog definitions
+│           ├── sidebar.py      # Sidebar forms & resource ingestion controls
+│           └── chat.py         # Multi-turn chat interface with expert routing
 ├── config/
-│   ├── domain_map.yaml         # Domain → expert slug routing (edit here)
-│   ├── profile.example.yml     # Template — copy to profile.yml
-│   └── models.yml              # LLM model config (gitignored)
+│   ├── domain_map.yaml         # Domain → expert slug routing mapping
+│   ├── profile.example.yml     # User profile template
+│   └── models.yml              # Model selection mappings
 ├── data/
-│   ├── experts/                # Expert directories (committed)
-│   └── knowledge/              # Insight notes (committed)
-├── indexes/                    # SQLite FTS5 DB (gitignored, auto-rebuilt)
+│   ├── experts/                # Active AI Experts (committed)
+│   └── knowledge/              # Insight Notes & public concepts (committed)
+├── indexes/                    # SQLite search DB (gitignored, auto-rebuilt)
 ├── scripts/
 │   └── core/
-│       ├── frontmatter.py      # YAML frontmatter read/write
-│       ├── youtube.py          # yt-dlp and transcript operations
-│       ├── web.py              # Web page fetching and metadata
-│       ├── experts.py          # Expert management and synthesis
-│       └── ingest.py           # Ingestion pipeline entry point
+│       ├── frontmatter.py      # Canonical YAML frontmatter read/write utilities
+│       ├── youtube.py          # yt-dlp wrapper & transcript fetcher
+│       ├── web.py              # Web page fetching & metadata parser
+│       ├── experts.py          # Expert management, persona synthesis
+│       └── ingest.py           # Orchestrates the ingestion pipeline
 ├── .env.example
 ├── requirements.txt
 └── README.md
@@ -72,62 +74,37 @@ lifeos/
 
 ---
 
-## How to Add an Expert
+## 🧠 Creating & Using AI Experts
 
-1. In the Streamlit UI, open the **Experts** tab
-2. Paste a YouTube channel URL or video URL
-3. Click **Build Expert** — LifeOS fetches the transcript, synthesises a persona, and writes the expert profile to `data/experts/`
-4. Review the generated profile and playbook, then start chatting
-
----
-
-## Configuration
-
-### `config/domain_map.yaml`
-
-Controls which expert is auto-suggested when an insight is ingested. Keys are the `domain` field values from insight frontmatter; values are expert directory slugs under `data/experts/`.
-
-```yaml
-ai-platform: expert--ai-systems-architect
-flow-temple: expert--flow-temple-strategist
-```
-
-Add new entries here when creating new experts — **no code changes needed**.
-
-### Environment Variables (`.env`)
-
-| Variable | Description |
-|---|---|
-| `OPENROUTER_API_KEY` | OpenRouter API key |
-| `AZURE_OPENAI_API_KEY` | Azure OpenAI API key (alternative) |
-| `AZURE_OPENAI_ENDPOINT` | Azure endpoint URL |
+1. **Build an Expert**: Open the **Experts** tab in the UI. Paste a YouTube channel/video or article URL, and click **Build Expert**. The pipeline downloads transcripts/content, synthesises a unique persona profile, and writes it to `data/experts/`.
+2. **Ingest Insights**: Paste any resource URL in the sidebar. LifeOS downloads it, parses it, structures it into an **Insight Note** with standardized YAML metadata, and saves it.
+3. **Route & Query**: In the **Ask Expert** tab, select a specialized expert (or let the auto-router choose one). Ask questions and receive detailed answers strictly grounded in your local knowledge base, complete with clickable source citations.
 
 ---
 
-## Data Privacy
+## 🔒 Data Privacy & GitHub Safety
 
-| Path | Status | Reason |
+LifeOS is designed to be completely safe for public version control while maintaining full privacy for your personal journal or proprietary business notes:
+
+| Path | Version Control | Reason |
 |---|---|---|
-| `data/knowledge/` | ✅ Committed | Curated public insights |
-| `data/experts/` | ✅ Committed | Expert profiles and playbooks |
-| `data/private/` | 🔒 Gitignored | Personal/sensitive data |
+| `data/knowledge/` | 🔒 Gitignored (except examples) | Your personal insights & research |
+| `data/experts/` | 🔒 Gitignored (except examples) | Generated expert playbooks & sources |
+| `data/private/` | 🔒 Gitignored | Personal diaries, goals, and business data |
 | `.env` | 🔒 Gitignored | API keys and secrets |
-| `config/profile.yml` | 🔒 Gitignored | Personal profile info |
-| `indexes/*.db` | 🔒 Gitignored | Auto-rebuilt SQLite index |
+| `config/profile.yml` | 🔒 Gitignored | Personal profile configuration |
+| `indexes/*.db` | 🔒 Gitignored | SQLite FTS database containing private data |
 
 ---
 
-## Development
+## 🧪 Testing
 
 ```bash
-# Run all tests
+# Run the entire test suite
 pytest
 
-# Run a specific test file
-pytest tests/test_frontmatter.py -v
-
-# Rebuild the search index
-python scripts/core/ingest.py --rebuild-index
+# Run UI and integration tests specifically
+pytest tests/test_ui.py -v
+pytest tests/test_integration.py -v
 ```
-
-All business logic lives in `scripts/core/` as pure Python modules — no Streamlit imports, fully unit-testable.
+All core business logic is isolated from the Streamlit UI layer under `scripts/core/`, making it highly testable and robust.

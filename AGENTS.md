@@ -1,69 +1,51 @@
-# LifeOS Agents & Architecture
+# 🧭 LifeOS Agents & Architecture
 
-## Mission
-LifeOS is a routed knowledge operating system designed to turn resources into decisions and actions. It acts as a personal AI platform, reducing idea overload by ensuring every interaction results in a practical next step.
+This document describes the agent system, prompt injection strategy, and modular core components of **LifeOS**.
 
-## User Layer vs System Layer
-- **System Layer**: Instructions, logic, and configurations (`modes/`, `scripts/`, `config/`, `templates/`).
-- **User Layer**: Markus's personal knowledge, notes, and outputs (`data/`, `outputs/`). The AI reads this but must be careful when modifying it.
+---
 
-## Source-of-Truth Order
-When answering questions or making plans, prioritize context in this order:
-1. `data/private/` and `data/business/` (Markus's actual current state and goals)
-2. `config/profile.yml` (Core preferences and domains)
-3. `data/knowledge/` (Saved resources and concepts)
-4. External web search
-5. AI's pre-trained knowledge
+## 🏛️ System Design Principles
 
-## Consent Edges
-The AI must ask for explicit human approval before:
-- Publishing or sending data externally (social media, email).
-- Making paid API calls.
-- Deleting files.
-- Silently overwriting personal/user-layer files (always append or propose changes).
+LifeOS operates as a local-first cognitive assistant. It uses specialized **Experts** rather than a single monolithic chatbot. Each expert is a stateful persona grounded in specific subsets of your knowledge base.
 
-## Routing Rules
-1. Every input is evaluated by the Router.
-2. The Router determines the input type, primary domain, and primary mode.
-3. The Router outputs its decision explicitly so Markus can correct it.
-4. The system executes the selected mode with the relevant knowledge folders attached.
+### 1. Separation of Layers
+- **System Layer**: Code, system prompts, schemas, and configurations (`scripts/`, `apps/`, `config/`, `modes/`).
+- **User Layer**: Your curated knowledge base, expert profiles, and private resources (`data/`, `config/profile.yml`). The application reads the User Layer to construct context but never overwrites human-written files without explicit approval.
 
-### Mode Directory
-| Mode | Domain | Trigger Topics |
-|------|--------|----------------|
-| `research-resource` | AI Platform | AI, LLM, RAG, agents, embeddings, tools |
-| `ai-builder` | AI Platform | Building AI projects, code, pipelines |
-| `flow-temple-operator` | Flow Temple | TCM, moxa, yoga content, massage, business |
-| `moxsensei-operator` | Flow Temple | MOXSensei brand specifically |
-| `career-brand` | Career | CV, LinkedIn, portfolio, interviews |
-| `creator-wisdom` | Creator Wisdom | Creators, channels, transcripts, multi-source profiles |
-| `life-kompass` | Life Kompass | Focus, routines, emotions, reflections, family |
-| `body-practice` | Body Practice | Training, strength, calisthenics, yoga skills, cut, mobility, recovery |
+### 2. Retrieval-Augmented Generation (RAG) Flow
+When you interact with an Expert, LifeOS executes the following pipeline:
+```
+User Query ──> Router ──> Retrieve Profile & Playbook ──> FTS SQLite Search ──> Grounded Prompt Injection ──> LLM Call ──> Answer with Citations
+```
 
-## Writeback Rules
-1. Do not duplicate resources. Store a resource in one canonical location and connect it to multiple domains via YAML metadata (`related_modes`, `tags`).
-2. Always suggest saving useful interactions.
-3. Use templates when creating new files (e.g., `resource-note.md`).
-4. Creator profiles under `creator-profiles/` are append-only. Never overwrite existing sections in `profile.md`, only add new evidence.
+---
 
-## Architecture (current)
+## 🗺️ Expert Routing & System Modes
 
-### scripts/core/ - Business logic modules
-- `frontmatter.py` - YAML frontmatter read/write. ALWAYS use this, never manual string parsing.
-- `youtube.py` - All yt-dlp and YouTube transcript operations
-- `web.py` - Web page fetching and metadata extraction
-- `experts.py` - Expert profile management, persona synthesis, insight assignment
-- `ingest.py` - Main ingestion pipeline entry point
+LifeOS can route user queries to specific experts. Routing is governed by:
+1. **Manual Selection**: Select a specific expert from the sidebar.
+2. **Auto-Routing**: Natural language queries are routed to experts based on declarative mapping (`config/domain_map.yaml`) and frontmatter tags.
 
-### apps/streamlit-chat/ui/ - Streamlit UI modules
-- `helpers.py` - Pure Python helpers (no st.* calls, safe to unit-test)
-- `modals.py` - @st.dialog modal definitions
-- `sidebar.py` - Sidebar rendering and URL form
-- `chat.py` - Chat loop, expert routing, source attribution
+### Core System Modes
+System modes guide the development assistant when operating within the workspace:
+- **`router`**: Evaluates incoming queries, resolves the target domain, and selects the matching expert.
+- **`research-resource`**: System mode for fetching web pages, downloading transcripts, and summarizing raw resources.
+- **`creator-wisdom`**: Mode for reading multiple resource profiles from a single channel or creator and synthesizing an integrated expert playbook.
+- **`ai-builder`**: Technical workspace mode for writing clean python code, scripts, and streamlit UI modules.
 
-### Key coding patterns
-- **YAML**: Always use `from core.frontmatter import read_fm, write_fm, update_fm`
-- **YouTube**: Always use `from core.youtube import ...` (not channel_ingest.py directly)
-- **LLM**: `call_llm(prompt='...')` or `call_llm(messages=[...])`
-- **Domain mapping**: Edit `config/domain_map.yaml` (not hardcoded)
-- **No patching**: Never patch app.py with string replacement scripts
+---
+
+## 📦 Modular Directory Structure
+
+### `scripts/core/` — Business Logic
+- **`frontmatter.py`**: Reads and writes YAML frontmatter in Markdown notes. Always use this module to keep frontmatter format consistent.
+- **`youtube.py`**: Downloads transcripts and queries metadata for YouTube videos and channels using `yt-dlp`.
+- **`web.py`**: Fetches HTML web pages and extracts content/metadata safely.
+- **`experts.py`**: Synthesizes expert profiles from ingested resources and manages references.
+- **`ingest.py`**: Main pipeline entry point to coordinate fetching, summarizing, and saving resources.
+
+### `apps/streamlit-chat/ui/` — Streamlit UI Modules
+- **`helpers.py`**: Pure Python helper functions (no Streamlit imports), ensuring the core UI logic is fully testable.
+- **`modals.py`**: Dialog overlays for configuration and library management.
+- **`sidebar.py`**: Controls for resource ingestion and API configurations.
+- **`chat.py`**: Chat rendering loop, message history management, and LLM chat client wrapping.
