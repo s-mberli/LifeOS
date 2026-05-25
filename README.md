@@ -1,110 +1,114 @@
-# 🧭 LifeOS — Personal Expert Network
+<p align="center">
+  <img src="https://img.shields.io/badge/LifeOS-Local_First-3553ff?style=for-the-badge" alt="LifeOS Badge">
+  <img src="https://img.shields.io/badge/Streamlit-UI-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit">
+  <img src="https://img.shields.io/badge/SQLite-FTS5-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite">
+</p>
 
-LifeOS is a **local-first personal knowledge operating system** that converts YouTube videos, web articles, and raw markdown notes into structured expert insights. It routes your natural language questions to curated AI experts built dynamically from your own knowledge library—with zero cloud databases, zero vector stores, and zero data amnesia.
+# LifeOS
 
-All data persists locally as Markdown files with YAML frontmatter under `data/`. Search and retrieval are powered by a local SQLite FTS5 (Full-Text Search) index.
+> **A local-first, privacy-respecting Personal Expert Network. Ingest raw notes, web pages, and YouTube transcripts to synthesize personalized AI experts that you can chat with over your own data.**
 
----
-
-## 🛠️ Architecture
-
-- **`scripts/core/`** — Pure Python business logic (ingestion pipeline, expert profile synthesis, YAML frontmatter parser, YouTube metadata & transcript downloader).
-- **`apps/streamlit-chat/`** — Clean, modular Streamlit UI.
-- **`data/knowledge/`** — Curated, structured insight notes (Markdown + YAML frontmatter).
-- **`data/experts/`** — Synthesized expert profiles, playbooks, and principles.
-- **`config/`** — Declarative system configurations (domain-to-expert mapping, models, profile templates).
-- **`indexes/`** — Local SQLite FTS5 search index (automatically rebuilt at startup, gitignored).
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](#)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## 🚀 Quick Start
+## The Problem
+Generic LLMs don't know *your* context. Standard note-taking apps require you to manually organize and search. We needed a system that acts as an intelligent sounding board, specifically trained on the creators, books, and insights we care about, without sending private thoughts to the cloud.
 
-### 1. Clone and Install
-```bash
-git clone https://github.com/s-mberli/LifeOS.git
-cd LifeOS
-pip install -r requirements.txt
-```
+## The Solution
+**LifeOS** is a local-first platform that synthesizes **Expert Personas** out of your ingested content.
+It builds a local SQLite Full-Text Search index over your data and uses Agentic Routing to answer your questions using the perspective of specific experts, fully citing the source material.
 
-### 2. Configure Environment
-```bash
-cp .env.example .env
-cp config/profile.example.yml config/profile.yml
-```
-Edit the `.env` file and add your `OPENROUTER_API_KEY` or `AZURE_OPENAI_API_KEY`.
-
-### 3. Run the App
-```bash
-streamlit run apps/streamlit-chat/app.py
-```
+**Key Features:**
+- **Local SQLite FTS5 Search** — Lightning fast, completely offline indexing.
+- **YouTube & Web Ingestion** — Drop a link, and LifeOS automatically downloads the transcript, parses the HTML, and summarizes it.
+- **Expert Synthesis** — Group content by creator/domain. LifeOS auto-generates a `playbook.md`, `principles.md`, and `profile.md` for that expert.
+- **Multi-Turn Chat with Citations** — Chat directly with your synthesized experts. Every claim is backed by a specific Markdown note reference.
+- **Modular Pipeline** — Built with clean Python. No LangChain bloat. You own the code and the prompts.
 
 ---
 
-## 📂 Project Structure
+## Architecture Diagram
 
-```
-LifeOS/
-├── apps/
-│   └── streamlit-chat/
-│       ├── app.py              # Streamlit entry point
-│       └── ui/
-│           ├── helpers.py      # Pure Python UI helpers (no Streamlit imports)
-│           ├── modals.py       # Modal dialog definitions
-│           ├── sidebar.py      # Sidebar forms & resource ingestion controls
-│           └── chat.py         # Multi-turn chat interface with expert routing
-├── config/
-│   ├── domain_map.yaml         # Domain → expert slug routing mapping
-│   ├── profile.example.yml     # User profile template
-│   └── models.yml              # Model selection mappings
-├── data/
-│   ├── experts/                # Active AI Experts (committed)
-│   └── knowledge/              # Insight Notes & public concepts (committed)
-├── indexes/                    # SQLite search DB (gitignored, auto-rebuilt)
-├── scripts/
-│   └── core/
-│       ├── frontmatter.py      # Canonical YAML frontmatter read/write utilities
-│       ├── youtube.py          # yt-dlp wrapper & transcript fetcher
-│       ├── web.py              # Web page fetching & metadata parser
-│       ├── experts.py          # Expert management, persona synthesis
-│       └── ingest.py           # Orchestrates the ingestion pipeline
-├── .env.example
-├── requirements.txt
-└── README.md
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#fafaf5','primaryTextColor':'#1a1a1a','primaryBorderColor':'#3553ff','lineColor':'#3553ff','fontFamily':'JetBrains Mono','fontSize':'13px'}}}%%
+flowchart TB
+    subgraph Ingestion
+        YT[YouTube URL] --> |yt-dlp| Transcript
+        Web[Web URL] --> |bs4| CleanText
+        Raw[Raw MD/TXT] --> Text
+    end
+    
+    subgraph Storage
+        Transcript --> MD[Markdown File with Frontmatter]
+        CleanText --> MD
+        Text --> MD
+        MD --> DB[(SQLite FTS5 Index)]
+    end
+    
+    subgraph Expert Synthesis
+        MD --> |Group by Domain| Synthesis[LLM Synthesis]
+        Synthesis --> Profile[Expert Profile, Playbook, Principles]
+    end
+    
+    subgraph Retrieval & Chat
+        Query[User Query] --> Router{Auto-Router}
+        Router --> |Selects Expert| DB
+        DB --> |Retrieves Sources| Context[Context Builder]
+        Profile --> Context
+        Context --> LLM[LLM Chat]
+        LLM --> Response[Response with Citations]
+    end
 ```
 
 ---
 
-## 🧠 Creating & Using AI Experts
+## 🧭 System Design & Agentic Flow
 
-1. **Build an Expert**: Open the **Experts** tab in the UI. Paste a YouTube channel/video or article URL, and click **Build Expert**. The pipeline downloads transcripts/content, synthesises a unique persona profile, and writes it to `data/experts/`.
-2. **Ingest Insights**: Paste any resource URL in the sidebar. LifeOS downloads it, parses it, structures it into an **Insight Note** with standardized YAML metadata, and saves it.
-3. **Route & Query**: In the **Ask Expert** tab, select a specialized expert (or let the auto-router choose one). Ask questions and receive detailed answers strictly grounded in your local knowledge base, complete with clickable source citations.
+LifeOS operates on specialized **Experts** rather than a single monolithic chatbot. Each expert is a stateful persona grounded in specific subsets of your knowledge base.
 
----
+### 1. Separation of Layers
+- **System Layer**: Code, system prompts, schemas, and configurations (`scripts/`, `apps/`, `config/`).
+- **User Layer**: Your curated knowledge base, expert profiles, and private resources (`data/`). The application reads the User Layer to construct context but never overwrites human-written files without explicit approval.
 
-## 🔒 Data Privacy & GitHub Safety
-
-LifeOS is designed to be completely safe for public version control while maintaining full privacy for your personal journal or proprietary business notes:
-
-| Path | Version Control | Reason |
-|---|---|---|
-| `data/knowledge/` | 🔒 Gitignored (except examples) | Your personal insights & research |
-| `data/experts/` | 🔒 Gitignored (except examples) | Generated expert playbooks & sources |
-| `data/private/` | 🔒 Gitignored | Personal diaries, goals, and business data |
-| `.env` | 🔒 Gitignored | API keys and secrets |
-| `config/profile.yml` | 🔒 Gitignored | Personal profile configuration |
-| `indexes/*.db` | 🔒 Gitignored | SQLite FTS database containing private data |
+### 2. Expert Routing
+Queries are routed to experts based on declarative mapping (`config/domain_map.yaml`) and frontmatter tags. If you ask a design question, the system automatically routes it to your curated design expert.
 
 ---
 
-## 🧪 Testing
+## Directory Structure
 
-```bash
-# Run the entire test suite
-pytest
+| Path | Description |
+|------|-------------|
+| `apps/streamlit-chat/` | The main Streamlit UI. Contains the `app.py` orchestrator and modular `ui/` components (chat, sidebar, modals). |
+| `scripts/core/` | Pure Python business logic: `frontmatter.py`, `youtube.py`, `web.py`, `experts.py`, `ingest.py`. |
+| `data/` | Your personal knowledge base. Separated into `knowledge/` (ingested notes), `experts/` (synthesized profiles), and `private/` (your backlog and sensitive data). |
+| `config/` | System configurations, domain maps, and model definitions. |
+| `.gemini/config/skills/` | Built-in interactive Agent Skills that allow AI coding assistants to interact with the LifeOS API. |
 
-# Run UI and integration tests specifically
-pytest tests/test_ui.py -v
-pytest tests/test_integration.py -v
-```
-All core business logic is isolated from the Streamlit UI layer under `scripts/core/`, making it highly testable and robust.
+---
+
+## Getting Started
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/s-mberli/LifeOS.git
+   cd LifeOS
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Set your API Keys:**
+   Create a `.env` file in the root directory:
+   ```env
+   OPENAI_API_KEY=your_key_here
+   ```
+
+4. **Run the UI:**
+   ```bash
+   streamlit run apps/streamlit-chat/app.py
+   ```
