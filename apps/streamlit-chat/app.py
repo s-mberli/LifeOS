@@ -66,20 +66,20 @@ st.markdown(
 
     /* Glassmorphic Chat Input */
     [data-testid="stChatInput"] {
-        background: rgba(242, 239, 233, 0.75) !important;
+        background: rgba(30, 41, 59, 0.75) !important;
         backdrop-filter: blur(12px) !important;
         border-radius: 20px !important;
-        border: 1px solid rgba(0,0,0,0.05) !important;
+        border: 1px solid rgba(255,255,255,0.05) !important;
     }
 
     /* Chat message bubbles */
     [data-testid="stChatMessage"] {
-        background: #FFFFFF !important;
+        background: #1E293B !important;
         border-radius: 12px !important;
         padding: 1.5rem !important;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.02) !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
         margin-bottom: 1rem !important;
-        border: 1px solid rgba(0,0,0,0.03) !important;
+        border: 1px solid rgba(255,255,255,0.05) !important;
     }
 
     /* Hide default streamlit branding in footer */

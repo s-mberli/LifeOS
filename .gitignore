@@ -54,7 +54,7 @@ scratch/
 indexes/*.db
 
 # Raw transcripts (can be very large)
-data/knowledge/raw/
+**/raw/
 
 # Raw inbox — unprocessed personal input
 data/inbox/raw/
@@ -68,6 +68,17 @@ config/profile.yml
 config/models.yml
 config/privacy.yml
 
+# Exclude all markdown notes and transcripts
+data/knowledge/**/*.md
+data/experts/**/*.md
+data/business/**/*.md
+data/inbox/**/*.md
+
+# Scratch tools in root
+fix_*.py
+format_*.py
+scratch_*.py
+
 # ============================================================
 # Explicitly KEEP these (force-include reusable system files)
 # ============================================================
@@ -80,3 +91,7 @@ config/privacy.yml
 !README.md
 !AGENTS.md
 !data/README.md
+!data/knowledge/creator-profiles/README.md
+!**/example-*.md
+!**/.gitkeep
+

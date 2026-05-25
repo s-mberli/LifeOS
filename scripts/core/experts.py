@@ -532,6 +532,101 @@ TRANSCRIPT EXCERPT:
         return empty
 
 
+def create_empty_expert(expert_name: str) -> dict:
+    """Create an empty expert profile directory structure and default markdown files.
+
+    Args:
+        expert_name: Human-readable name of the expert.
+
+    Returns:
+        Dict with keys ``success`` (bool), ``expert_dir`` (str on success),
+        and ``error`` (str on failure).
+    """
+    try:
+        expert_slug = slugify_expert_name(expert_name)
+        expert_dir = ROOT / "data" / "experts" / expert_slug
+        sources_dir = expert_dir / "sources"
+        profile_path = expert_dir / "profile.md"
+
+        if expert_dir.exists():
+            return {
+                "success": False,
+                "error": f"Expert '{expert_name}' (slug: {expert_slug}) already exists."
+            }
+
+        expert_dir.mkdir(parents=True, exist_ok=True)
+        sources_dir.mkdir(parents=True, exist_ok=True)
+
+        now = datetime.datetime.now(datetime.timezone.utc).astimezone()
+        now_str = now.isoformat()
+
+        _SCAFFOLDS: dict[str, str] = {
+            "playbook.md": (
+                "# Playbook\n\n"
+                "> What strategies, systems, or frameworks does this expert use?\n\n"
+                "## Repeated Frameworks\n- \n\n"
+                "## How They Operate\n- \n\n"
+                "## What They Avoid\n- \n\n"
+                "---\n"
+                "*Synthesized from attached insights.*\n"
+            ),
+            "principles.md": (
+                "# Principles\n\n"
+                "> What are their core beliefs and the unique angles they bring?\n\n"
+                "## Core Beliefs\n- \n\n"
+                "## Unique Angle\n- \n\n"
+                "---\n"
+                "*Synthesized from attached insights.*\n"
+            ),
+            "evidence.md": (
+                "# Evidence Index\n\n"
+                "> A running log of all insights attached to this expert.\n\n"
+                "| Date | Insight | Summary |\n"
+                "|------|---------|---------||\n"
+            ),
+        }
+        for fname, scaffold_content in _SCAFFOLDS.items():
+            fpath = expert_dir / fname
+            fpath.write_text(scaffold_content, encoding="utf-8")
+
+        profile_fm: dict = {
+            "type": "synthesis_expert",
+            "expert": expert_name,
+            "expert_slug": expert_slug,
+            "channel": "",
+            "created_at": now_str,
+            "insight_count": 0,
+        }
+        profile_body = (
+            f"\n# {expert_name}\n\n"
+            f"**Channel / Handle:** \n\n"
+            "## About\n"
+            "(Write a brief summary of who this expert is and why you study them.)\n\n"
+            "---\n"
+            "## Principles\n"
+            "![[principles]]\n\n"
+            "## Playbook\n"
+            "![[playbook]]\n\n"
+        )
+        from scripts.core.frontmatter import write_fm
+        write_fm(profile_path, profile_fm, profile_body)
+
+        # Rebuild FTS index
+        try:
+            _scripts_dir = ROOT / "scripts"
+            if str(_scripts_dir) not in sys.path:
+                sys.path.insert(0, str(_scripts_dir))
+            from build_fts_index import build_index  # type: ignore
+            build_index()
+        except Exception as exc:
+            print(f"  [-] Failed to rebuild index automatically: {exc}")
+
+        return {"success": True, "expert_dir": str(expert_dir), "expert_slug": expert_slug}
+
+    except Exception as exc:
+        return {"success": False, "error": str(exc)}
+
+
 def _suggest_experts_for_domain(
     domain: str,
     tags: list[str],

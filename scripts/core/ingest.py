@@ -434,6 +434,240 @@ def process_one_file(source: str, use_ai: bool = False, status_callback=None) ->
 
     return result
 
+def process_directory(dir_path: Path, use_ai: bool = False, status_callback=None) -> dict:
+    """Recursively scan a directory for .txt and .md files and ingest them.
+
+    To protect the original files, this function creates a temporary copy
+    of each file, processes the copy, and deletes/cleans up, leaving the
+    original files completely untouched.
+    """
+    import tempfile
+
+    results = {"success": True, "processed": [], "failed": []}
+
+    if not dir_path.exists() or not dir_path.is_dir():
+        return {"success": False, "error": f"Path {dir_path} does not exist or is not a directory."}
+
+    # Walk directory
+    files_to_process = []
+    for ext in ("*.txt", "*.md"):
+        files_to_process.extend(list(dir_path.rglob(ext)))
+
+    # Sort files to process them consistently
+    files_to_process.sort()
+
+    if not files_to_process:
+        if status_callback:
+            status_callback("No .txt or .md files found in the directory.")
+        return results
+
+    for i, file_path in enumerate(files_to_process):
+        filename = file_path.name
+        if status_callback:
+            status_callback(f"Processing ({i + 1}/{len(files_to_process)}): {filename}")
+
+        try:
+            # Create a temporary file to hold the copy, so process_one_file doesn't move the original file
+            with tempfile.TemporaryDirectory() as tmpdir:
+                tmp_copy = Path(tmpdir) / filename
+                shutil.copy2(file_path, tmp_copy)
+
+                # Run process_one_file on the copy
+                res = process_one_file(str(tmp_copy), use_ai=use_ai, status_callback=status_callback)
+
+                if res.get("success"):
+                    results["processed"].append({
+                        "original_path": str(file_path),
+                        "output_path": res.get("out_filepath"),
+                    })
+                else:
+                    results["failed"].append({
+                        "original_path": str(file_path),
+                        "error": res.get("error"),
+                    })
+        except Exception as exc:
+            results["failed"].append({
+                "original_path": str(file_path),
+                "error": str(exc),
+            })
+            if status_callback:
+                status_callback(f"Error processing {filename}: {exc}")
+
+    return results
+
+
+def regenerate_insight_summary(insight_path: Path) -> dict:
+    """Regenerate the AI summary for an existing insight note.
+
+    Reads the raw content from the bottom of the note (or transcript file)
+    and calls the LLM to generate a fresh summary, key ideas, and metadata.
+    Updates the note's frontmatter and body, overwriting the old summary sections.
+
+    Args:
+        insight_path: Path to the insight note markdown file.
+
+    Returns:
+        Dict with keys ``success`` (bool), ``error`` (str on failure).
+    """
+    from scripts.core.frontmatter import read_fm, write_fm
+    from scripts.llm_client import generate_resource_summary  # type: ignore
+
+    try:
+        if not insight_path.exists():
+            return {"success": False, "error": f"File {insight_path} does not exist."}
+
+        fm, body = read_fm(insight_path)
+
+        # 1. Identify raw/original content to send to LLM
+        raw_content = ""
+        transcript_path_str = fm.get("transcript_path")
+        is_youtube = fm.get("source_type") == "youtube_video" or (fm.get("source_url") and "youtu" in fm.get("source_url"))
+
+        if transcript_path_str:
+            t_path = Path(transcript_path_str)
+            if not t_path.is_absolute():
+                t_path = ROOT / t_path
+            if t_path.exists():
+                try:
+                    raw_content = t_path.read_text(encoding="utf-8")
+                except Exception:
+                    pass
+
+        if not raw_content:
+            # Fallback: extract from note body
+            idx = body.find("## Original Content")
+            if idx != -1:
+                orig_section = body[idx:]
+                sub_idx = orig_section.find("### Raw User Input")
+                if sub_idx != -1:
+                    start = sub_idx + len("### Raw User Input")
+                    end_idx = orig_section.find("### Source URL", start)
+                    if end_idx != -1:
+                        raw_content = orig_section[start:end_idx].strip()
+                    else:
+                        raw_content = orig_section[start:].strip()
+                else:
+                    raw_content = orig_section[len("## Original Content"):].strip()
+            else:
+                raw_content = body.strip()
+
+        if not raw_content:
+            return {"success": False, "error": "Could not extract raw content or transcript to summarize."}
+
+        # 2. Call LLM to generate summary
+        title = fm.get("title", insight_path.stem)
+        source_url = fm.get("source_url", "")
+        domain = fm.get("domain", "")
+        primary_mode = fm.get("primary_mode", "")
+        secondary_modes = fm.get("secondary_modes", [])
+
+        ai_data = generate_resource_summary(
+            title=title,
+            source_url=source_url,
+            domain=domain,
+            primary_mode=primary_mode,
+            secondary_modes=secondary_modes,
+            raw_content=raw_content,
+        )
+
+        if not ai_data:
+            return {"success": False, "error": "LLM summarization failed."}
+
+        # 3. Update frontmatter tags and metadata
+        now_str = datetime.datetime.now(datetime.timezone.utc).astimezone().isoformat()
+        fm["updated_at"] = now_str
+
+        # If LLM returned tags, merge them
+        if "suggested_tags" in ai_data:
+            existing_tags = fm.get("tags", [])
+            new_tags = ai_data["suggested_tags"]
+            merged_tags = list(existing_tags)
+            for tag in new_tags:
+                if tag.lower() not in [t.lower() for t in merged_tags]:
+                    merged_tags.append(tag)
+            fm["tags"] = merged_tags
+
+        # 4. Rebuild the body
+        warning_text = "Transcript unavailable. Summary is based only on title/metadata.\n\n" if (is_youtube and not transcript_path_str) else ""
+
+        new_body = f"\n# {title}\n\n"
+
+        if "summary" in ai_data:
+            new_body += f"## Summary\n{warning_text}{ai_data.get('summary', '')}\n\n"
+            new_body += "## Key Ideas\n"
+            for idea in ai_data.get("key_ideas", []):
+                new_body += f"- {idea}\n"
+            new_body += "\n## Why this matters for Markus\n"
+            for reason in ai_data.get("why_this_matters_for_markus", []):
+                new_body += f"- {reason}\n"
+            new_body += "\n## Related Modes\n"
+            for mode in ai_data.get("related_modes", []):
+                new_body += f"- {mode}\n"
+            new_body += f"\n## Next Action\n- [ ] {ai_data.get('next_action', '')}\n"
+
+            if ai_data.get("is_chunked"):
+                new_body += (
+                    f"\n## Long Resource Processing\n"
+                    f"- chunks processed: {ai_data['chunks_processed']}\n"
+                    "- method: chunked map-reduce summary\n"
+                )
+
+            provider = ai_data.get("provider_used", "Unknown")
+            model = ai_data.get("model_used", "Unknown")
+            new_body += f"\n## AI Generation Data\n- Provider: {provider}\n- Model: {model}\n"
+
+            reliability = ai_data.get("source_reliability", "Based on resource content.")
+            new_body += f"\n## Source Reliability\n{reliability}\n"
+        elif "raw_output" in ai_data:
+            provider = ai_data.get("provider_used", "Unknown")
+            model = ai_data.get("model_used", "Unknown")
+            new_body += (
+                f"## Summary\n{warning_text}AI summarization succeeded, but JSON parsing failed.\n\n"
+                f"## AI Raw Output\n```text\n{ai_data['raw_output']}\n```\n\n"
+                "## Key Ideas\n- Refer to the AI Raw Output above.\n\n"
+                "## Why this matters for Markus\n- Refer to the AI Raw Output above.\n\n"
+                f"## Related Modes\n- {primary_mode}\n"
+            )
+            for m in secondary_modes:
+                new_body += f"- {m}\n"
+            new_body += f"\n## AI Generation Data\n- Provider: {provider}\n- Model: {model}\n"
+            new_body += (
+                "\n## Next Action\n"
+                "- [ ] Review raw AI output and extract action items manually.\n\n"
+                "## Source Reliability\nAI summarization was performed but parsing failed.\n"
+            )
+
+        if ai_data.get("is_chunked") and ai_data.get("chunk_summaries"):
+            new_body += f"\n## Detailed Chunk Summaries\n\n{ai_data['chunk_summaries']}\n"
+
+        # Find where ## Original Content started in the original body
+        orig_idx = body.find("## Original Content")
+        if orig_idx != -1:
+            orig_content_block = body[orig_idx:]
+            new_body += f"\n{orig_content_block.strip()}\n"
+        else:
+            # Reconstruct original content section
+            transcript_display = ""
+            if transcript_path_str and Path(transcript_path_str).exists():
+                transcript_display = f"\n### Full Transcript File\n[full_transcript](file://{transcript_path_str})"
+            new_body += f"\n## Original Content\n### Raw User Input\n{raw_content}\n\n### Source URL\n{source_url}{transcript_display}\n"
+
+        # 5. Write the file back
+        write_fm(insight_path, fm, new_body)
+
+        # 6. Rebuild FTS index
+        try:
+            from build_fts_index import build_index  # type: ignore
+            build_index()
+        except Exception:
+            pass
+
+        return {"success": True}
+
+    except Exception as exc:
+        return {"success": False, "error": str(exc)}
+
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
