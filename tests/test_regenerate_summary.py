@@ -49,7 +49,7 @@ def test_regenerate_insight_summary_success(tmp_project: Path, sample_insight: P
     }
 
     try:
-        with patch("src.core.llm_client.generate_resource_summary", return_value=fake_ai_data):
+        with patch("src.core.ingest.generate_resource_summary", return_value=fake_ai_data):
             res = regenerate_insight_summary(sample_insight)
             assert res["success"] is True
 

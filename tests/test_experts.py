@@ -38,10 +38,10 @@ class TestSlugifyExpertName:
     def _import_slugify(self):
         """Import slugify_expert_name from ingest_resource at test time."""
         try:
-            from ingest_resource import slugify_expert_name
+            from core.experts import slugify_expert_name
             self._fn = slugify_expert_name
         except Exception as exc:
-            pytest.skip(f"Could not import ingest_resource: {exc}")
+            pytest.skip(f"Could not import core.experts: {exc}")
 
     def test_simple_name(self):
         """A plain two-word name must be lowercased, hyphenated, and prefixed."""
@@ -202,4 +202,39 @@ class TestCreateEmptyExpert:
             assert "already exists" in res["error"]
         finally:
             self._mod.ROOT = original_root
+
+
+@pytest.mark.skipif(
+    not _CORE_EXPERTS_AVAILABLE,
+    reason="src.core.experts not yet implemented",
+)
+class TestScanUnattachedInsights:
+    """Tests for ``src.core.experts.scan_unattached_insights``."""
+
+    @pytest.fixture(autouse=True)
+    def _import_core(self):
+        import src.core.experts as experts_mod
+        self._mod = experts_mod
+        self._fn = experts_mod.scan_unattached_insights
+
+    def test_scans_inbox_as_well_as_knowledge(self, tmp_project: Path):
+        from src.core.frontmatter import write_fm
+        
+        # Create unattached insight in inbox
+        inbox_dir = tmp_project / "data" / "inbox" / "processed" / "needs-review"
+        inbox_dir.mkdir(parents=True, exist_ok=True)
+        inbox_file = inbox_dir / "inbox_note.md"
+        write_fm(inbox_file, {"type": "insight_note", "expert_status": "unattached"}, "body")
+        
+        # Create unattached insight in knowledge
+        knowledge_dir = tmp_project / "data" / "knowledge" / "general"
+        knowledge_dir.mkdir(parents=True, exist_ok=True)
+        knowledge_file = knowledge_dir / "know_note.md"
+        write_fm(knowledge_file, {"type": "insight_note", "expert_status": "unattached"}, "body")
+
+        results = self._fn(tmp_project)
+        paths = [r["path"] for r in results]
+        assert str(inbox_file) in paths
+        assert str(knowledge_file) in paths
+
 

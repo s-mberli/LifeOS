@@ -317,55 +317,59 @@ def scan_unattached_insights(root: Path, limit: int = 50) -> list[dict]:
     """
     from src.core.frontmatter import read_fm  # type: ignore
 
-    knowledge_dir = root / "data" / "knowledge"
+    search_dirs = [
+        root / "data" / "knowledge",
+        root / "data" / "private",
+        root / "data" / "inbox"
+    ]
     results: list[dict] = []
 
-    if not knowledge_dir.is_dir():
-        return results
-
-    for fpath in knowledge_dir.rglob("*.md"):
-        # Skip raw transcript folders
-        if "raw" in fpath.parts:
+    for s_dir in search_dirs:
+        if not s_dir.is_dir():
             continue
-        try:
-            fm, _ = read_fm(fpath)
-        except Exception:
-            continue
+        for fpath in s_dir.rglob("*.md"):
+            # Skip raw transcript folders
+            if "raw" in fpath.parts:
+                continue
+            try:
+                fm, _ = read_fm(fpath)
+            except Exception:
+                continue
 
-        if fm.get("type") != "insight_note":
-            continue
+            if fm.get("type") != "insight_note":
+                continue
 
-        status = fm.get("expert_status", "unattached")
-        review = fm.get("review_status", "new")
-        if status in ("attached", "ignored") or review == "ignored":
-            continue
+            status = fm.get("expert_status", "unattached")
+            review = fm.get("review_status", "new")
+            if status in ("attached", "ignored") or review == "ignored":
+                continue
 
-        suggested_raw = fm.get("suggested_experts", [])
-        if isinstance(suggested_raw, str):
-            suggested = [s.strip() for s in suggested_raw.split(",") if s.strip()]
-        else:
-            suggested = list(suggested_raw) if suggested_raw else []
+            suggested_raw = fm.get("suggested_experts", [])
+            if isinstance(suggested_raw, str):
+                suggested = [s.strip() for s in suggested_raw.split(",") if s.strip()]
+            else:
+                suggested = list(suggested_raw) if suggested_raw else []
 
-        tags_raw = fm.get("tags", [])
-        if isinstance(tags_raw, str):
-            tags = [t.strip() for t in tags_raw.split(",") if t.strip()]
-        else:
-            tags = list(tags_raw) if tags_raw else []
+            tags_raw = fm.get("tags", [])
+            if isinstance(tags_raw, str):
+                tags = [t.strip() for t in tags_raw.split(",") if t.strip()]
+            else:
+                tags = list(tags_raw) if tags_raw else []
 
-        results.append(
-            {
-                "path": str(fpath),
-                "title": fm.get("title", fpath.stem),
-                "domain": fm.get("domain", ""),
-                "tags": tags,
-                "created_at": fm.get("created_at", ""),
-                "review_status": review,
-                "suggested_experts": suggested,
-            }
-        )
+            results.append(
+                {
+                    "path": str(fpath),
+                    "title": fm.get("title", fpath.stem),
+                    "domain": fm.get("domain", ""),
+                    "tags": tags,
+                    "created_at": fm.get("created_at", ""),
+                    "review_status": review,
+                    "suggested_experts": suggested,
+                }
+            )
 
-        if len(results) >= limit:
-            break
+            if len(results) >= limit:
+                return results
 
     return results
 

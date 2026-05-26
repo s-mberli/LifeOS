@@ -26,7 +26,7 @@ def test_execute_agent_search_loop_no_tool_call():
     """If the LLM response has no XML tool calls, return the response directly."""
     mock_ask_llm = MagicMock(return_value="Ali Abdaal says productivity is about feeling good.")
     
-    with patch("ui.helpers.ask_llm_chat", mock_ask_llm):
+    with patch("src.core.chat_context.ask_llm_chat", mock_ask_llm):
         final_answer, calls_made = execute_agent_search_loop(
             system_prompt="You are an assistant.",
             user_prompt="Explain Ali Abdaal's view on productivity.",
@@ -54,8 +54,8 @@ def test_execute_agent_search_loop_with_tool_call():
         ("Ali Abdaal note", "data/knowledge/ali.md", "feeling good leads to productivity", -1.2)
     ])
     
-    with patch("ui.helpers.ask_llm_chat", mock_ask_llm), \
-         patch("ui.helpers.fts_search", mock_fts):
+    with patch("src.core.chat_context.ask_llm_chat", mock_ask_llm), \
+         patch("src.core.search_knowledge.fts_search", mock_fts):
          
         final_answer, calls_made = execute_agent_search_loop(
             system_prompt="You are an assistant.",

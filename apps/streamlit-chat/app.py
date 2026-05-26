@@ -12,8 +12,7 @@ from pathlib import Path
 # Resolve the project root (3 levels up from this file).
 ROOT = Path(__file__).resolve().parent.parent.parent
 
-# src/ must be on sys.path so ui/ modules can import project scripts.
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "src"))
 
 # Add this file's directory so that `from ui.xxx import …` resolves correctly
 # whether the app is launched from the project root or from this directory.

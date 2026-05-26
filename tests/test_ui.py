@@ -93,7 +93,7 @@ def test_ui_chat_input_flow(tmp_project: Path):
          patch("ui.helpers.DB_PATH", tmp_project / "indexes" / "lifeos.db"), \
          patch("ui.sidebar.ROOT", tmp_project), \
          patch("ui.chat.ROOT", tmp_project), \
-         patch("ui.helpers.ask_llm_chat", return_value="I am a chatbot response.") as mock_ask, \
+         patch("core.chat_context.ask_llm_chat", return_value="I am a chatbot response.") as mock_ask, \
          patch("ui.chat.auto_route_prompt", return_value={"primary_domain": "general"}):
 
         at = AppTest.from_file(APP_PATH)
@@ -115,4 +115,44 @@ def test_ui_chat_input_flow(tmp_project: Path):
         assert messages[0]["content"] == "What is AI?"
         assert messages[1]["role"] == "assistant"
         assert messages[1]["content"] == "I am a chatbot response."
+
+
+def test_ui_chat_save_insight_flow(tmp_project: Path):
+    """Test that generated chat response renders Save Insight button, and clicking it works."""
+    if str(ROOT / "src") not in sys.path:
+        sys.path.insert(0, str(ROOT / "src"))
+    if str(ROOT / "apps" / "streamlit-chat") not in sys.path:
+        sys.path.insert(0, str(ROOT / "apps" / "streamlit-chat"))
+
+    with patch("ui.helpers.ROOT", tmp_project), \
+         patch("ui.helpers.DB_PATH", tmp_project / "indexes" / "lifeos.db"), \
+         patch("ui.sidebar.ROOT", tmp_project), \
+         patch("ui.chat.ROOT", tmp_project), \
+         patch("core.chat_context.ask_llm_chat", return_value="I am a chatbot response.") as mock_ask, \
+         patch("ui.chat.auto_route_prompt", return_value={"primary_domain": "general"}), \
+         patch("core.chat_persistence.save_message_as_insight", return_value=(True, "data/knowledge/chat-insights/some-note.md")) as mock_save:
+
+        at = AppTest.from_file(APP_PATH)
+        at.run()
+
+        # Type message in chat input and run
+        chat_input = at.chat_input[0]
+        chat_input.set_value("Explain quantum physics simply.")
+        at.run()
+
+        assert not at.exception
+        
+        # Save Insight button should render in history
+        save_buttons = [b for b in at.button if b.key and b.key.startswith("save_insight_")]
+        assert len(save_buttons) == 1
+        
+        # Click the Save Insight button
+        save_buttons[0].click()
+        at.run()
+
+        assert not at.exception
+        mock_save.assert_called_once()
+        # Verify index is added to saved msg indices in session state
+        assert 1 in at.session_state.saved_msg_indices
+
 
