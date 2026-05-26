@@ -157,12 +157,23 @@ def _library_modal_body() -> None:
             except Exception:
                 created_at = ""
 
+        # Format created_at for human-readable display
+        date_display = ""
+        if isinstance(created_at, str) and created_at:
+            try:
+                from datetime import datetime
+                dt = datetime.fromisoformat(created_at)
+                date_display = dt.strftime("%d %b %Y")  # e.g. "26 May 2026"
+            except (ValueError, TypeError):
+                date_display = created_at[:10] if len(created_at) >= 10 else created_at
+
         raw_data.append({
             "Title": fm.get("title", f.name),
             "Domain": fm.get("domain", "Unknown"),
             "Expert": expert_col,
             "Tags": tags_str,
             "created_at": created_at,
+            "date_display": date_display,
             "path": str(f),
         })
 
@@ -179,6 +190,7 @@ def _library_modal_body() -> None:
             "Domain": item["Domain"],
             "Expert": item["Expert"],
             "Tags": item["Tags"],
+            "Added": item["date_display"],
         })
         path_map[i] = item["path"]
 
@@ -192,10 +204,11 @@ def _library_modal_body() -> None:
             column_config={
                 "_id": None,
                 "View": st.column_config.CheckboxColumn("📖 View", default=False),
-                "Expert": st.column_config.SelectboxColumn("Expert", options=expert_names, required=True),
                 "Title": st.column_config.TextColumn("Title"),
                 "Domain": st.column_config.TextColumn("Domain"),
+                "Expert": st.column_config.SelectboxColumn("Expert", options=expert_names, required=True),
                 "Tags": st.column_config.TextColumn("Tags"),
+                "Added": st.column_config.TextColumn("📅 Added"),
             },
             use_container_width=True,
             hide_index=True,

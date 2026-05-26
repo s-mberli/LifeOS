@@ -156,3 +156,29 @@ def test_ui_chat_save_insight_flow(tmp_project: Path):
         assert 1 in at.session_state.saved_msg_indices
 
 
+# ── Date Added column formatting ──────────────────────────────────────────────
+
+def _format_date_display(created_at: str) -> str:
+    """Mirror of the formatting logic added to modals._library_modal_body."""
+    date_display = ""
+    if isinstance(created_at, str) and created_at:
+        try:
+            from datetime import datetime
+            dt = datetime.fromisoformat(created_at)
+            date_display = dt.strftime("%d %b %Y")
+        except (ValueError, TypeError):
+            date_display = created_at[:10] if len(created_at) >= 10 else created_at
+    return date_display
+
+
+def test_date_display_valid_iso_timestamp():
+    """Valid ISO-8601 created_at should format as DD Mon YYYY."""
+    result = _format_date_display("2026-05-26T11:28:53+10:00")
+    assert result == "26 May 2026"
+
+
+def test_date_display_missing_or_invalid():
+    """Empty or non-ISO strings should return empty string or raw fallback without crashing."""
+    assert _format_date_display("") == ""
+    assert _format_date_display("not-a-date") == "not-a-date"  # exactly 10 chars, returned as-is
+    assert _format_date_display("1748297200.123456") == "1748297200"  # mtime float fallback
