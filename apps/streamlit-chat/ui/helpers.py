@@ -58,12 +58,15 @@ def get_all_insight_files() -> list[dict]:
     """
     knowledge_dir = ROOT / "data" / "knowledge"
     private_dir = ROOT / "data" / "private"
+    inbox_dir = ROOT / "data" / "inbox"
     
     files = []
     if knowledge_dir.exists():
         files.extend(list(knowledge_dir.rglob("*.md")))
     if private_dir.exists():
         files.extend(list(private_dir.rglob("*.md")))
+    if inbox_dir.exists():
+        files.extend(list(inbox_dir.rglob("*.md")))
         
     results = []
     for fpath in files:
@@ -74,9 +77,25 @@ def get_all_insight_files() -> list[dict]:
             if fm.get("type") == "insight_note":
                 title = fm.get("title", fpath.stem)
                 rel_path = fpath.relative_to(ROOT)
-                results.append({"title": title, "path": str(rel_path)})
+                
+                # Extract created_at for sorting, fallback to filesystem mtime
+                created_at = fm.get("created_at")
+                if not isinstance(created_at, str):
+                    try:
+                        created_at = str(fpath.stat().st_mtime)
+                    except Exception:
+                        created_at = ""
+                        
+                results.append({
+                    "title": title,
+                    "path": str(rel_path),
+                    "created_at": created_at
+                })
         except Exception:
             continue
+            
+    # Sort descending so newest files are at the top
+    results.sort(key=lambda x: x["created_at"], reverse=True)
     return results
 
 
@@ -115,110 +134,6 @@ def read_insight_frontmatter(file_path: Path) -> dict:
         return {}
 
 
-# ── Full-text search ──────────────────────────────────────────────────────────
-
-def fts_search(
-    query: str,
-    limit: int = 5,
-    allowed_paths: Optional[set] = None,
-    require_insight_note: bool = False,
-) -> list[tuple]:
-    """Run a full-text search against the SQLite FTS5 index.
-
-    Args:
-        query:               Search query string.
-        limit:               Maximum number of results to return.
-        allowed_paths:       When provided, only results whose ``path``
-                             column is in this set are included.
-        require_insight_note: When ``True``, only rows whose path starts
-                              with ``data/knowledge/`` or ``data/private/`` are included.
-
-    Returns:
-        A list of ``(title, path, snippet, score)`` tuples ordered by
-        relevance (best first).  Returns an empty list if the database
-        does not exist or the query fails.
-    """
-    if not DB_PATH.exists():
-        return []
-
-    try:
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-
-        def run_fts_query(q_str: str) -> list[tuple]:
-            cursor.execute(
-                """
-                SELECT path, title, snippet(search_index, 2, '**', '**', '...', 64),
-                       bm25(search_index)
-                FROM search_index
-                WHERE content MATCH ?
-                ORDER BY bm25(search_index)
-                LIMIT 50
-                """,
-                (q_str,),
-            )
-            return cursor.fetchall()
-
-        rows = []
-        try:
-            rows = run_fts_query(query)
-        except sqlite3.OperationalError:
-            pass
-
-        if not rows:
-            import re
-            words = re.findall(r"\b\w+\b", query.lower())
-            stopwords = {
-                "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are",
-                "arent", "as", "at", "be", "because", "been", "before", "being", "below", "between", "both",
-                "but", "by", "cant", "cannot", "could", "couldnt", "did", "didnt", "do", "does", "doesnt",
-                "doing", "dont", "down", "during", "each", "few", "for", "from", "further", "had", "hadnt",
-                "has", "hasnt", "have", "havent", "having", "he", "hed", "hell", "hes", "her", "here",
-                "heres", "hers", "herself", "him", "himself", "his", "how", "hows", "i", "id", "ill", "im",
-                "ive", "if", "in", "into", "is", "isnt", "it", "its", "itself", "lets", "me", "more", "most",
-                "mustnt", "my", "myself", "no", "nor", "not", "of", "off", "on", "once", "only", "or", "other",
-                "ought", "our", "ours", "ourselves", "out", "over", "own", "same", "shant", "she", "shed",
-                "shell", "shes", "should", "shouldnt", "so", "some", "such", "than", "that", "thats", "the",
-                "their", "theirs", "them", "themselves", "then", "there", "theres", "these", "they", "theyd",
-                "theyll", "theyre", "theyve", "this", "those", "through", "to", "too", "under", "until",
-                "up", "very", "was", "wasnt", "we", "wed", "well", "were", "weve", "werent", "what", "whats",
-                "when", "whens", "where", "wheres", "which", "while", "who", "whos", "whom", "why", "whys",
-                "with", "wont", "would", "wouldnt", "you", "youd", "youll", "youre", "youve", "your", "yours",
-                "yourself", "yourselves"
-            }
-            tokens = [w for w in words if w not in stopwords]
-            if tokens:
-                and_query = " AND ".join(tokens)
-                try:
-                    rows = run_fts_query(and_query)
-                except sqlite3.OperationalError:
-                    pass
-
-                if not rows:
-                    or_query = " OR ".join(tokens)
-                    try:
-                        rows = run_fts_query(or_query)
-                    except sqlite3.OperationalError:
-                        pass
-
-        results: list[tuple] = []
-        for path, title, snippet, score in rows:
-            if require_insight_note and not (path.startswith("data/knowledge/") or path.startswith("data/private/")):
-                continue
-            if allowed_paths is not None and path not in allowed_paths:
-                continue
-
-            results.append((title, path, snippet, score))
-            if len(results) >= limit:
-                break
-
-        conn.close()
-        return results
-
-    except Exception as exc:  # pragma: no cover
-        print(f"[helpers] fts_search error: {exc}")
-        return []
-
 
 # ── Search index rebuild ──────────────────────────────────────────────────────
 
@@ -234,47 +149,6 @@ def rebuild_search_index() -> dict:
 
     return build_fts_index.build_index()
 
-
-# ── LLM interaction ───────────────────────────────────────────────────────────
-
-def ask_llm_chat(
-    system_prompt: str,
-    user_prompt: str,
-    history: Optional[list] = None,
-) -> str:
-    """Call the project's LLM client and return the response as a string.
-
-    Constructs a ``messages`` list with the system prompt, any provided
-    conversation history, and the current user prompt, then delegates to
-    ``llm_client.call_llm``.
-
-    Args:
-        system_prompt: The system-level instruction for the model.
-        user_prompt:   The user's current message / question.
-        history:       Optional list of prior ``{"role": …, "content": …}``
-                       dicts to include as conversation context.
-
-    Returns:
-        The model's response text, or an ``"[LLM Error] …"`` string on
-        failure.
-    """
-    try:
-        from src.core.llm_client import call_llm  # noqa: PLC0415
-
-        messages: list[dict] = [{"role": "system", "content": system_prompt}]
-
-        if history:
-            for msg in history:
-                if msg.get("role") in ("user", "assistant"):
-                    messages.append(msg)
-
-        messages.append({"role": "user", "content": user_prompt})
-
-        result = call_llm(messages=messages, model_type="smart", json_mode=False)
-        return result[0] if isinstance(result, tuple) else result
-
-    except Exception as exc:  # pragma: no cover
-        return f"[LLM Error] {exc}"
 
 
 # ── Auto-router ───────────────────────────────────────────────────────────────
@@ -343,7 +217,9 @@ def construct_chat_prompts(
     system_prompt += (
         "\n\nYour job:\n"
         "- Answer the user's question using the retrieved notes as context.\n"
-        "- Be concise and practical.\n"
+        "- Be comprehensive and detailed. Explore the nuances of the topic and provide practical examples or context, ensuring your response is thorough (aim for depth).\n"
+        "- When an insight contains a core principle, clearly explain the principle first so the user understands the foundation. Then, provide highly CONCRETE and ACTIONABLE advice on how they can practically apply that principle to their life.\n"
+        "- Use clear markdown formatting. Break up large walls of text using bullet points, bold text for key concepts, and short paragraphs to make your answer highly readable and scannable.\n"
         "- Do NOT invent facts.\n"
         "- Adopt the style, tone, and directives of the active expert profile (if loaded).\n"
         "- If the context contains a summary rather than the full raw transcript, answer based on the summary. Do NOT ask the user to provide the link or transcript to you."
@@ -420,87 +296,12 @@ def construct_chat_prompts(
     return system_prompt, user_prompt
 
 
-def execute_agent_search_loop(
-    system_prompt: str,
-    user_prompt: str,
-    history: Optional[list] = None,
-    allowed_paths: Optional[set] = None,
-    max_turns: int = 3,
-) -> tuple[str, list[tuple[str, str]]]:
-    """Execute an agentic loop allowing the LLM to call the FTS search tool.
+# ── Compatibility Re-exports for Tests ───────────────────────────────────────
+from src.core.search_knowledge import fts_search  # noqa: F401
+from src.core.chat_context import (  # noqa: F401
+    execute_agent_search_loop,
+    ask_llm_chat,
+)
 
-    Uses a robust, provider-agnostic XML format:
-    <call:fts_search>search query</call:fts_search>
-
-    Args:
-        system_prompt: The initial system prompt.
-        user_prompt:   The user prompt / question.
-        history:       Conversation history.
-        allowed_paths: Optional filter paths for FTS search.
-        max_turns:     Max number of tool call iterations.
-
-    Returns:
-        A tuple of (final_response_text, list_of_tool_calls_made).
-        Each tool call is a tuple of (search_query, formatted_results).
-    """
-    import re
-
-    # Inject tool-use instructions into the system prompt
-    tool_instructions = (
-        "\n\n=== Tool Access ===\n"
-        "You have access to a search tool: fts_search.\n"
-        "If you need to query the database/vault for specific facts, insights, or details "
-        "not present in your active context, output an XML tag exactly like this:\n"
-        "<call:fts_search>your query here</call:fts_search>\n"
-        "Do not explain the call, do not output any other text when calling a tool.\n"
-        "After you output the tag, the system will execute it and provide the results.\n"
-    )
-    augmented_system = system_prompt + tool_instructions
-    
-    current_history = list(history) if history else []
-    calls_made = []
-
-    for _ in range(max_turns):
-        response = ask_llm_chat(augmented_system, user_prompt, history=current_history)
-        if not response:
-            break
-
-        # Check for tool call pattern
-        match = re.search(r"<call:fts_search>(.*?)</call:fts_search>", response, re.DOTALL)
-        if not match:
-            # No tool call; return this as final response
-            return response, calls_made
-
-        # We found a tool call! Extract query and execute it
-        query = match.group(1).strip()
-        
-        # Execute FTS search
-        results = fts_search(query, limit=3, allowed_paths=allowed_paths)
-        
-        # Format results
-        if results:
-            formatted_list = []
-            for r_title, r_path, r_snippet, _ in results:
-                formatted_list.append(f"{r_title} ({r_path}):\n{r_snippet}")
-            results_str = "\n\n".join(formatted_list)
-        else:
-            results_str = "No results found in knowledge base."
-
-        # Record the call
-        calls_made.append((query, results_str))
-
-        # Append assistant's tool invocation and user's tool response to history
-        current_history.append({"role": "assistant", "content": response})
-        current_history.append({
-            "role": "user",
-            "content": (
-                f"<response:fts_search>\n{results_str}\n</response:fts_search>\n"
-                f"Use the above search results to complete your answer."
-            )
-        })
-
-    # Fallback/exhausted turns: get final answer
-    final_response = ask_llm_chat(augmented_system, user_prompt, history=current_history)
-    return final_response, calls_made
 
 

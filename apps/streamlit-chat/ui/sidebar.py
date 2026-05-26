@@ -68,7 +68,7 @@ def _render_sidebar_body() -> None:
                 and "\n" not in pasted_text
             )
 
-        use_ai_bulk = st.checkbox("Run AI Summaries (slow)", value=False, key="use_ai_bulk")
+        use_ai_bulk = st.checkbox("Run AI Summaries (slow)", value=True, key="use_ai_bulk")
         st.markdown(
             "ℹ️ *AI summaries generate searchable metadata (tags, key ideas, next actions) "
             "for the library. Skip if you only want raw content immediately available for chat search.*"
@@ -179,6 +179,11 @@ def _render_sidebar_body() -> None:
 
                 st.write("Rebuilding search index...")
                 rebuild_search_index()
+                try:
+                    from .chat import cached_get_all_insight_files
+                    cached_get_all_insight_files.clear()
+                except Exception:
+                    pass
                 
                 status.update(
                     label=f"Ingestion complete. {success_count} succeeded, {failed_count} failed.",

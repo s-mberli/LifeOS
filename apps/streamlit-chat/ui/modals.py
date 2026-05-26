@@ -110,9 +110,9 @@ def library_modal() -> None:
 
 def _library_modal_body() -> None:
     try:
-        from ingest_resource import assign_insight_to_expert, update_insight_frontmatter
+        from core.ingest_resource import assign_insight_to_expert, update_insight_frontmatter
     except ImportError as exc:
-        st.error(f"Could not import ingest_resource: {exc}")
+        st.error(f"Could not import core.ingest_resource: {exc}")
         return
 
     st.subheader("Saved Insights")
@@ -120,10 +120,12 @@ def _library_modal_body() -> None:
 
     knowledge_dir = ROOT / "data" / "knowledge"
     private_dir = ROOT / "data" / "private"
+    inbox_dir = ROOT / "data" / "inbox"
 
     md_files = []
     if knowledge_dir.exists(): md_files.extend(list(knowledge_dir.rglob("*.md")))
     if private_dir.exists(): md_files.extend(list(private_dir.rglob("*.md")))
+    if inbox_dir.exists(): md_files.extend(list(inbox_dir.rglob("*.md")))
     md_files = [f for f in md_files if "raw" not in f.parts]
 
     if not md_files:
@@ -135,10 +137,8 @@ def _library_modal_body() -> None:
     expert_slug_map = {e["display_name"]: e["slug"] for e in experts}
     slug_to_name_map = {e["slug"]: e["display_name"] for e in experts}
 
-    data = []
-    path_map = {}
-
-    for i, f in enumerate(md_files):
+    raw_data = []
+    for f in md_files:
         fm = read_insight_frontmatter(f)
         attached = fm.get("attached_experts", [])
         if isinstance(attached, str):
@@ -149,15 +149,38 @@ def _library_modal_body() -> None:
         raw_tags = fm.get("tags", "")
         tags_str = ", ".join(map(str, raw_tags)) if isinstance(raw_tags, list) else str(raw_tags)
 
-        data.append({
-            "_id": i,
-            "View": (st.session_state.get("last_viewed_id") == i),
+        # Retrieve created_at for sorting, fallback to filesystem mtime
+        created_at = fm.get("created_at")
+        if not isinstance(created_at, str):
+            try:
+                created_at = str(f.stat().st_mtime)
+            except Exception:
+                created_at = ""
+
+        raw_data.append({
             "Title": fm.get("title", f.name),
             "Domain": fm.get("domain", "Unknown"),
             "Expert": expert_col,
             "Tags": tags_str,
+            "created_at": created_at,
+            "path": str(f),
         })
-        path_map[i] = str(f)
+
+    # Sort descending so newest is at the top
+    raw_data.sort(key=lambda x: x["created_at"], reverse=True)
+
+    data = []
+    path_map = {}
+    for i, item in enumerate(raw_data):
+        data.append({
+            "_id": i,
+            "View": (st.session_state.get("last_viewed_id") == i),
+            "Title": item["Title"],
+            "Domain": item["Domain"],
+            "Expert": item["Expert"],
+            "Tags": item["Tags"],
+        })
+        path_map[i] = item["path"]
 
     df = pd.DataFrame(data)
 
@@ -306,7 +329,7 @@ def _creator_expert_modal_body() -> None:
 
     try:
         from core.youtube import fetch_channel_metadata, fetch_recent_videos, fetch_video_metadata
-        from core.experts import assign_insight_to_expert, synthesize_creator_persona
+        from core.experts import assign_insight_to_expert, synthesize_creator_persona, slugify_expert_name
         from core.ingest import process_one_file
     except ImportError as exc:
         st.error(f"Could not import required modules: {exc}")
@@ -356,8 +379,7 @@ def _creator_expert_modal_body() -> None:
 
     if st.session_state.channel_meta:
         uploader: str = st.session_state.channel_meta["uploader"]
-        slug = f"expert--{re.sub(r'[^a-zA-Z0-9-]', '-', uploader.lower())}"
-        slug = re.sub(r"-+", "-", slug).strip("-")
+        slug = slugify_expert_name(uploader)
 
         st.success(f"Detected Creator: **{uploader}**")
         if is_single_video:

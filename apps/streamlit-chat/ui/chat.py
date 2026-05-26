@@ -12,13 +12,18 @@ import streamlit as st
 
 from .helpers import (
     ROOT,
-    ask_llm_chat,
     auto_route_prompt,
-    fts_search,
     get_existing_experts,
     get_all_insight_files,
     read_insight_frontmatter,
 )
+from core.search_knowledge import fts_search
+
+
+@st.cache_data(ttl=60)
+def cached_get_all_insight_files() -> list[dict]:
+    return get_all_insight_files()
+
 
 
 def render_chat_interface() -> None:
@@ -55,14 +60,18 @@ def _render_chat_body() -> None:
         with messages_container.chat_message(msg["role"]):
             st.write(msg["content"])
             if msg["role"] == "assistant" and not msg["content"].startswith("[LLM Error]"):
+                # Source attribution popover
+                if msg.get("sources"):
+                    with st.popover(f"📚 Sources Referenced ({len(msg['sources'])})"):
+                        for title, path, snippet, score in msg["sources"]:
+                            display_score = abs(score) * 1000
+                            st.markdown(
+                                f"**{title}** (`{path}`) — Score: `{display_score:.2f}`"
+                            )
                 if idx in st.session_state.saved_msg_indices:
                     st.caption("✅ Saved to Library")
                 else:
-                    user_prompt = ""
-                    for prev_idx in range(idx - 1, -1, -1):
-                        if st.session_state.messages[prev_idx]["role"] == "user":
-                            user_prompt = st.session_state.messages[prev_idx]["content"]
-                            break
+                    user_prompt = msg.get("user_prompt", "")
                     if st.button("💾 Save Insight to Library", key=f"save_insight_{idx}"):
                         from core.chat_persistence import save_message_as_insight
                         success, file_path = save_message_as_insight(
@@ -73,14 +82,14 @@ def _render_chat_body() -> None:
                         )
                         if success:
                             st.session_state.saved_msg_indices.add(idx)
+                            cached_get_all_insight_files.clear()
                             st.success("Saved as insight note!")
                             st.rerun()
                         else:
                             st.error("Failed to save insight.")
 
-    # ── Context Selection ────────────────────────────────────────────────────
     existing_experts = get_existing_experts()
-    all_files = get_all_insight_files()
+    all_files = cached_get_all_insight_files()
     
     options_map: dict = {}
     for e in existing_experts:
@@ -107,20 +116,25 @@ def _render_chat_body() -> None:
     messages_container.chat_message("user").write(prompt)
 
     # 2. Resolve @mention overrides
-    target_expert_dict_from_at_mention = None
-    for e in existing_experts:
-        slug_without_prefix = e["slug"].replace("expert--", "")
-        if (
-            f"@{e['display_name'].lower()}" in prompt.lower()
-            or f"@{slug_without_prefix}" in prompt.lower()
-        ):
-            target_expert_dict_from_at_mention = e
-            st.toast(f"Routed to {e['display_name']}")
-            break
+    # 2. Resolve @mention overrides
+    from core.chat_context import extract_mention
+    target_expert_dict_from_at_mention = extract_mention(prompt, existing_experts)
+    if target_expert_dict_from_at_mention:
+        st.toast(f"Routed to {target_expert_dict_from_at_mention['display_name']}")
 
     # 3. Build the set of allowed document paths for FTS filtering
     allowed_paths: set = set()
     require_insight_note = False
+
+    def _add_expert_paths(expert_slug: str, paths_set: set) -> None:
+        sources_dir = ROOT / "data" / "experts" / expert_slug / "sources"
+        if sources_dir.exists():
+            for ref_file in sources_dir.glob("*-ref.md"):
+                fm = read_insight_frontmatter(ref_file)
+                if fm.get("source_path"):
+                    paths_set.add(fm["source_path"])
+        for doc in ("profile.md", "playbook.md", "principles.md", "evidence.md"):
+            paths_set.add(f"data/experts/{expert_slug}/{doc}")
 
     if not selected_scopes and not target_expert_dict_from_at_mention:
         # General Library mode
@@ -130,29 +144,13 @@ def _render_chat_body() -> None:
         for scope in selected_scopes:
             item = options_map[scope]
             if item["type"] == "expert":
-                slug = item["data"]["slug"]
-                sources_dir = ROOT / "data" / "experts" / slug / "sources"
-                if sources_dir.exists():
-                    for ref_file in sources_dir.glob("*-ref.md"):
-                        fm = read_insight_frontmatter(ref_file)
-                        if fm.get("source_path"):
-                            allowed_paths.add(fm["source_path"])
-                for doc in ("profile.md", "playbook.md", "principles.md", "evidence.md"):
-                    allowed_paths.add(f"data/experts/{slug}/{doc}")
+                _add_expert_paths(item["data"]["slug"], allowed_paths)
             elif item["type"] == "file":
                 allowed_paths.add(item["data"]["path"])
                 
         # Handle @mention
         if target_expert_dict_from_at_mention:
-            slug = target_expert_dict_from_at_mention["slug"]
-            sources_dir = ROOT / "data" / "experts" / slug / "sources"
-            if sources_dir.exists():
-                for ref_file in sources_dir.glob("*-ref.md"):
-                    fm = read_insight_frontmatter(ref_file)
-                    if fm.get("source_path"):
-                        allowed_paths.add(fm["source_path"])
-            for doc in ("profile.md", "playbook.md", "principles.md", "evidence.md"):
-                allowed_paths.add(f"data/experts/{slug}/{doc}")
+            _add_expert_paths(target_expert_dict_from_at_mention["slug"], allowed_paths)
 
     # 4. Search, synthesise, and stream the response
     with messages_container.chat_message("assistant"):
@@ -197,10 +195,11 @@ def _render_chat_body() -> None:
             # Provide the last 5 prior messages as conversation history
             history = st.session_state.get("messages", [])[-6:-1]
 
-            from .helpers import execute_agent_search_loop
+            from core.chat_context import execute_agent_search_loop
             answer_text, calls_made = execute_agent_search_loop(
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
+                fts_search_fn=fts_search,
                 history=history,
                 allowed_paths=allowed_paths if allowed_paths else None,
             )
@@ -212,10 +211,16 @@ def _render_chat_body() -> None:
 
             if answer_text and not answer_text.startswith("[LLM Error]"):
                 st.write(answer_text)
-                assistant_msg = {"role": "assistant", "content": answer_text}
+                assistant_msg = {
+                    "role": "assistant",
+                    "content": answer_text,
+                    "user_prompt": prompt
+                }
                 if target_expert:
                     assistant_msg["expert_slug"] = target_expert["slug"]
                     assistant_msg["expert_name"] = target_expert["display_name"]
+                if results:
+                    assistant_msg["sources"] = results
                 st.session_state.messages.append(assistant_msg)
 
                 # Auto-log to daily chat logs
@@ -229,17 +234,11 @@ def _render_chat_body() -> None:
                 except Exception as log_exc:
                     print(f"Auto-log failed: {log_exc}")
 
-                # Source attribution popover
-                if results:
-                    with st.popover(f"📚 Sources Referenced ({len(results)})"):
-                        for title, path, snippet, score in results:
-                            display_score = abs(score) * 1000
-                            st.markdown(
-                                f"**{title}** (`{path}`) — Score: `{display_score:.2f}`"
-                            )
+                st.rerun()
             else:
                 err_msg = answer_text if answer_text else "Unknown LLM error."
                 st.error(err_msg)
                 st.session_state.messages.append(
                     {"role": "assistant", "content": err_msg}
                 )
+                st.rerun()

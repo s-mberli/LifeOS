@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 
 # Base paths
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 INDEX_DIR = BASE_DIR / "indexes"
 DB_PATH = INDEX_DIR / "lifeos.db"
 
@@ -12,6 +12,7 @@ DB_PATH = INDEX_DIR / "lifeos.db"
 DIRECTORIES_TO_INDEX = [
     BASE_DIR / "data" / "knowledge",
     BASE_DIR / "data" / "private",
+    BASE_DIR / "data" / "inbox",
     BASE_DIR / "data" / "experts",
     BASE_DIR / "data" / "business",
     BASE_DIR / "data" / "career",
