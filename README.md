@@ -82,6 +82,8 @@ Queries are routed to experts based on declarative mapping (`config/domain_map.y
 | Path | Description |
 |------|-------------|
 | `apps/streamlit-chat/` | The main Streamlit UI. Contains the `app.py` orchestrator and modular `ui/` components (chat, sidebar, modals). |
+| `apps/firefox-clipper/` | Firefox 1-click clipper extension that captures the active tab's URL. |
+| `src/api.py` | FastAPI sidecar server that receives clipped URLs and triggers ingestion. |
 | `src/core/` | Pure Python business logic: `frontmatter.py`, `youtube.py`, `web.py`, `experts.py`, `ingest.py`. |
 | `data/` | Your personal knowledge base. Separated into `knowledge/` (ingested notes), `experts/` (synthesized profiles), and `private/` (your backlog and sensitive data). |
 | `config/` | System configurations, domain maps, and model definitions. |
@@ -112,3 +114,10 @@ Queries are routed to experts based on declarative mapping (`config/domain_map.y
    ```bash
    streamlit run apps/streamlit-chat/app.py
    ```
+
+5. **(Optional) Run the Ingestion API & Firefox Clipper:**
+   To clip URLs directly from your browser, start the background FastAPI server:
+   ```bash
+   ./start_api.sh
+   ```
+   Then load the extension in Firefox from the `apps/firefox-clipper/` directory (see [apps/firefox-clipper/README.md](file:///Users/markus/markusos/apps/firefox-clipper/README.md) for setup details).
