@@ -14,10 +14,10 @@
 ---
 
 ## The Problem
-Generic LLMs don't know *your* context. Standard note-taking apps require you to manually organize and search. We needed a system that acts as an intelligent sounding board, specifically trained on the creators, books, and insights we care about, without sending private thoughts to the cloud.
+Generic LLMs don't know *your* context. Standard note-taking apps require you to manually organize and search, leaving your knowledge to sit inactive. We needed a system that acts as an intelligent sounding board, specifically trained on the creators, books, and insights we care about, while also proactively applying this knowledge. *(Note: While data storage and search are fully local, LifeOS relies on cloud APIs like Google Gemini or Azure OpenAI for LLM processing).*
 
 ## The Solution
-**LifeOS** is a local-first platform that synthesizes **Expert Personas** out of your ingested content.
+**LifeOS** is a local-storage platform that synthesizes **Expert Personas** out of your ingested content and actively applies insights via the autonomous **Hermes** agent loop.
 It builds a local SQLite Full-Text Search index over your data and uses Agentic Routing to answer your questions using the perspective of specific experts, fully citing the source material.
 
 **Key Features:**
@@ -25,6 +25,7 @@ It builds a local SQLite Full-Text Search index over your data and uses Agentic 
 - **YouTube & Web Ingestion** — Drop a link, and LifeOS automatically downloads the transcript, parses the HTML, and summarizes it.
 - **Expert Synthesis** — Group content by creator/domain. LifeOS auto-generates a `playbook.md`, `principles.md`, and `profile.md` for that expert.
 - **Multi-Turn Chat with Citations** — Chat directly with your synthesized experts. Every claim is backed by a specific Markdown note reference.
+- **Autonomous Codebase Improvements** — An event-driven loop triages ingested notes cheaply for coding/architecture insights and triggers the Hermes Agent weekly to propose refactoring and generate GitHub PRs.
 - **Modular Pipeline** — Built with clean Python. No LangChain bloat. You own the code and the prompts.
 
 ---
@@ -77,17 +78,29 @@ Queries are routed to experts based on declarative mapping (`config/domain_map.y
 
 ---
 
+## 🤖 Autonomous Hermes Loop (Self-Improvement)
+
+LifeOS does not just store your knowledge; it actively applies it. The system features a decoupled, event-driven self-improvement pipeline:
+1. **Outbox Ingest**: Upon note ingestion, `src/core/ingest.py` pushes note metadata to the `automation_outbox` table.
+2. **Cheap Triage**: A lightweight worker script `scripts/triage_outbox.py` periodically scans the outbox for coding and architecture keywords (AI, Architecture, Github, Python, SQLite, etc.) without calling heavy LLMs.
+3. **Weekly Run**: Every week, `scripts/weekly_hermes_run.sh` runs via cron, aggregates all actionable notes, and passes them to the **Hermes Agent** in `--oneshot` mode.
+4. **Closed-Loop Action**: Hermes reviews the codebase, implements refactoring or features, runs unit tests, and creates a **GitHub Pull Request** with the proposed improvements for the user's approval.
+
+---
+
 ## Directory Structure
 
 | Path | Description |
 |------|-------------|
 | `apps/streamlit-chat/` | The main Streamlit UI. Contains the `app.py` orchestrator and modular `ui/` components (chat, sidebar, modals). |
 | `apps/firefox-clipper/` | Firefox 1-click clipper extension that captures the active tab's URL. |
+| `scripts/` | Shell and Python automation pipeline scripts (outbox triage, weekly Hermes review loop, cron configurations). |
 | `src/api.py` | FastAPI sidecar server that receives clipped URLs and triggers ingestion. |
 | `src/core/` | Pure Python business logic: `frontmatter.py`, `youtube.py`, `web.py`, `experts.py`, `ingest.py`. |
 | `data/` | Your personal knowledge base. Separated into `knowledge/` (ingested notes), `experts/` (synthesized profiles), and `private/` (your backlog and sensitive data). |
 | `config/` | System configurations, domain maps, and model definitions. |
 | `.gemini/config/skills/` | Built-in interactive Agent Skills that allow AI coding assistants to interact with the LifeOS API. |
+
 
 ---
 

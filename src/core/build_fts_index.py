@@ -43,6 +43,21 @@ def build_index():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
+    # Create automation_outbox table if not exists
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS automation_outbox (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            note_path TEXT,
+            source_url TEXT,
+            word_count INTEGER,
+            added_at TEXT,
+            processed_at TEXT,
+            score INTEGER,
+            is_actionable INTEGER,
+            hermes_run_at TEXT
+        )
+    """)
+    
     # Create FTS5 virtual table
     # We drop it first to ensure a full rebuild
     cursor.execute("DROP TABLE IF EXISTS search_index")
