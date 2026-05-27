@@ -142,6 +142,9 @@ def fetch_jina_reader(url: str) -> tuple[str, str]:
                 if line.startswith("# "):
                     title = line[2:].strip()
                     break
+                if line.startswith("Title: "):
+                    title = line[7:].strip()
+                    break
 
         return title, content
     except Exception as exc:
