@@ -15,7 +15,6 @@ All core capabilities are modularized inside `src/core/`. Do not write business 
 - [experts.py](file:///Users/markus/markusos/src/core/experts.py): Managing expert directories, reference files (`*-ref.md`), and synthesizing playbooks.
 - [ingest.py](file:///Users/markus/markusos/src/core/ingest.py): The main entry point orchestrating resource ingestion.
 - [llm_client.py](file:///Users/markus/markusos/src/core/llm_client.py): Unified LLM wrapper supporting simple prompts or messages.
-
 ### 2. `apps/streamlit-chat/` — Streamlit UI
 The Streamlit app is split into decoupled UI components.
 
@@ -24,6 +23,13 @@ The Streamlit app is split into decoupled UI components.
 - `ui/chat.py`: Chat dialog body, routing to experts, and citations.
 - `ui/modals.py`: Dialog modals for settings, the knowledge library, and expert creation.
 - `ui/helpers.py`: Pure Python helpers for database/search (no Streamlit UI calls, fully unit-testable).
+
+### 3. `scripts/` & `automation_outbox` — Event-Driven Automation Pipeline
+MarkusOS implements an event-driven automation outbox to bridge note ingestion and autonomous actions (like weekly code reviews and PR generation by the Hermes agent) without calling heavy LLMs on every single ingestion.
+
+- **Outbox Ingestion Hook**: Inside `src/core/ingest.py` (after saving a note), a record is inserted into `automation_outbox` in `indexes/lifeos.db`.
+- **Triage Worker (`scripts/triage_outbox.py`)**: A lightweight keyword-based scanner (AI, Architecture, Github, Python, etc.) that filters and scores notes cheaply.
+- **Weekly Hermes Runner (`scripts/weekly_hermes_run.py`)**: A weekly pipeline orchestrated by cron that aggregates all triaged actionable notes, feeds them to the Hermes Agent in `--oneshot` mode, runs the test suite, and opens Pull Requests to propose changes.
 
 ---
 

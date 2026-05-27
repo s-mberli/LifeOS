@@ -582,6 +582,37 @@ def process_one_file(source: str, use_ai: bool = False, status_callback=None) ->
     try:
         out_filepath.write_text(note_content, encoding="utf-8")
         log(f"Note saved to: {out_filepath}")
+        
+        # Queue in automation_outbox
+        try:
+            import sqlite3
+            db_path = ROOT / "indexes" / "lifeos.db"
+            db_path.parent.mkdir(parents=True, exist_ok=True)
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS automation_outbox (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        note_path TEXT,
+                        source_url TEXT,
+                        word_count INTEGER,
+                        added_at TEXT,
+                        processed_at TEXT,
+                        score INTEGER,
+                        is_actionable INTEGER,
+                        hermes_run_at TEXT
+                    )
+                """)
+                relative_note_path = str(out_filepath.relative_to(ROOT))
+                cursor.execute("""
+                    INSERT INTO automation_outbox (note_path, source_url, word_count, added_at)
+                    VALUES (?, ?, ?, ?)
+                """, (relative_note_path, source_url, len(note_content.split()), now_str))
+                conn.commit()
+                log(f"Queued in automation_outbox: {relative_note_path}")
+        except Exception as db_exc:
+            log(f"Warning: failed to queue note in automation_outbox: {db_exc}")
+            
     except OSError as exc:
         result["error"] = f"Failed to save note: {exc}"
         result["process_time_sec"] = round(time.time() - start_time, 2)

@@ -40,4 +40,4 @@ This document outlines the product direction and upcoming features for the **Lif
 
 * [ ] **Hybrid Search**: Combine keyword-based SQLite FTS5 search with dense vector embeddings (e.g., using Chromadb or SQLite-vec) for semantic retrieval.
 * [ ] **Local LLM Execution**: Native support for running lightweight models locally (via Ollama or Llama.cpp) to enable 100% offline usage.
-* [ ] **Self-Improvement Candidates**: Enable the system to propose architecture, configuration, or playbook updates to itself based on new insights (requiring manual human approval).
+* [x] **Self-Improvement Candidates**: Enable the system to propose architecture, configuration, or playbook updates to itself based on new insights (requiring manual human approval). *[Delivered via the weekly Autonomous Hermes review and PR loop]*
