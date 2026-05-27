@@ -165,13 +165,23 @@ def _extract_title_from_url(url: str) -> str:
         from urllib.parse import urlparse
         parsed = urlparse(url)
         path = parsed.path.strip("/")
+        
+        segments = [s for s in path.split("/") if s]
+        netloc_lower = parsed.netloc.lower()
+        
+        # Special handling for Twitter / X URLs
+        if "x.com" in netloc_lower or "twitter.com" in netloc_lower:
+            if len(segments) >= 1:
+                username = segments[0]
+                if username not in ("home", "explore", "notifications", "messages", "search", "i"):
+                    return f"X Post by @{username}"
+                    
         if not path:
             netloc = parsed.netloc
             if netloc.startswith("www."):
                 netloc = netloc[4:]
             return netloc.split(".")[0].title()
         
-        segments = [s for s in path.split("/") if s]
         if not segments:
             return "Web Page"
         last_segment = segments[-1]
@@ -187,6 +197,7 @@ def _extract_title_from_url(url: str) -> str:
         return title if title else "Web Page"
     except Exception:
         return "Web Page"
+
 
 
 def _extract_metadata(content: str, filepath: Path, log) -> dict:
