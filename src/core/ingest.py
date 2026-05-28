@@ -475,6 +475,65 @@ def _get_unique_filepath(target_dir: Path, filename: str) -> Path:
         counter += 1
     return out_filepath
 
+def _run_cheap_triage(title: str, source_url: str, content: str, transcript: str | None, is_youtube: bool, log) -> dict | None:
+    from src.core.llm_client import try_providers, parse_json_safely
+    log("Running cheap AI triage (tags & domain only)…")
+    
+    if is_youtube and transcript:
+        sample_text = transcript[:1500]
+    else:
+        sample_text = content[:1500]
+        
+    # Load valid domains from config/domains.yaml
+    domains_list = []
+    try:
+        config_path = ROOT / "config" / "domains.yaml"
+        if config_path.exists():
+            with open(config_path, 'r', encoding='utf-8') as f:
+                domains_data = yaml.safe_load(f)
+                if isinstance(domains_data, dict) and "domains" in domains_data:
+                    domains_list = list(domains_data["domains"].keys())
+    except Exception as e:
+        log(f"Error loading domains.yaml in triage: {e}")
+
+    # Fallback list if domains.yaml loading fails or is empty
+    if not domains_list:
+        domains_list = ["ai-platform", "flow-temple", "career", "creator-wisdom", "life-kompass", "body-practice"]
+
+    system_prompt = (
+        "You are a fast router. Analyze the text and output a JSON object with 'domain' (a short string) "
+        "and 'tags' (a list of 3-5 string keywords).\n"
+        f"CRITICAL: The 'domain' value MUST be one of these exact keys: {domains_list}. Do NOT make up any other domain.\n"
+        "Output ONLY valid JSON. No markdown blocks, no backticks, no explanations."
+    )
+    user_prompt = (
+        f"Title: {title}\nURL: {source_url}\n\nContent Sample:\n{sample_text}\n\n"
+        f"Return EXACTLY this format (domain MUST be one of {domains_list}):\n"
+        "{\n\"domain\": \"...\",\n\"tags\": [\"...\"]\n}"
+    )
+    
+    try:
+        res = try_providers(system_prompt, user_prompt, 1000, 0.1)
+        if res:
+            llm_text, p_name, m_name, t_usage = res
+            parsed = parse_json_safely(llm_text)
+            if parsed:
+                domain_val = parsed.get("domain")
+                if domain_val not in domains_list:
+                    # Try simple normalization (e.g., lowercase, replace space/underscore with dash)
+                    normalized = str(domain_val).lower().replace("_", "-").replace(" ", "-")
+                    if normalized in domains_list:
+                        parsed["domain"] = normalized
+                    else:
+                        log(f"Cheap triage returned invalid domain '{domain_val}'. Rejecting invalid domain.")
+                        parsed["domain"] = None
+                log(f"Cheap triage successful: domain='{parsed.get('domain')}', tags={parsed.get('tags')}")
+                return parsed
+        return None
+    except Exception as exc:
+        log(f"Cheap triage error: {exc}")
+        return None
+
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
@@ -530,6 +589,15 @@ def process_one_file(source: str, use_ai: bool = False, status_callback=None) ->
             result["ai_parsed"] = True
             suggested_tags_str = _deduplicate_tags(suggested_tags_str, ai_data.get("suggested_tags", []))
         result["ai_data"] = ai_data
+    else:
+        triage_data = _run_cheap_triage(title, source_url, content, transcript, is_youtube, log)
+        if triage_data:
+            new_domain = triage_data.get("domain")
+            if new_domain and decision.get("primary_domain") in ["unknown", "general", ""]:
+                decision["primary_domain"] = new_domain
+            new_tags = triage_data.get("tags", [])
+            if new_tags:
+                suggested_tags_str = _deduplicate_tags(suggested_tags_str, new_tags)
 
     # 4. Deduplicate tags
     tags = _deduplicate_tags(suggested_tags_str)

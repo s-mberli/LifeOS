@@ -84,13 +84,13 @@ def capture_input(text: str, decision: dict = None) -> str:
     content = "\n".join(lines)
     
     # Write to file
-    ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    capture_dir = os.path.join(ROOT, "data", "private", "raw-capture", date_str)
-    os.makedirs(capture_dir, exist_ok=True)
+    from pathlib import Path
+    ROOT = Path(__file__).resolve().parent.parent.parent
+    capture_dir = ROOT / "data" / "private" / "raw-capture" / date_str
+    capture_dir.mkdir(parents=True, exist_ok=True)
     
-    file_path = os.path.join(capture_dir, f"capture-{safe_time}.md")
+    file_path = capture_dir / f"capture-{safe_time}.md"
     
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(content)
+    file_path.write_text(content, encoding="utf-8")
         
     return file_path

@@ -220,6 +220,7 @@ def construct_chat_prompts(
         "- Be comprehensive and detailed. Explore the nuances of the topic and provide practical examples or context, ensuring your response is thorough (aim for depth).\n"
         "- When an insight contains a core principle, clearly explain the principle first so the user understands the foundation. Then, provide highly CONCRETE and ACTIONABLE advice on how they can practically apply that principle to their life.\n"
         "- Use clear markdown formatting. Break up large walls of text using bullet points, bold text for key concepts, and short paragraphs to make your answer highly readable and scannable.\n"
+        "- **Cite your sources**: Always use inline citations (e.g., [1], [2]) referring to the specific notes/paths provided in the context so the user knows where each insight came from.\n"
         "- Do NOT invent facts.\n"
         "- Adopt the style, tone, and directives of the active expert profile (if loaded).\n"
         "- If the context contains a summary rather than the full raw transcript, answer based on the summary. Do NOT ask the user to provide the link or transcript to you."
