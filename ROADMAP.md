@@ -30,6 +30,7 @@ This document outlines the product direction and upcoming features for the **Lif
 > *Bringing in the archives and tweaking the personas.*
 
 * [ ] **Playbook Editing**: Allow users to edit expert profiles, principles, and playbooks directly from the Streamlit UI.
+* [x] **Manual Personal Memory**: User-controlled UI to inject persistent context, preferences, and custom instructions into chat sessions.
 * [ ] **Local Folder Bulk Ingestion**: Add support for selecting a local directory containing `.txt` or `.md` files (such as journal/transcript backups) and batch-ingesting them into the knowledge base.
 * [ ] **Improved Audio Ingestion**: Integration of local Whisper APIs to transcribe voice notes and local audio files.
 

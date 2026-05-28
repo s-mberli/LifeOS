@@ -32,6 +32,7 @@ Most AI tools stop at retrieval. **LifeOS closes the loop**: new knowledge becom
 | **Local SQLite FTS5 Search** | Lightning-fast, fully offline full-text indexing. No vector DB setup required. |
 | **Autonomous Self-Improvement** | The [Hermes Agent](#-autonomous-hermes-loop) triages new notes for architecture/coding insights, reviews the codebase weekly, and opens GitHub PRs. |
 | **Browser Clipper** | 1-click Firefox extension to capture any URL directly into your knowledge vault. |
+| **Manual Personal Memory** | User-managed memory system to inject persistent context, preferences, and LLM expert exports directly into the system prompt. |
 | **MCP Server** | Exposes `search_vault` and `get_note` tools via the [Model Context Protocol](https://modelcontextprotocol.io), so any MCP-compatible agent can query your knowledge base. |
 | **Multi-Provider LLM** | Cascading fallback across Azure OpenAI → Gemini → OpenRouter. Swap models without code changes. |
 
