@@ -15,6 +15,19 @@ from ui.helpers import construct_chat_prompts
 from dotenv import load_dotenv
 load_dotenv(ROOT / ".env")
 
+# Guard: Skip the entire module if no LLM API keys are set in the environment
+import pytest
+has_keys = (
+    os.environ.get("GEMINI_API_KEY")
+    or os.environ.get("AZURE_OPENAI_API_KEY")
+    or os.environ.get("OPENROUTER_API_KEY")
+)
+
+pytestmark = pytest.mark.skipif(
+    not has_keys,
+    reason="No LLM API keys configured in environment. Skipping evaluation test."
+)
+
 # Mock FTS Data
 SHORT_NOTE = "Principle: Eat the frog. Do the hardest thing first thing in the morning."
 MEDIUM_NOTE = "Health Protocol: Sleep is the foundation. Aim for 8 hours. Principle: Consistency over intensity. Go to bed at the same time every day. Action: Set an alarm for bedtime."

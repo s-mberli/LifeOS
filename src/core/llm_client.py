@@ -124,7 +124,7 @@ def call_azure(messages: list, max_tokens: int, temperature: float):
     usage = res_body.get("usage", {})
     return content, deployment, usage
 
-def try_providers(system_prompt: str, user_prompt: str, max_tokens: int, temperature: float = 0.2):
+def try_providers(system_prompt: str, user_prompt: str, max_tokens: int, temperature: float = 0.3):
     """
     Attempts to call LLM providers in fallback order using explicit requests.
     Returns: tuple (content, provider_name, model_name, usage_dict) or None
@@ -168,7 +168,7 @@ def call_llm(
     system_prompt: str = 'You are a helpful assistant.',
     messages: list | None = None,
     max_tokens: int = 4096,
-    temperature: float = 0.2,
+    temperature: float = 0.3,
     model_type: str = 'smart',
     json_mode: bool = False,
 ) -> str | None:
@@ -186,16 +186,39 @@ def call_llm(
     return res
 
 def parse_json_safely(raw_output):
-    clean_json = raw_output
+    if not raw_output:
+        return None
+    clean_json = raw_output.strip()
     if clean_json.startswith("```json"):
-        clean_json = clean_json[7:-3].strip()
+        # Remove markdown block start and end if present
+        if clean_json.endswith("```"):
+            clean_json = clean_json[7:-3].strip()
+        else:
+            clean_json = clean_json[7:].strip()
     elif clean_json.startswith("```"):
-        clean_json = clean_json[3:-3].strip()
+        if clean_json.endswith("```"):
+            clean_json = clean_json[3:-3].strip()
+        else:
+            clean_json = clean_json[3:].strip()
         
     try:
         return json.loads(clean_json)
     except Exception as e:
         print(f"  [!] Failed to parse JSON: {e}")
+        print(f"  [!] Raw output was: {repr(raw_output)}")
         return None
 
-
+def split_text(text: str, chunk_size: int = 12000, overlap: int = 1000) -> list[str]:
+    """Splits a long string into chunks with a specified overlap."""
+    if not text:
+        return []
+    if len(text) <= chunk_size:
+        return [text]
+        
+    chunks = []
+    start = 0
+    while start < len(text):
+        end = start + chunk_size
+        chunks.append(text[start:end])
+        start += chunk_size - overlap
+    return chunks
