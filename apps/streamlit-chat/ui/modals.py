@@ -525,7 +525,12 @@ def _memories_modal_body() -> None:
                 st.session_state.memory_added = True
                 if len(new_content) > 8000:
                     st.session_state.memory_warning = True
-                st.rerun()
+
+    def _delete_cb(mid):
+        delete_user_memory(mid)
+
+    def _toggle_cb(mid, tkey):
+        toggle_user_memory(mid, st.session_state[tkey])
 
     memories = get_user_memories()
     if memories:
@@ -538,11 +543,7 @@ def _memories_modal_body() -> None:
                 
                 col1, col2 = st.columns([3, 1])
                 with col1:
-                    is_active = st.toggle("Active", value=bool(mem['is_active']), key=f"mem_toggle_{mem['id']}")
-                    if is_active != bool(mem['is_active']):
-                        toggle_user_memory(mem['id'], is_active)
-                        st.rerun()
+                    tkey = f"mem_toggle_{mem['id']}"
+                    st.toggle("Active", value=bool(mem['is_active']), key=tkey, on_change=_toggle_cb, args=(mem['id'], tkey))
                 with col2:
-                    if st.button("🗑️", key=f"mem_del_{mem['id']}", help="Delete"):
-                        delete_user_memory(mem['id'])
-                        st.rerun()
+                    st.button("🗑️", key=f"mem_del_{mem['id']}", help="Delete", on_click=_delete_cb, args=(mem['id'],))
