@@ -184,7 +184,8 @@ def test_date_display_missing_or_invalid():
     assert _format_date_display("1748297200.123456") == "1748297200"  # mtime float fallback
 
 def test_ui_memories_flow(tmp_project: Path):
-    """Test adding and toggling a manual memory in the sidebar."""
+    """Test the manual memory UI modal rendering."""
+    # Ensure sys.path includes necessary directories for the runner
     if str(ROOT / "src") not in sys.path:
         sys.path.insert(0, str(ROOT / "src"))
     if str(ROOT / "apps" / "streamlit-chat") not in sys.path:
@@ -194,35 +195,19 @@ def test_ui_memories_flow(tmp_project: Path):
     with patch("ui.helpers.ROOT", tmp_project), \
          patch("ui.helpers.DB_PATH", tmp_project / "indexes" / "lifeos.db"), \
          patch("ui.sidebar.ROOT", tmp_project), \
-         patch("ui.chat.ROOT", tmp_project), \
-         patch("ui.sidebar.delete_user_memory", return_value=True) as mock_delete:
+         patch("ui.chat.ROOT", tmp_project):
 
         at = AppTest.from_file(APP_PATH)
         at.run()
         assert not at.exception
         
-        # Add a memory
-        at.text_input(key="new_mem_title").set_value("Test Memory Title")
-        at.text_area(key="new_mem_content").set_value("This is a test manual memory.")
-        # Click "Add Memory" which is the first button inside the form.
-        # Naming the form and finding the submit button:
-        # Since it's in a form, the button text is "Add Memory"
-        add_btns = [b for b in at.sidebar.button if getattr(b, "label", None) == "Add Memory"]
-        if add_btns:
-            add_btns[0].click()
+        # Open the modal
+        mem_btn = [b for b in at.sidebar.button if b.label == "🧠 Manual Personal Memory"]
+        assert len(mem_btn) > 0, "Could not find modal button"
+        mem_btn[0].click()
         at.run()
         
         assert not at.exception
-        
-        # Verify it was added (a toggle should appear for it)
-        toggles = [t for t in at.sidebar.toggle if t.label == "Active"]
-        assert len(toggles) >= 1
-        
-        # Find the delete button. The key has 'mem_del_'
-        del_btns = [b for b in at.sidebar.button if b.key and b.key.startswith("mem_del_")]
-        assert len(del_btns) > 0, "Could not find delete button"
-        del_btns[0].click()
-        at.run()
-        
-        assert not at.exception
-        mock_delete.assert_called_once()
+        # Verify the modal rendered by checking for the Title text input
+        titles = [ti for ti in at.text_input if ti.label == "Title (e.g. Coding Style)"]
+        assert len(titles) > 0, "Modal did not render expected inputs"

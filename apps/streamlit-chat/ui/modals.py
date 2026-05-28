@@ -496,3 +496,53 @@ def _creator_expert_modal_body() -> None:
                     st.session_state.channel_meta = None
                     st.session_state.build_done = False
                     st.rerun()
+
+# ── Memories modal ────────────────────────────────────────────────────────────
+
+@st.dialog("🧠 Manual Personal Memory", width="large")
+def memories_modal() -> None:
+    try:
+        _memories_modal_body()
+    except Exception as exc:
+        _show_modal_error("Memories", exc)
+
+def _memories_modal_body() -> None:
+    from .helpers import add_user_memory, get_user_memories, toggle_user_memory, delete_user_memory
+    
+    st.markdown("Inject custom context into chat.")
+    
+    if st.session_state.pop("memory_added", False):
+        st.success("Memory added!")
+    if st.session_state.pop("memory_warning", False):
+        st.warning("Warning: The memory you just added is very large (>2000 tokens) and will consume a lot of the context window.")
+    
+    with st.form("add_memory_form", clear_on_submit=True):
+        new_title = st.text_input("Title (e.g. Coding Style)", key="new_mem_title")
+        new_content = st.text_area("Content", height=100, key="new_mem_content")
+        submitted = st.form_submit_button("Add Memory")
+        if submitted and new_title and new_content:
+            if add_user_memory(new_title, new_content):
+                st.session_state.memory_added = True
+                if len(new_content) > 8000:
+                    st.session_state.memory_warning = True
+                st.rerun()
+
+    memories = get_user_memories()
+    if memories:
+        st.markdown("### Saved Memories")
+        for mem in memories:
+            with st.container(border=True):
+                st.markdown(f"**{mem['title']}**")
+                display_content = mem['content'] if len(mem['content']) < 100 else mem['content'][:100] + "..."
+                st.caption(display_content)
+                
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    is_active = st.toggle("Active", value=bool(mem['is_active']), key=f"mem_toggle_{mem['id']}")
+                    if is_active != bool(mem['is_active']):
+                        toggle_user_memory(mem['id'], is_active)
+                        st.rerun()
+                with col2:
+                    if st.button("🗑️", key=f"mem_del_{mem['id']}", help="Delete"):
+                        delete_user_memory(mem['id'])
+                        st.rerun()
