@@ -58,6 +58,18 @@ def build_index():
         )
     """)
     
+    # Create user_memory table for manual personal memory
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS user_memory (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            content TEXT,
+            is_active BOOLEAN DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    
     # Create FTS5 virtual table
     # We drop it first to ensure a full rebuild
     cursor.execute("DROP TABLE IF EXISTS search_index")

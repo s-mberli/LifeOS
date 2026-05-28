@@ -24,6 +24,90 @@ if _SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, _SCRIPTS_DIR)
 
 
+# ── User Memory Helpers ───────────────────────────────────────────────────────
+
+def _get_db_conn():
+    """Get a SQLite connection and ensure the user_memory table exists."""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS user_memory (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            content TEXT,
+            is_active BOOLEAN DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
+    return conn
+
+def get_user_memories(active_only: bool = False) -> list[dict]:
+    """Fetch user manual memories from the SQLite DB."""
+    if not DB_PATH.exists():
+        return []
+    try:
+        conn = _get_db_conn()
+        cursor = conn.cursor()
+        if active_only:
+            cursor.execute("SELECT * FROM user_memory WHERE is_active = 1 ORDER BY created_at DESC")
+        else:
+            cursor.execute("SELECT * FROM user_memory ORDER BY created_at DESC")
+        rows = cursor.fetchall()
+        conn.close()
+        return [dict(row) for row in rows]
+    except Exception as e:
+        print(f"[helpers] Error fetching user memories: {e}")
+        return []
+
+def add_user_memory(title: str, content: str) -> bool:
+    """Add a new user memory to the DB."""
+    try:
+        conn = _get_db_conn()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO user_memory (title, content, is_active) VALUES (?, ?, 1)",
+            (title, content)
+        )
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"[helpers] Error adding user memory: {e}")
+        return False
+
+def toggle_user_memory(memory_id: int, is_active: bool) -> bool:
+    """Toggle the active state of a user memory."""
+    try:
+        conn = _get_db_conn()
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE user_memory SET is_active = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            (1 if is_active else 0, memory_id)
+        )
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"[helpers] Error toggling user memory: {e}")
+        return False
+
+def delete_user_memory(memory_id: int) -> bool:
+    """Delete a user memory from the DB."""
+    try:
+        conn = _get_db_conn()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM user_memory WHERE id = ?", (memory_id,))
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"[helpers] Error deleting user memory: {e}")
+        return False
+
+
 # ── Expert helpers ────────────────────────────────────────────────────────────
 
 def get_existing_experts() -> list[dict]:
@@ -213,6 +297,13 @@ def construct_chat_prompts(
         system_prompt = (
             "You are LifeOS, a local-first personal AI operating system."
         )
+
+    active_memories = get_user_memories(active_only=True)
+    if active_memories:
+        memory_blocks = []
+        for mem in active_memories:
+            memory_blocks.append(f"[{mem['title']}]\n{mem['content']}")
+        system_prompt += "\n\n=== User Context & Preferences ===\n" + "\n\n".join(memory_blocks) + "\n\n"
 
     system_prompt += (
         "\n\nYour job:\n"
