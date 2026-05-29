@@ -117,13 +117,22 @@ def _render_chat_body() -> None:
     for f in all_files:
         options_map[f"File: {f['title']}"] = {"type": "file", "data": f}
 
-    selected_scopes = st.multiselect(
-        "Active Context (Leave empty to search entire library)",
-        options=list(options_map.keys()),
-        default=[],
-        placeholder="Select Experts or Files...",
-        label_visibility="collapsed",
-    )
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        selected_scopes = st.multiselect(
+            "Active Context (Leave empty to search entire library)",
+            options=list(options_map.keys()),
+            default=[],
+            placeholder="Select Experts or Files...",
+            label_visibility="collapsed",
+        )
+    with col2:
+        response_length = st.selectbox(
+            "Response Length",
+            options=["Concise", "Standard", "Detailed"],
+            index=1,
+            label_visibility="collapsed"
+        )
 
     # ── Chat input ───────────────────────────────────────────────────────────
     prompt = st.chat_input("Ask anything or use @ to call an expert")
@@ -198,6 +207,7 @@ def _render_chat_body() -> None:
                 options_map=options_map,
                 fts_results=results,
                 root_dir=ROOT,
+                response_length=response_length,
             )
 
             # Provide the last 5 prior messages as conversation history
