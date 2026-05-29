@@ -129,6 +129,17 @@ LifeOS doesn't just store knowledge — it **acts on it**. The system features a
 
 ---
 
+## 🛡️ Agentic AI Security (OWASP 1.1)
+
+LifeOS is designed with defense-in-depth against autonomous AI threats, specifically adhering to the **OWASP Agentic AI Threats and Mitigations 1.1** standard:
+
+- **Memory Poisoning (LLM04):** LifeOS uses a strictly *manual* persistent memory injection system (`user_memory` table). Agents cannot autonomously overwrite your core preferences or system prompts, completely mitigating autonomous memory contamination.
+- **Tool Misuse & Privilege Escalation (LLM02):** The Model Context Protocol (MCP) server runs in a highly restricted sandbox. It explicitly blocks path traversal and hard-denies access to `.env` and `data/private/`. External agents are granted **read-only** access by default.
+- **Cascading Failures & Repudiation:** Every MCP tool invocation, including arguments and hidden Python exceptions, is securely logged to a private `mcp_audit.log`, ensuring full traceability of autonomous actions.
+- **Denial of Service (LLM04):** The local MCP server enforces strict rate limiting (max 60 req/min) and truncates excessively long string inputs to prevent malicious agents from causing CPU exhaustion or Out-of-Memory crashes.
+
+---
+
 ## 📁 Project Structure
 
 ```

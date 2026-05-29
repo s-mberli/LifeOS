@@ -142,56 +142,13 @@ def _render_chat_body() -> None:
         st.toast(f"Routed to {target_expert_dict_from_at_mention['display_name']}")
 
     # 3. Build the set of allowed document paths for FTS filtering
-    allowed_paths: set = set()
-    require_insight_note = False
-
-    def _add_expert_paths(expert_slug: str, paths_set: set) -> None:
-        sources_dir = ROOT / "data" / "experts" / expert_slug / "sources"
-        if sources_dir.exists():
-            for ref_file in sources_dir.glob("*-ref.md"):
-                fm = read_insight_frontmatter(ref_file)
-                src_path = fm.get("source_path")
-                if src_path:
-                    # Handle if cleanup_data.py renamed the file
-                    if "tmp" in src_path and not (ROOT / src_path).exists():
-                        import re
-                        title = fm.get("source_title", "")
-                        safe_title = re.sub(r"[^a-z0-9\-]", "", title.lower().replace(" ", "-"))
-                        possible_path = f"data/knowledge/ai-resources/{safe_title}.md"
-                        if (ROOT / possible_path).exists():
-                            src_path = possible_path
-                    paths_set.add(src_path)
-                    
-                    # Also allow searching the raw transcript file
-                    try:
-                        real_p = ROOT / src_path
-                        if real_p.exists():
-                            real_fm = read_insight_frontmatter(real_p)
-                            t_path = real_fm.get("transcript_path", "")
-                            if "data/knowledge" in str(t_path):
-                                rel_path = str(t_path)[str(t_path).find("data/knowledge"):]
-                                paths_set.add(rel_path)
-                    except Exception:
-                        pass
-
-        for doc in ("profile.md", "playbook.md", "principles.md", "evidence.md"):
-            paths_set.add(f"data/experts/{expert_slug}/{doc}")
-
-    if not selected_scopes and not target_expert_dict_from_at_mention:
-        # General Library mode
-        require_insight_note = True
-    else:
-        # Add paths from multiselect
-        for scope in selected_scopes:
-            item = options_map[scope]
-            if item["type"] == "expert":
-                _add_expert_paths(item["data"]["slug"], allowed_paths)
-            elif item["type"] == "file":
-                allowed_paths.add(item["data"]["path"])
-                
-        # Handle @mention
-        if target_expert_dict_from_at_mention:
-            _add_expert_paths(target_expert_dict_from_at_mention["slug"], allowed_paths)
+    from .helpers import build_allowed_paths
+    allowed_paths, require_insight_note = build_allowed_paths(
+        selected_scopes=selected_scopes,
+        target_expert_dict=target_expert_dict_from_at_mention,
+        options_map=options_map,
+        root_dir=ROOT,
+    )
 
     # 4. Search, synthesise, and stream the response
     with messages_container.chat_message("assistant"):
@@ -221,6 +178,7 @@ def _render_chat_body() -> None:
                 limit=5,
                 allowed_paths=allowed_paths if allowed_paths else None,
                 require_insight_note=require_insight_note,
+                include_private=True,
             )
 
             from .helpers import construct_chat_prompts
@@ -243,6 +201,7 @@ def _render_chat_body() -> None:
                 fts_search_fn=fts_search,
                 history=history,
                 allowed_paths=allowed_paths if allowed_paths else None,
+                include_private=True,
             )
 
             # Show visual indicators of agent searches
