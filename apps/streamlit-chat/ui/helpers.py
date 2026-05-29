@@ -394,10 +394,16 @@ def construct_chat_prompts(
         else "No relevant notes found in knowledge base."
     )
 
+    length_reminder = ""
+    if response_length == "Concise":
+        length_reminder = "\n\nCRITICAL REQUIREMENT: Keep your response extremely concise. Give me a short summary (1-2 paragraphs maximum) regardless of prior message length."
+    elif response_length == "Detailed":
+        length_reminder = "\n\nCRITICAL REQUIREMENT: Provide a highly detailed and comprehensive answer."
+
     user_prompt = (
         f"Question: {prompt}\n\n"
         f"Relevant Notes from Knowledge Base:\n{retrieved_context}\n\n"
-        "Please answer based on the above context."
+        f"Please answer based on the above context.{length_reminder}"
     )
 
     return system_prompt, user_prompt
