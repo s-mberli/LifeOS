@@ -13,6 +13,7 @@ def fts_search(
     limit: int = 5,
     allowed_paths: Optional[set] = None,
     require_insight_note: bool = False,
+    include_private: bool = False,
 ) -> list[tuple]:
     if not DB_PATH.exists():
         return []
@@ -79,6 +80,8 @@ def fts_search(
 
         results: list[tuple] = []
         for path, title, snippet, score in rows:
+            if not include_private and path.startswith("data/private/"):
+                continue
             if require_insight_note and not (path.startswith("data/knowledge/") or path.startswith("data/private/")):
                 continue
             if allowed_paths is not None and path not in allowed_paths:

@@ -32,6 +32,7 @@ def execute_agent_search_loop(
     allowed_paths: Optional[set] = None,
     max_turns: int = 3,
     fts_search_fn=None,
+    include_private: bool = False,
 ) -> tuple[str, list[tuple[str, str]]]:
     import re
     tool_instructions = (
@@ -61,7 +62,12 @@ def execute_agent_search_loop(
             return response, calls_made
 
         query = match.group(1).strip()
-        results = fts_search_fn(query, limit=3, allowed_paths=allowed_paths)
+        # Some fts_search_fn signatures might not support include_private, so handle carefully if needed.
+        # But we know we are passing the core fts_search which does.
+        try:
+            results = fts_search_fn(query, limit=3, allowed_paths=allowed_paths, include_private=include_private)
+        except TypeError:
+            results = fts_search_fn(query, limit=3, allowed_paths=allowed_paths)
         
         if results:
             formatted_list = []

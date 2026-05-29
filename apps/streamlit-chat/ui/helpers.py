@@ -403,4 +403,66 @@ from src.core.chat_context import (  # noqa: F401
 )
 
 
+def build_allowed_paths(
+    selected_scopes: list, 
+    target_expert_dict: Optional[dict], 
+    options_map: dict, 
+    root_dir: Path
+) -> tuple[set, bool]:
+    """
+    Build the set of allowed document paths for FTS filtering based on selected scopes.
+    Returns a tuple of (allowed_paths_set, require_insight_note_boolean).
+    """
+    allowed_paths: set = set()
+    require_insight_note = False
 
+    def _add_expert_paths(expert_slug: str, paths_set: set) -> None:
+        sources_dir = root_dir / "data" / "experts" / expert_slug / "sources"
+        if sources_dir.exists():
+            for ref_file in sources_dir.glob("*-ref.md"):
+                fm = read_insight_frontmatter(ref_file)
+                src_path = fm.get("source_path")
+                if src_path:
+                    # Handle if cleanup_data.py renamed the file
+                    if "tmp" in src_path and not (root_dir / src_path).exists():
+                        import re
+                        title = fm.get("source_title", "")
+                        safe_title = re.sub(r"[^a-z0-9\-]", "", title.lower().replace(" ", "-"))
+                        possible_path = f"data/knowledge/ai-resources/{safe_title}.md"
+                        if (root_dir / possible_path).exists():
+                            src_path = possible_path
+                    paths_set.add(src_path)
+                    
+                    # Also allow searching the raw transcript file
+                    try:
+                        real_p = root_dir / src_path
+                        if real_p.exists():
+                            real_fm = read_insight_frontmatter(real_p)
+                            t_path = real_fm.get("transcript_path", "")
+                            if "data/knowledge" in str(t_path):
+                                rel_path = str(t_path)[str(t_path).find("data/knowledge"):]
+                                paths_set.add(rel_path)
+                    except Exception:
+                        pass
+
+        for doc in ("profile.md", "playbook.md", "principles.md", "evidence.md"):
+            paths_set.add(f"data/experts/{expert_slug}/{doc}")
+
+    if not selected_scopes and not target_expert_dict:
+        # General Library mode
+        require_insight_note = True
+    else:
+        # Add paths from multiselect
+        for scope in selected_scopes:
+            item = options_map.get(scope)
+            if item:
+                if item["type"] == "expert":
+                    _add_expert_paths(item["data"]["slug"], allowed_paths)
+                elif item["type"] == "file":
+                    allowed_paths.add(item["data"]["path"])
+                
+        # Handle @mention
+        if target_expert_dict:
+            _add_expert_paths(target_expert_dict["slug"], allowed_paths)
+
+    return allowed_paths, require_insight_note
