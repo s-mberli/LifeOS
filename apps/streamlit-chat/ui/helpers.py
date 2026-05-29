@@ -125,11 +125,18 @@ def get_existing_experts() -> list[dict]:
         return experts
 
     for d in experts_dir.iterdir():
-        if d.is_dir() and (d / "profile.md").exists():
+        profile_path = d / "profile.md"
+        if d.is_dir() and profile_path.exists():
             display_name = (
                 d.name.replace("expert--", "").replace("-", " ").title()
             )
-            experts.append({"slug": d.name, "display_name": display_name})
+            fm = read_insight_frontmatter(profile_path)
+            voice_id = fm.get("elevenlabs_voice_id")
+            experts.append({
+                "slug": d.name, 
+                "display_name": display_name,
+                "elevenlabs_voice_id": voice_id
+            })
 
     return experts
 

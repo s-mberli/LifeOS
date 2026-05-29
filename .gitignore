@@ -13,10 +13,12 @@
 
 # Private/sensitive data
 data/private/
+src/data/
 
 # Logs & generated outputs (too large for git)
 logs/
 outputs/
+data/tts_cache/
 
 # Python cache
 __pycache__/

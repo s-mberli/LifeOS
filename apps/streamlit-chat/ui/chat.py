@@ -54,6 +54,10 @@ def _render_chat_body() -> None:
     if "saved_msg_indices" not in st.session_state:
         st.session_state.saved_msg_indices = set()
 
+    # Load experts early to have voice map available
+    existing_experts = get_existing_experts()
+    expert_voice_map = {e["slug"]: e.get("elevenlabs_voice_id") for e in existing_experts}
+
     # ── Message history ──────────────────────────────────────────────────────
     messages_container = st.container()
     for idx, msg in enumerate(st.session_state.messages):
@@ -68,27 +72,42 @@ def _render_chat_body() -> None:
                             st.markdown(
                                 f"**{title}** (`{path}`) — Score: `{display_score:.2f}`"
                             )
-                if idx in st.session_state.saved_msg_indices:
-                    st.caption("✅ Saved to Library")
-                else:
-                    user_prompt = msg.get("user_prompt", "")
-                    if st.button("💾 Save Insight to Library", key=f"save_insight_{idx}"):
-                        from core.chat_persistence import save_message_as_insight
-                        success, file_path = save_message_as_insight(
-                            user_prompt=user_prompt,
-                            assistant_response=msg["content"],
-                            expert_slug=msg.get("expert_slug"),
-                            expert_name=msg.get("expert_name"),
-                        )
-                        if success:
-                            st.session_state.saved_msg_indices.add(idx)
-                            cached_get_all_insight_files.clear()
-                            st.success("Saved as insight note!")
-                            st.rerun()
-                        else:
-                            st.error("Failed to save insight.")
-
-    existing_experts = get_existing_experts()
+                
+                action_cols = st.columns([1, 1, 2])
+                with action_cols[0]:
+                    if idx in st.session_state.saved_msg_indices:
+                        st.caption("✅ Saved to Library")
+                    else:
+                        user_prompt = msg.get("user_prompt", "")
+                        if st.button("💾 Save Insight", key=f"save_insight_{idx}"):
+                            from core.chat_persistence import save_message_as_insight
+                            success, file_path = save_message_as_insight(
+                                user_prompt=user_prompt,
+                                assistant_response=msg["content"],
+                                expert_slug=msg.get("expert_slug"),
+                                expert_name=msg.get("expert_name"),
+                            )
+                            if success:
+                                st.session_state.saved_msg_indices.add(idx)
+                                cached_get_all_insight_files.clear()
+                                st.success("Saved as insight note!")
+                                st.rerun()
+                            else:
+                                st.error("Failed to save insight.")
+                with action_cols[1]:
+                    if st.button("🔊 Read Aloud", key=f"tts_{idx}"):
+                        try:
+                            from core.tts import generate_speech
+                            expert_slug = msg.get("expert_slug")
+                            voice_id = None
+                            if expert_slug:
+                                voice_id = expert_voice_map.get(expert_slug)
+                            
+                            with st.spinner("Generating speech..."):
+                                audio_bytes = generate_speech(msg["content"], voice_id=voice_id)
+                            st.audio(audio_bytes, format="audio/mp3", autoplay=True)
+                        except Exception as tts_exc:
+                            st.error(f"TTS Failed: {tts_exc}")
     all_files = cached_get_all_insight_files()
     
     options_map: dict = {}
@@ -131,8 +150,30 @@ def _render_chat_body() -> None:
         if sources_dir.exists():
             for ref_file in sources_dir.glob("*-ref.md"):
                 fm = read_insight_frontmatter(ref_file)
-                if fm.get("source_path"):
-                    paths_set.add(fm["source_path"])
+                src_path = fm.get("source_path")
+                if src_path:
+                    # Handle if cleanup_data.py renamed the file
+                    if "tmp" in src_path and not (ROOT / src_path).exists():
+                        import re
+                        title = fm.get("source_title", "")
+                        safe_title = re.sub(r"[^a-z0-9\-]", "", title.lower().replace(" ", "-"))
+                        possible_path = f"data/knowledge/ai-resources/{safe_title}.md"
+                        if (ROOT / possible_path).exists():
+                            src_path = possible_path
+                    paths_set.add(src_path)
+                    
+                    # Also allow searching the raw transcript file
+                    try:
+                        real_p = ROOT / src_path
+                        if real_p.exists():
+                            real_fm = read_insight_frontmatter(real_p)
+                            t_path = real_fm.get("transcript_path", "")
+                            if "data/knowledge" in str(t_path):
+                                rel_path = str(t_path)[str(t_path).find("data/knowledge"):]
+                                paths_set.add(rel_path)
+                    except Exception:
+                        pass
+
         for doc in ("profile.md", "playbook.md", "principles.md", "evidence.md"):
             paths_set.add(f"data/experts/{expert_slug}/{doc}")
 
