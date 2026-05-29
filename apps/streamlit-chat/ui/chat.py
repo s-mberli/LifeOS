@@ -204,14 +204,23 @@ def _render_chat_body() -> None:
             history = st.session_state.get("messages", [])[-6:-1]
 
             from core.chat_context import execute_agent_search_loop
-            answer_text, calls_made = execute_agent_search_loop(
-                system_prompt=system_prompt,
-                user_prompt=user_prompt,
-                fts_search_fn=fts_search,
-                history=history,
-                allowed_paths=allowed_paths if allowed_paths else None,
-                include_private=True,
-            )
+            try:
+                answer_text, calls_made = execute_agent_search_loop(
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    fts_search_fn=fts_search,
+                    history=history,
+                    allowed_paths=allowed_paths if allowed_paths else None,
+                    include_private=True,
+                )
+            except TypeError:
+                answer_text, calls_made = execute_agent_search_loop(
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    fts_search_fn=fts_search,
+                    history=history,
+                    allowed_paths=allowed_paths if allowed_paths else None,
+                )
 
             # Show visual indicators of agent searches
             if calls_made:
