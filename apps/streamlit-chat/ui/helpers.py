@@ -269,6 +269,7 @@ def construct_chat_prompts(
     options_map: dict,
     fts_results: list[tuple],
     root_dir: Path,
+    response_length: str = "Standard",
 ) -> tuple[str, str]:
     """Build the system_prompt and user_prompt separating Hot vs Vault memory.
 
@@ -323,6 +324,13 @@ def construct_chat_prompts(
         "- Adopt the style, tone, and directives of the active expert profile (if loaded).\n"
         "- If the context contains a summary rather than the full raw transcript, answer based on the summary. Do NOT ask the user to provide the link or transcript to you."
     )
+
+    if response_length == "Concise":
+        system_prompt += "\n- Keep your response extremely concise. Aim for a short summary (1-2 paragraphs max)."
+    elif response_length == "Detailed":
+        system_prompt += "\n- Provide a highly detailed and comprehensive answer, exploring all nuances deeply."
+    else:
+        system_prompt += "\n- Provide a standard length response that balances detail and readability."
 
     # ── Vault Memory: Facts and Context ───────────────────────────────────────
     context_blocks: list[str] = []
