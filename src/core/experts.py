@@ -97,11 +97,23 @@ def get_existing_experts(root: Path) -> list[dict]:
         if not entry.is_dir() or not entry.name.startswith("expert--"):
             continue
         display_name = entry.name.replace("expert--", "").replace("-", " ").title()
+        
+        profile_path = entry / "profile.md"
+        voice_id = None
+        if profile_path.exists():
+            try:
+                from src.core.frontmatter import read_fm
+                fm, _ = read_fm(profile_path)
+                voice_id = fm.get("elevenlabs_voice_id")
+            except Exception:
+                pass
+
         results.append(
             {
                 "slug": entry.name,
                 "display_name": display_name,
                 "path": entry,
+                "elevenlabs_voice_id": voice_id,
             }
         )
     return results
