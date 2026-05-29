@@ -173,13 +173,22 @@ def _render_chat_body() -> None:
                         break
 
             # FTS retrieval
-            results = fts_search(
-                prompt,
-                limit=5,
-                allowed_paths=allowed_paths if allowed_paths else None,
-                require_insight_note=require_insight_note,
-                include_private=True,
-            )
+            try:
+                results = fts_search(
+                    prompt,
+                    limit=5,
+                    allowed_paths=allowed_paths if allowed_paths else None,
+                    require_insight_note=require_insight_note,
+                    include_private=True,
+                )
+            except TypeError:
+                # Fallback if Streamlit hasn't reloaded the search_knowledge module yet
+                results = fts_search(
+                    prompt,
+                    limit=5,
+                    allowed_paths=allowed_paths if allowed_paths else None,
+                    require_insight_note=require_insight_note,
+                )
 
             from .helpers import construct_chat_prompts
             system_prompt, user_prompt = construct_chat_prompts(
