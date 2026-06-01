@@ -84,8 +84,8 @@ def _render_chat_body() -> None:
                             success, file_path = save_message_as_insight(
                                 user_prompt=user_prompt,
                                 assistant_response=msg["content"],
-                                expert_slug=msg.get("expert_slug"),
-                                expert_name=msg.get("expert_name"),
+                                expert_slugs=msg.get("expert_slugs") or ([msg.get("expert_slug")] if msg.get("expert_slug") else None),
+                                expert_names=msg.get("expert_names") or ([msg.get("expert_name")] if msg.get("expert_name") else None),
                             )
                             if success:
                                 st.session_state.saved_msg_indices.add(idx)
@@ -98,10 +98,13 @@ def _render_chat_body() -> None:
                     if st.button("🔊 Read Aloud", key=f"tts_{idx}"):
                         try:
                             from core.tts import generate_speech
-                            expert_slug = msg.get("expert_slug")
+                            expert_slugs = msg.get("expert_slugs")
+                            legacy_slug = msg.get("expert_slug")
                             voice_id = None
-                            if expert_slug:
-                                voice_id = expert_voice_map.get(expert_slug)
+                            if expert_slugs:
+                                voice_id = expert_voice_map.get(expert_slugs[0])
+                            elif legacy_slug:
+                                voice_id = expert_voice_map.get(legacy_slug)
                             
                             with st.spinner("Generating speech..."):
                                 audio_bytes = generate_speech(msg["content"], voice_id=voice_id)
@@ -172,14 +175,15 @@ def _render_chat_body() -> None:
             except Exception:
                 pass  # auto_capture is best-effort
 
-            # Determine active target expert
-            target_expert = target_expert_dict_from_at_mention
-            if not target_expert and selected_scopes:
+            # Determine active target experts
+            target_experts = []
+            if target_expert_dict_from_at_mention:
+                target_experts.append(target_expert_dict_from_at_mention)
+            elif selected_scopes:
                 for scope in selected_scopes:
                     item = options_map[scope]
                     if item["type"] == "expert":
-                        target_expert = item["data"]
-                        break
+                        target_experts.append(item["data"])
 
             # FTS retrieval
             try:
@@ -201,7 +205,7 @@ def _render_chat_body() -> None:
 
             from .helpers import construct_chat_prompts
             system_prompt, user_prompt = construct_chat_prompts(
-                target_expert=target_expert,
+                target_experts=target_experts,
                 prompt=prompt,
                 selected_scopes=selected_scopes,
                 options_map=options_map,
@@ -244,9 +248,9 @@ def _render_chat_body() -> None:
                     "content": answer_text,
                     "user_prompt": prompt
                 }
-                if target_expert:
-                    assistant_msg["expert_slug"] = target_expert["slug"]
-                    assistant_msg["expert_name"] = target_expert["display_name"]
+                if target_experts:
+                    assistant_msg["expert_slugs"] = [e["slug"] for e in target_experts]
+                    assistant_msg["expert_names"] = [e["display_name"] for e in target_experts]
                 if results:
                     assistant_msg["sources"] = results
                 st.session_state.messages.append(assistant_msg)
@@ -257,7 +261,7 @@ def _render_chat_body() -> None:
                     append_to_daily_chat_log(
                         user_prompt=prompt,
                         assistant_response=answer_text,
-                        expert_slug=target_expert["slug"] if target_expert else None,
+                        expert_slugs=[e["slug"] for e in target_experts] if target_experts else None,
                     )
                 except Exception as log_exc:
                     print(f"Auto-log failed: {log_exc}")

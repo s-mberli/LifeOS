@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 def append_to_daily_chat_log(
     user_prompt: str,
     assistant_response: str,
-    expert_slug: str | None = None,
+    expert_slugs: list[str] | None = None,
 ) -> bool:
     """Append a Q&A interaction to the daily chat log file.
 
@@ -27,7 +27,7 @@ def append_to_daily_chat_log(
     Args:
         user_prompt: The prompt sent by the user.
         assistant_response: The response returned by the assistant.
-        expert_slug: The slug of the active expert context, if any.
+        expert_slugs: List of slugs of the active expert contexts, if any.
 
     Returns:
         True on success, False otherwise.
@@ -54,7 +54,7 @@ def append_to_daily_chat_log(
 
         fm, body = read_fm(log_file)
 
-        expert_info = f" (Expert: {expert_slug})" if expert_slug else ""
+        expert_info = f" (Experts: {', '.join(expert_slugs)})" if expert_slugs else ""
         new_entry = (
             f"\n## [{time_str}] User{expert_info}\n"
             f"{user_prompt}\n\n"
@@ -73,19 +73,19 @@ def append_to_daily_chat_log(
 def save_message_as_insight(
     user_prompt: str,
     assistant_response: str,
-    expert_slug: str | None = None,
-    expert_name: str | None = None,
+    expert_slugs: list[str] | None = None,
+    expert_names: list[str] | None = None,
 ) -> tuple[bool, str]:
     """Format and save a single Q&A pair as a permanent knowledge base note.
 
-    If an expert_slug is provided, the insight is automatically attached
-    to that expert using assign_insight_to_expert.
+    If expert_slugs are provided, the insight is automatically attached
+    to those experts using assign_insight_to_expert.
 
     Args:
         user_prompt: The user's question.
         assistant_response: The assistant's response.
-        expert_slug: The slug of the expert to assign to, if any.
-        expert_name: The display name of the expert, if any.
+        expert_slugs: The slugs of the experts to assign to, if any.
+        expert_names: The display names of the experts, if any.
 
     Returns:
         A tuple of (success, filepath_string).
@@ -143,13 +143,14 @@ def save_message_as_insight(
 
         write_fm(out_filepath, fm, body)
 
-        if expert_slug:
-            assign_insight_to_expert(
-                insight_path=out_filepath,
-                expert_slug=expert_slug,
-                expert_name=expert_name,
-                reason="Saved from Chat session",
-            )
+        if expert_slugs and expert_names:
+            for slug, name in zip(expert_slugs, expert_names):
+                assign_insight_to_expert(
+                    insight_path=out_filepath,
+                    expert_slug=slug,
+                    expert_name=name,
+                    reason="Saved from Chat session",
+                )
 
         # Rebuild the FTS search index so it is immediately searchable
         from src.core.build_fts_index import build_index

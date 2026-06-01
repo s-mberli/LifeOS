@@ -263,7 +263,7 @@ def auto_route_prompt(prompt: str) -> dict:
 
 
 def construct_chat_prompts(
-    target_expert: Optional[dict],
+    target_experts: list[dict],
     prompt: str,
     selected_scopes: list,
     options_map: dict,
@@ -278,29 +278,43 @@ def construct_chat_prompts(
     """
     # ── Hot Memory: Expert Persona/Playbook/Principles ────────────────────────
     expert_instructions = []
-    if target_expert:
-        slug = target_expert["slug"]
-        for doc in ("profile.md", "playbook.md", "principles.md"):
-            doc_path = root_dir / "data" / "experts" / slug / doc
-            if doc_path.exists():
-                try:
-                    note_content = doc_path.read_text(encoding="utf-8")[:10000]
-                    expert_instructions.append(
-                        f"=== Expert {doc.split('.')[0].upper()} ===\n"
-                        f"{note_content}"
-                    )
-                except Exception:
-                    pass
+    if target_experts:
+        for target_expert in target_experts:
+            slug = target_expert["slug"]
+            for doc in ("profile.md", "playbook.md", "principles.md"):
+                doc_path = root_dir / "data" / "experts" / slug / doc
+                if doc_path.exists():
+                    try:
+                        note_content = doc_path.read_text(encoding="utf-8")[:10000]
+                        expert_instructions.append(
+                            f"=== Expert: {target_expert['display_name']} - {doc.split('.')[0].upper()} ===\n"
+                            f"{note_content}"
+                        )
+                    except Exception:
+                        pass
 
-    if target_expert:
-        system_prompt = (
-            f"You are LifeOS operating as the expert: {target_expert['display_name']}.\n\n"
-        )
-        if expert_instructions:
-            system_prompt += (
-                "Adopt the persona, values, and guidelines defined in your expert profile:\n"
-                + "\n\n".join(expert_instructions) + "\n\n"
+    if target_experts:
+        if len(target_experts) == 1:
+            system_prompt = (
+                f"You are LifeOS operating as the expert: {target_experts[0]['display_name']}.\n\n"
             )
+            if expert_instructions:
+                system_prompt += (
+                    "Adopt the persona, values, and guidelines defined in your expert profile:\n"
+                    + "\n\n".join(expert_instructions) + "\n\n"
+                )
+        else:
+            names = [e['display_name'] for e in target_experts]
+            names_str = ", ".join(names)
+            system_prompt = (
+                f"You are LifeOS operating as a 'Blended Super-Expert' combining the expertise of: {names_str}.\n\n"
+            )
+            if expert_instructions:
+                system_prompt += (
+                    "You have deeply internalized the principles, mindsets, and playbooks of all these experts. "
+                    "Adopt a singular, cohesive persona that synergizes their combined wisdom, speaking with a unified voice:\n"
+                    + "\n\n".join(expert_instructions) + "\n\n"
+                )
     else:
         system_prompt = (
             "You are LifeOS, a local-first personal AI operating system."
@@ -337,20 +351,21 @@ def construct_chat_prompts(
     loaded_paths: set[str] = set()
 
     # 1. Load active expert evidence (Tier 2 Vault, NOT Hot memory instructions)
-    if target_expert:
-        slug = target_expert["slug"]
-        evidence_path = root_dir / "data" / "experts" / slug / "evidence.md"
-        if evidence_path.exists():
-            try:
-                note_content = evidence_path.read_text(encoding="utf-8")[:15000]
-                context_blocks.append(
-                    f"### Expert Core Profile (evidence.md)\n"
-                    f"Path: data/experts/{slug}/evidence.md\n\n"
-                    f"{note_content}"
-                )
-                loaded_paths.add(f"data/experts/{slug}/evidence.md")
-            except Exception:
-                pass
+    if target_experts:
+        for target_expert in target_experts:
+            slug = target_expert["slug"]
+            evidence_path = root_dir / "data" / "experts" / slug / "evidence.md"
+            if evidence_path.exists():
+                try:
+                    note_content = evidence_path.read_text(encoding="utf-8")[:15000]
+                    context_blocks.append(
+                        f"### Expert Core Profile (evidence.md) for {target_expert['display_name']}\n"
+                        f"Path: data/experts/{slug}/evidence.md\n\n"
+                        f"{note_content}"
+                    )
+                    loaded_paths.add(f"data/experts/{slug}/evidence.md")
+                except Exception:
+                    pass
 
     # 2. Load explicitly selected file scopes
     if selected_scopes:
