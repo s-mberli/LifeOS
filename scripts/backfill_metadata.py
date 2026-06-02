@@ -1,11 +1,11 @@
 import sys
 from pathlib import Path
-import yaml
 
-ROOT = Path("/Users/markus/markusos")
+ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from src.core.ingest import _run_cheap_triage
+from src.core.frontmatter import read_fm, write_fm
 
 DATA_DIR = ROOT / "data"
 
@@ -17,16 +17,7 @@ def main():
         if "experts" in f.parts or "raw" in f.parts: continue
         
         try:
-            content = f.read_text(encoding="utf-8")
-        except Exception:
-            continue
-            
-        if not content.startswith("---"): continue
-        parts = content.split("---", 2)
-        if len(parts) < 3: continue
-        
-        try:
-            fm = yaml.safe_load(parts[1])
+            fm, body = read_fm(f)
         except Exception:
             continue
             
@@ -41,9 +32,8 @@ def main():
             source_url = fm.get("source_url", "")
             is_youtube = fm.get("is_youtube", False)
             transcript = None
-            if is_youtube and "Transcript" in content:
-                # Naive extraction for cheap triage
-                transcript = content.split("Transcript")[-1][:1500]
+            if is_youtube and "Transcript" in body:
+                transcript = body.split("Transcript")[-1][:1500]
                 
             def simple_log(msg):
                 print(f"  {msg}")
@@ -51,7 +41,7 @@ def main():
             triage_data = _run_cheap_triage(
                 title=title,
                 source_url=source_url,
-                content=parts[2],
+                content=body,
                 transcript=transcript,
                 is_youtube=is_youtube,
                 log=simple_log
@@ -64,10 +54,7 @@ def main():
                 if new_domain: fm["domain"] = new_domain
                 if new_tags: fm["tags"] = new_tags
                 
-                # Write back
-                new_fm_str = yaml.dump(fm, default_flow_style=False, allow_unicode=True)
-                new_content = f"---\n{new_fm_str}---\n{parts[2]}"
-                f.write_text(new_content, encoding="utf-8")
+                write_fm(f, fm, body)
                 updated_count += 1
                 
     print(f"\nMetadata backfill complete. Updated {updated_count} files.")

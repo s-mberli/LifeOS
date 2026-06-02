@@ -4,7 +4,7 @@ from pathlib import Path
 from collections import defaultdict
 import re
 
-ROOT = Path("/Users/markus/markusos")
+ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "data"
 
 def parse_frontmatter(path: Path):

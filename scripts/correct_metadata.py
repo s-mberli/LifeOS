@@ -1,11 +1,13 @@
 import sys
+import datetime
 from pathlib import Path
 import yaml
 
-ROOT = Path("/Users/markus/markusos")
+ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from src.core.ingest import _run_cheap_triage
+from src.core.frontmatter import read_fm, write_fm
 
 DATA_DIR = ROOT / "data"
 
@@ -31,16 +33,7 @@ def main():
         if "experts" in f.parts or "raw" in f.parts: continue
         
         try:
-            content = f.read_text(encoding="utf-8")
-        except Exception:
-            continue
-            
-        if not content.startswith("---"): continue
-        parts = content.split("---", 2)
-        if len(parts) < 3: continue
-        
-        try:
-            fm = yaml.safe_load(parts[1])
+            fm, body = read_fm(f)
         except Exception:
             continue
             
@@ -62,8 +55,8 @@ def main():
                 is_youtube = True
                 
             transcript = None
-            if is_youtube and "Transcript" in content:
-                transcript = content.split("Transcript")[-1][:1500]
+            if is_youtube and "Transcript" in body:
+                transcript = body.split("Transcript")[-1][:1500]
                 
             def simple_log(msg):
                 print(f"  {msg}")
@@ -71,7 +64,7 @@ def main():
             triage_data = _run_cheap_triage(
                 title=title,
                 source_url=source_url,
-                content=parts[2],
+                content=body,
                 transcript=transcript,
                 is_youtube=is_youtube,
                 log=simple_log
@@ -97,13 +90,9 @@ def main():
                     print(f"  -> Combined tags: {combined}")
                 
                 # Update updated_at timestamp
-                import datetime
                 fm["updated_at"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 
-                # Write back
-                new_fm_str = yaml.dump(fm, default_flow_style=False, allow_unicode=True)
-                new_content = f"---\n{new_fm_str}---\n{parts[2]}"
-                f.write_text(new_content, encoding="utf-8")
+                write_fm(f, fm, body)
                 updated_count += 1
             else:
                 print(f"  -> Triage returned no data. Skipping.")

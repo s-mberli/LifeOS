@@ -142,6 +142,7 @@ def test_weekly_hermes_run(tmp_project: Path):
          patch("scripts.weekly_hermes_run.DB_PATH", db_path), \
          patch("scripts.triage_outbox.BASE_DIR", tmp_project), \
          patch("scripts.triage_outbox.DB_PATH", db_path), \
+         patch.dict("os.environ", {"HERMES_BIN": "/fake/hermes-agent/venv/bin/python", "HERMES_SCRIPT": "/fake/hermes-agent/hermes"}), \
          patch("os.path.exists", side_effect=mock_exists), \
          patch("subprocess.run", mock_run):
          

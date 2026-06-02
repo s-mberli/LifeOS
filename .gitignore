@@ -74,6 +74,7 @@ config/privacy.yml
 data/knowledge/**/*.md
 data/experts/**/*.md
 data/business/**/*.md
+data/career/**/*.md
 data/inbox/**/*.md
 
 # Scratch tools in root
@@ -88,6 +89,7 @@ scratch_*.py
 !templates/
 !scripts/
 !config/profile.example.yml
+!config/models.example.yml
 !config/domain_map.yaml
 !.env.example
 !README.md

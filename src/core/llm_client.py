@@ -40,7 +40,7 @@ def call_openrouter(messages: list, max_tokens: int, temperature: float):
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://github.com/markus/markusos",
+        "HTTP-Referer": "https://github.com/s-mberli/LifeOS",
         "X-Title": "MarkusOS",
     }
     

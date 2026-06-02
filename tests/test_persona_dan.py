@@ -68,7 +68,7 @@ def test_persona_dan_prompts_separation(tmp_project: Path, expert_fixture: dict)
     ]
     
     system_prompt, user_prompt = construct_chat_prompts(
-        target_expert=expert_fixture,
+        target_experts=[expert_fixture],
         prompt="How do I fix database latency?",
         selected_scopes=["Expert: Dan Helper"],
         options_map=options_map,

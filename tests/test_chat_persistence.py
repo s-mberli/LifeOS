@@ -19,7 +19,7 @@ def test_append_to_daily_chat_log(tmp_project: Path):
         success = append_to_daily_chat_log(
             user_prompt="Who is David Deida?",
             assistant_response="He is a spiritual teacher.",
-            expert_slug="expert--david-deida"
+            expert_slugs=["expert--david-deida"]
         )
         assert success is True
 
@@ -64,8 +64,8 @@ def test_save_message_as_insight(tmp_project: Path):
         success, out_path_str = save_message_as_insight(
             user_prompt="Explain intimacy practices",
             assistant_response="Intimacy practices include breathing together.",
-            expert_slug=expert_slug,
-            expert_name=expert_name
+            expert_slugs=[expert_slug],
+            expert_names=[expert_name]
         )
 
         assert success is True

@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-import yaml
+
 
 # ── Path constants ────────────────────────────────────────────────────────────
 # apps/streamlit-chat/ui/helpers.py  → resolve 3 levels up for project root
@@ -195,8 +195,8 @@ def get_all_insight_files() -> list[dict]:
 def read_insight_frontmatter(file_path: Path) -> dict:
     """Parse YAML front-matter from a Markdown file and return it as a dict.
 
-    Uses ``yaml.safe_load`` — never manual string splitting — so structured
-    values (lists, booleans, etc.) are returned with their correct types.
+    Delegates to ``src.core.frontmatter.read_fm`` — the single canonical
+    frontmatter parser for the project (per AGENTS.md rule #4).
 
     Args:
         file_path: Absolute path to a Markdown file.
@@ -206,22 +206,10 @@ def read_insight_frontmatter(file_path: Path) -> dict:
         has no front-matter or it cannot be parsed.
     """
     try:
-        content = file_path.read_text(encoding="utf-8")
-    except OSError:
-        return {}
-
-    if not content.startswith("---"):
-        return {}
-
-    parts = content.split("---", 2)
-    if len(parts) < 3:
-        return {}
-
-    fm_str = parts[1]
-    try:
-        parsed = yaml.safe_load(fm_str)
-        return parsed if isinstance(parsed, dict) else {}
-    except yaml.YAMLError:
+        from src.core.frontmatter import read_fm  # noqa: PLC0415
+        fm, _ = read_fm(file_path)
+        return fm if isinstance(fm, dict) else {}
+    except Exception:
         return {}
 
 

@@ -3,23 +3,16 @@ from pathlib import Path
 import re
 from collections import defaultdict
 
-ROOT = Path("/Users/markus/.gemini/antigravity/scratch/lifeos")
+from src.core.frontmatter import read_fm
+
+ROOT = Path(__file__).resolve().parent.parent.parent
 knowledge_dir = ROOT / "data" / "knowledge"
 
 def get_frontmatter(path: Path) -> dict:
     try:
-        content = path.read_text(encoding="utf-8")
-        if not content.startswith("---"): return {}
-        fm_end = content.find("---", 3)
-        if fm_end < 0: return {}
-        
-        fields = {}
-        for line in content[3:fm_end].split("\n"):
-            if ":" in line:
-                k, _, v = line.partition(":")
-                fields[k.strip()] = v.strip().strip("\"'")
-        return fields
-    except:
+        fm, _ = read_fm(path)
+        return fm
+    except Exception:
         return {}
 
 def clean_data():
