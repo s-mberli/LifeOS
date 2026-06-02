@@ -9,12 +9,12 @@ This document outlines the architecture, coding patterns, and rules that autonom
 ### 1. `src/core/` — Business Logic (Pure Python)
 All core capabilities are modularized inside `src/core/`. Do not write business logic directly inside Streamlit files or standalone root scripts.
 
-- [frontmatter.py](file:///Users/markus/markusos/src/core/frontmatter.py): Reading, writing, and updating YAML frontmatter. **Always use this module** instead of hand-rolled string split parsers.
-- [youtube.py](file:///Users/markus/markusos/src/core/youtube.py): Centralized yt-dlp execution and YouTube metadata/transcript fetching.
-- [web.py](file:///Users/markus/markusos/src/core/web.py): BeautifulSoup/Jina/Reddit fetching and parsing helpers.
-- [experts.py](file:///Users/markus/markusos/src/core/experts.py): Managing expert directories, reference files (`*-ref.md`), and synthesizing playbooks.
-- [ingest.py](file:///Users/markus/markusos/src/core/ingest.py): The main entry point orchestrating resource ingestion.
-- [llm_client.py](file:///Users/markus/markusos/src/core/llm_client.py): Unified LLM wrapper supporting simple prompts or messages.
+- [frontmatter.py](src/core/frontmatter.py): Reading, writing, and updating YAML frontmatter. **Always use this module** instead of hand-rolled string split parsers.
+- [youtube.py](src/core/youtube.py): Centralized yt-dlp execution and YouTube metadata/transcript fetching.
+- [web.py](src/core/web.py): BeautifulSoup/Jina/Reddit fetching and parsing helpers.
+- [experts.py](src/core/experts.py): Managing expert directories, reference files (`*-ref.md`), and synthesizing playbooks.
+- [ingest.py](src/core/ingest.py): The main entry point orchestrating resource ingestion.
+- [llm_client.py](src/core/llm_client.py): Unified LLM wrapper supporting simple prompts or messages.
 ### 2. `apps/streamlit-chat/` — Streamlit UI
 The Streamlit app is split into decoupled UI components.
 

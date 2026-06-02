@@ -93,7 +93,7 @@ We have ingested some new guidelines, ideas, or architectural rules this week th
 {notes_text}
 
 Your task:
-1. Review the existing codebase at /Users/markus/markusos/ using the search_vault MCP tool or reading files.
+1. Review the existing codebase at {BASE_DIR}/ using the search_vault MCP tool or reading files.
 2. Identify if there are any violations, refactoring opportunities, or new features we should implement to align with these new guidelines (while respecting rules in AGENTS.md).
 3. If you find clear, valuable codebase improvements:
    a. Create a new git branch (e.g., 'hermes-auto-improvement-...').
@@ -104,11 +104,17 @@ Your task:
 """
 
     # 5. Invoke Hermes
-    hermes_bin = "/Users/markus/.hermes/hermes-agent/venv/bin/python"
-    hermes_script = "/Users/markus/.hermes/hermes-agent/hermes"
+    # Paths configured via HERMES_BIN / HERMES_SCRIPT env vars (see .env.example)
+    hermes_bin = os.environ.get("HERMES_BIN", "")
+    hermes_script = os.environ.get("HERMES_SCRIPT", "")
     
+    if not hermes_bin or not hermes_script:
+        print("HERMES_BIN or HERMES_SCRIPT not set in environment. Set them in .env to enable the Hermes loop. Exiting.")
+        conn.close()
+        return
+
     if not os.path.exists(hermes_bin) or not os.path.exists(hermes_script):
-        print(f"Hermes executable not found at {hermes_script}. Exiting.")
+        print(f"Hermes executable not found (HERMES_BIN={hermes_bin}). Exiting.")
         conn.close()
         return
 

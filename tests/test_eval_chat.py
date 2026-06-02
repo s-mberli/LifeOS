@@ -44,7 +44,7 @@ def mock_fts_search_long(query, limit, allowed_paths):
 
 def get_system_prompt():
     sys_prompt, _ = construct_chat_prompts(
-        target_expert=None,
+        target_experts=[],
         prompt="",
         selected_scopes=[],
         options_map={},

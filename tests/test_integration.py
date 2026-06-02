@@ -93,18 +93,18 @@ def test_youtube_to_chat_e2e(tmp_project: Path):
         assert idx_res["indexed"] > 0
 
         # 4. Search via exact term match
-        results = fts_search("David Deida")
+        results = fts_search("David Deida", include_private=True)
         print("DEBUG RESULTS:", results)
         assert len(results) > 0
         assert results[0][0] == "The New Way Of The Superior Man - David Deida (1st interview in a decade)"
 
         # 5. Search via natural language containing stopwords (e.g. what, does, say)
-        results_nl = fts_search("What does david deida say about polarity")
+        results_nl = fts_search("What does david deida say about polarity", include_private=True)
         assert len(results_nl) > 0
         assert results_nl[0][0] == "The New Way Of The Superior Man - David Deida (1st interview in a decade)"
 
         # 6. Search for unrelated content
-        results_none = fts_search("xyzabcqwe")
+        results_none = fts_search("xyzabcqwe", include_private=True)
         assert len(results_none) == 0
 
 
