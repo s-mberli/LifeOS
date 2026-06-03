@@ -84,6 +84,8 @@ def _settings_modal_body() -> None:
 
 # ── Library modal ─────────────────────────────────────────────────────────────
 
+
+
 def _enforce_single_checkbox() -> None:
     if "library_editor" not in st.session_state:
         return
@@ -217,6 +219,7 @@ def _library_modal_body() -> None:
             key="library_editor",
             on_change=_enforce_single_checkbox,
         )
+
         
         with st.expander("➕ Create New Expert", expanded=False):
             new_expert_name = st.text_input("Expert Name", key="new_expert_name_input")
@@ -239,15 +242,27 @@ def _library_modal_body() -> None:
             content = Path(file_path).read_text(encoding="utf-8")
             st.caption(f"**Path:** `{Path(file_path).relative_to(ROOT)}`")
             
-            # Button for regenerating summary
-            if st.button("🔄 Regenerate AI Summary", key=f"regen_summary_{view_id}"):
-                with st.spinner("Regenerating AI Summary..."):
-                    from core.ingest import regenerate_insight_summary
-                    res = regenerate_insight_summary(Path(file_path))
-                    if res.get("success"):
-                        st.success("Summary regenerated successfully!")
-                    else:
-                        st.error(f"Error: {res.get('error')}")
+            # Buttons for regenerating summary or deleting
+            btn_c1, btn_c2 = st.columns(2)
+            with btn_c1:
+                if st.button("🔄 Regenerate AI Summary", key=f"regen_summary_{view_id}", use_container_width=True):
+                    with st.spinner("Regenerating AI Summary..."):
+                        from core.ingest import regenerate_insight_summary
+                        res = regenerate_insight_summary(Path(file_path))
+                        if res.get("success"):
+                            st.success("Summary regenerated successfully!")
+                        else:
+                            st.error(f"Error: {res.get('error')}")
+            
+            with btn_c2:
+                if st.button("🗑️ Delete Insight", key=f"delete_insight_{view_id}", use_container_width=True):
+                    try:
+                        import os
+                        os.remove(file_path)
+                        st.session_state.last_viewed_id = None
+                        rebuild_search_index()
+                    except Exception as e:
+                        st.error(f"Error deleting file: {e}")
             
             with st.container(height=500):
                 import re
@@ -516,46 +531,93 @@ def memories_modal() -> None:
         _show_modal_error("Memories", exc)
 
 def _memories_modal_body() -> None:
-    from .helpers import add_user_memory, get_user_memories, toggle_user_memory, delete_user_memory
+    tab1, tab2 = st.tabs(["👤 User Identity", "🧠 Context Memories"])
     
-    st.markdown("Inject custom context into chat.")
+    with tab1:
+        _render_user_identity_form()
+        
+    with tab2:
+        from .helpers import add_user_memory, get_user_memories, toggle_user_memory, delete_user_memory
     
-    if st.session_state.pop("memory_added", False):
-        st.success("Memory added!")
-    if st.session_state.pop("memory_warning", False):
-        st.warning("Warning: The memory you just added is very large (>2000 tokens) and will consume a lot of the context window.")
+        st.markdown("Inject custom context into chat.")
+        
+        if st.session_state.pop("memory_added", False):
+            st.success("Memory added!")
+        if st.session_state.pop("memory_warning", False):
+            st.warning("Warning: The memory you just added is very large (>2000 tokens) and will consume a lot of the context window.")
+        
+        with st.form("add_memory_form", clear_on_submit=True):
+            new_title = st.text_input("Title (e.g. Coding Style)", key="new_mem_title")
+            new_content = st.text_area("Content", height=100, key="new_mem_content")
+            submitted = st.form_submit_button("Add Memory")
+            if submitted and new_title and new_content:
+                if add_user_memory(new_title, new_content):
+                    st.session_state.memory_added = True
+                    if len(new_content) > 8000:
+                        st.session_state.memory_warning = True
+
+        def _delete_cb(mid):
+            delete_user_memory(mid)
+
+        def _toggle_cb(mid, tkey):
+            toggle_user_memory(mid, st.session_state[tkey])
+
+        memories = get_user_memories()
+        if memories:
+            st.markdown("### Saved Memories")
+            for mem in memories:
+                with st.container(border=True):
+                    st.markdown(f"**{mem['title']}**")
+                    display_content = mem['content'] if len(mem['content']) < 100 else mem['content'][:100] + "..."
+                    st.caption(display_content)
+                    
+                    col1, col2 = st.columns([3, 1])
+                    with col1:
+                        tkey = f"mem_toggle_{mem['id']}"
+                        st.toggle("Active", value=bool(mem['is_active']), key=tkey, on_change=_toggle_cb, args=(mem['id'], tkey))
+                    with col2:
+                        st.button("🗑️", key=f"mem_del_{mem['id']}", help="Delete", on_click=_delete_cb, args=(mem['id'],))
+
+def _render_user_identity_form() -> None:
+    import yaml
+    from .helpers import ROOT
     
-    with st.form("add_memory_form", clear_on_submit=True):
-        new_title = st.text_input("Title (e.g. Coding Style)", key="new_mem_title")
-        new_content = st.text_area("Content", height=100, key="new_mem_content")
-        submitted = st.form_submit_button("Add Memory")
-        if submitted and new_title and new_content:
-            if add_user_memory(new_title, new_content):
-                st.session_state.memory_added = True
-                if len(new_content) > 8000:
-                    st.session_state.memory_warning = True
+    st.markdown("Configure your core identity. The system uses this to tailor summaries and interaction.")
+    
+    profile_path = ROOT / "config" / "profile.yml"
+    
+    if not profile_path.exists():
+        example_path = ROOT / "config" / "profile.example.yml"
+        if example_path.exists():
+            profile_data = yaml.safe_load(example_path.read_text(encoding="utf-8"))
+        else:
+            profile_data = {}
+    else:
+        try:
+            profile_data = yaml.safe_load(profile_path.read_text(encoding="utf-8")) or {}
+        except:
+            profile_data = {}
 
-    def _delete_cb(mid):
-        delete_user_memory(mid)
-
-    def _toggle_cb(mid, tkey):
-        toggle_user_memory(mid, st.session_state[tkey])
-
-    memories = get_user_memories()
-    if memories:
-        st.markdown("### Saved Memories")
-        for mem in memories:
-            with st.container(border=True):
-                st.markdown(f"**{mem['title']}**")
-                display_content = mem['content'] if len(mem['content']) < 100 else mem['content'][:100] + "..."
-                st.caption(display_content)
-                
-                col1, col2 = st.columns([3, 1])
-                with col1:
-                    tkey = f"mem_toggle_{mem['id']}"
-                    st.toggle("Active", value=bool(mem['is_active']), key=tkey, on_change=_toggle_cb, args=(mem['id'], tkey))
-                with col2:
-                    st.button("🗑️", key=f"mem_del_{mem['id']}", help="Delete", on_click=_delete_cb, args=(mem['id'],))
+    with st.form("user_identity_form"):
+        name = st.text_input("Name", value=profile_data.get("name", ""))
+        role = st.text_input("Role", value=profile_data.get("role", ""))
+        
+        prefs = profile_data.get("preferences", {})
+        comm_style = st.text_area("Communication Style", value=prefs.get("communication_style", ""))
+        
+        submitted = st.form_submit_button("Save Identity")
+        if submitted:
+            profile_data["name"] = name
+            profile_data["role"] = role
+            if "preferences" not in profile_data:
+                profile_data["preferences"] = {}
+            profile_data["preferences"]["communication_style"] = comm_style
+            
+            profile_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(profile_path, "w", encoding="utf-8") as f:
+                yaml.dump(profile_data, f, default_flow_style=False, sort_keys=False)
+            
+            st.success("Identity saved successfully! Future AI summaries will adapt to this profile.")
 
 # ── Experts Viewer modal ────────────────────────────────────────────────────────────
 
