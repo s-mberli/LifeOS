@@ -27,7 +27,7 @@ def test_execute_agent_search_loop_no_tool_call():
     mock_ask_llm = MagicMock(return_value="Ali Abdaal says productivity is about feeling good.")
     
     with patch("src.core.chat_context.ask_llm_chat", mock_ask_llm):
-        final_answer, calls_made = execute_agent_search_loop(
+        final_answer, calls_made, _ = execute_agent_search_loop(
             system_prompt="You are an assistant.",
             user_prompt="Explain Ali Abdaal's view on productivity.",
             history=[],
@@ -57,7 +57,7 @@ def test_execute_agent_search_loop_with_tool_call():
     with patch("src.core.chat_context.ask_llm_chat", mock_ask_llm), \
          patch("src.core.search_knowledge.fts_search", mock_fts):
          
-        final_answer, calls_made = execute_agent_search_loop(
+        final_answer, calls_made, _ = execute_agent_search_loop(
             system_prompt="You are an assistant.",
             user_prompt="Explain Ali Abdaal's view on productivity.",
             history=[],
@@ -66,7 +66,7 @@ def test_execute_agent_search_loop_with_tool_call():
         
     assert final_answer == "Based on the search results, Ali Abdaal suggests that feeling good leads to productivity."
     assert len(calls_made) == 1
-    assert calls_made[0] == ("Ali Abdaal productivity", "Ali Abdaal note (data/knowledge/ali.md):\nfeeling good leads to productivity")
+    assert calls_made[0] == ("Ali Abdaal productivity", "### Search Result [1]: Ali Abdaal note\nPath: data/knowledge/ali.md\n\nfeeling good leads to productivity")
     
     # Verify LLM was called twice
     assert mock_ask_llm.call_count == 2
