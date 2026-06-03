@@ -54,6 +54,7 @@ scratch/
 
 # SQLite indexes (rebuilt at startup)
 indexes/*.db
+src/indexes/*.db
 
 # Raw transcripts (can be very large)
 **/raw/
@@ -69,6 +70,7 @@ data/inbox/voice/
 config/profile.yml
 config/models.yml
 config/privacy.yml
+config/domains.yaml
 
 # Exclude all markdown notes and transcripts
 data/knowledge/**/*.md
@@ -90,6 +92,7 @@ scratch_*.py
 !scripts/
 !config/profile.example.yml
 !config/models.example.yml
+!config/domains.example.yaml
 !config/domain_map.yaml
 !.env.example
 !README.md

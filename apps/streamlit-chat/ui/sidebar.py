@@ -14,7 +14,7 @@ import streamlit as st
 from .helpers import (
     ROOT, rebuild_search_index
 )
-from .modals import creator_expert_modal, library_modal, settings_modal, memories_modal
+from .modals import creator_expert_modal, library_modal, settings_modal, memories_modal, experts_modal
 
 
 def render_sidebar() -> None:
@@ -206,6 +206,9 @@ def _render_sidebar_body() -> None:
 
         if st.button("📚 Browse Library", use_container_width=True):
             library_modal()
+
+        if st.button("🧑‍🏫 View Experts", use_container_width=True):
+            experts_modal()
 
         if st.button("🧠 Manual Personal Memory", use_container_width=True):
             memories_modal()
