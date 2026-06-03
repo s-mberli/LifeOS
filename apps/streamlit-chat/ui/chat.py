@@ -86,10 +86,10 @@ def _render_chat_body() -> None:
                 # Source attribution popover
                 if msg.get("sources"):
                     with st.popover(f"📚 Sources Referenced ({len(msg['sources'])})"):
-                        for title, path, snippet, score in msg["sources"]:
+                        for i, (title, path, snippet, score) in enumerate(msg["sources"], 1):
                             display_score = abs(score) * 1000
                             st.markdown(
-                                f"**{title}** (`{path}`) — Score: `{display_score:.2f}`"
+                                f"**[{i}] {title}** (`{path}`) — Score: `{display_score:.2f}`"
                             )
                 
                 action_cols = st.columns([1.5, 1.2, 4.3])

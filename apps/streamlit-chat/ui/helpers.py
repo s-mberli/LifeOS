@@ -318,21 +318,23 @@ def construct_chat_prompts(
     system_prompt += (
         "\n\nYour job:\n"
         "- Answer the user's question using the retrieved notes as context.\n"
-        "- Be comprehensive and detailed. Explore the nuances of the topic and provide practical examples or context, ensuring your response is thorough (aim for depth).\n"
+    )
+
+    if response_length == "Concise":
+        system_prompt += "- CRITICAL REQUIREMENT: Keep your response extremely concise. Give me a short summary (1-2 paragraphs maximum) prioritizing brevity.\n"
+    elif response_length == "Detailed":
+        system_prompt += "- Be comprehensive and detailed. Explore the nuances of the topic and provide practical examples or context, ensuring your response is thorough (aim for depth).\n"
+    else:
+        system_prompt += "- Provide a standard length response that balances detail and readability.\n"
+
+    system_prompt += (
         "- When an insight contains a core principle, clearly explain the principle first so the user understands the foundation. Then, provide highly CONCRETE and ACTIONABLE advice on how they can practically apply that principle to their life.\n"
         "- Use clear markdown formatting. Break up large walls of text using bullet points, bold text for key concepts, and short paragraphs to make your answer highly readable and scannable.\n"
-        "- **Cite your sources**: Always use inline citations (e.g., [1], [2]) referring to the specific notes/paths provided in the context so the user knows where each insight came from.\n"
+        "- **Cite your sources**: When using information from the search results, use short numeric inline citations matching the Search Result index (e.g., [1], [2]). Do NOT embed full source titles in the text.\n"
         "- Do NOT invent facts.\n"
         "- Adopt the style, tone, and directives of the active expert profile (if loaded).\n"
         "- If the context contains a summary rather than the full raw transcript, answer based on the summary. Do NOT ask the user to provide the link or transcript to you."
     )
-
-    if response_length == "Concise":
-        system_prompt += "\n- Keep your response extremely concise. Aim for a short summary (1-2 paragraphs max)."
-    elif response_length == "Detailed":
-        system_prompt += "\n- Provide a highly detailed and comprehensive answer, exploring all nuances deeply."
-    else:
-        system_prompt += "\n- Provide a standard length response that balances detail and readability."
 
     # ── Vault Memory: Facts and Context ───────────────────────────────────────
     context_blocks: list[str] = []
@@ -376,7 +378,7 @@ def construct_chat_prompts(
                             pass
 
     # 3. Append FTS results
-    for title, path, snippet, _ in fts_results:
+    for i, (title, path, snippet, _) in enumerate(fts_results, 1):
         if path not in loaded_paths:
             full_path = root_dir / path
             if full_path.exists():
@@ -387,7 +389,7 @@ def construct_chat_prompts(
             else:
                 note_content = snippet
             context_blocks.append(
-                f"### {title}\nPath: {path}\n\n{note_content}"
+                f"### Search Result [{i}]: {title}\nPath: {path}\n\n{note_content}"
             )
             loaded_paths.add(path)
 

@@ -48,6 +48,7 @@ def _settings_modal_body() -> None:
     openrouter_key = st.text_input("OpenRouter API Key", value=get_env_val("OPENROUTER_API_KEY"), type="password")
     azure_endpoint = st.text_input("Azure Endpoint", value=get_env_val("AZURE_OPENAI_ENDPOINT"))
     azure_key = st.text_input("Azure API Key", value=get_env_val("AZURE_OPENAI_API_KEY"), type="password")
+    elevenlabs_key = st.text_input("ElevenLabs API Key", value=get_env_val("ELEVENLABS_API_KEY"), type="password")
 
     if st.button("Save Settings"):
         new_env = current_env
@@ -63,6 +64,7 @@ def _settings_modal_body() -> None:
         new_env = update_or_add(new_env, "OPENROUTER_API_KEY", openrouter_key)
         new_env = update_or_add(new_env, "AZURE_OPENAI_ENDPOINT", azure_endpoint)
         new_env = update_or_add(new_env, "AZURE_OPENAI_API_KEY", azure_key)
+        new_env = update_or_add(new_env, "ELEVENLABS_API_KEY", elevenlabs_key)
 
         env_path.write_text(new_env, encoding="utf-8")
         st.success("Saved to .env!")
@@ -444,19 +446,26 @@ def _creator_expert_modal_body() -> None:
                                         t_text = t_path.read_text(encoding="utf-8")[:15000]
                                         persona = synthesize_creator_persona(uploader, t_text)
                                         expert_dir.mkdir(parents=True, exist_ok=True)
+                                        def _fmt(val):
+                                            if isinstance(val, list):
+                                                return "\n".join(f"- {v}" for v in val)
+                                            elif isinstance(val, dict):
+                                                return "\n\n".join(f"**{k.replace('_', ' ').title()}**\n{v}" for k, v in val.items())
+                                            return str(val)
+
                                         if persona.get("profile"):
                                             (expert_dir / "profile.md").write_text(
-                                                f"---\ntype: expert_profile\nstatus: cloned\n---\n\n# Profile\n\n{persona['profile']}",
+                                                f"---\ntype: expert_profile\nstatus: cloned\n---\n\n# Profile\n\n{_fmt(persona['profile'])}",
                                                 encoding="utf-8",
                                             )
                                         if persona.get("playbook"):
                                             (expert_dir / "playbook.md").write_text(
-                                                f"---\ntype: expert_playbook\n---\n\n# Playbook & Style\n\n{persona['playbook']}",
+                                                f"---\ntype: expert_playbook\n---\n\n# Playbook & Style\n\n{_fmt(persona['playbook'])}",
                                                 encoding="utf-8",
                                             )
                                         if persona.get("principles"):
                                             (expert_dir / "principles.md").write_text(
-                                                f"---\ntype: expert_principles\n---\n\n# Core Principles\n\n{persona['principles']}",
+                                                f"---\ntype: expert_principles\n---\n\n# Core Principles\n\n{_fmt(persona['principles'])}",
                                                 encoding="utf-8",
                                             )
                             else:
@@ -547,3 +556,92 @@ def _memories_modal_body() -> None:
                     st.toggle("Active", value=bool(mem['is_active']), key=tkey, on_change=_toggle_cb, args=(mem['id'], tkey))
                 with col2:
                     st.button("🗑️", key=f"mem_del_{mem['id']}", help="Delete", on_click=_delete_cb, args=(mem['id'],))
+
+# ── Experts Viewer modal ────────────────────────────────────────────────────────────
+
+@st.dialog("🧑‍🏫 Expert Personas", width="large")
+def experts_modal() -> None:
+    try:
+        _experts_modal_body()
+    except Exception as exc:
+        _show_modal_error("Experts", exc)
+
+def _experts_modal_body() -> None:
+    st.markdown("Browse the synthesized personas, playbooks, and principles of your AI experts.")
+    experts = get_existing_experts()
+    if not experts:
+        st.info("No experts built yet.")
+        return
+
+    expert_names = [e["display_name"] for e in experts]
+    selected_name = st.selectbox("Select an Expert", expert_names)
+    
+    if selected_name:
+        slug = next(e["slug"] for e in experts if e["display_name"] == selected_name)
+        expert_dir = ROOT / "data" / "experts" / slug
+        
+        def render_doc(doc_name: str) -> None:
+            doc_path = expert_dir / doc_name
+            if not doc_path.exists():
+                st.info(f"No {doc_name} found.")
+                return
+                
+            from core.frontmatter import read_fm
+            try:
+                fm, body = read_fm(doc_path)
+            except Exception:
+                body = doc_path.read_text(encoding="utf-8")
+                
+            # Quick fix for existing python lists/dicts saved by mistake
+            def _format_parsed(val):
+                if isinstance(val, list):
+                    return "\n".join(f"- {item}" for item in val)
+                elif isinstance(val, dict):
+                    return "\n\n".join(f"**{k.replace('_', ' ').title()}**\n{v}" for k, v in val.items())
+                return str(val)
+
+            import re
+            import ast
+            # The regex handles optional markdown headings before the list/dict
+            match = re.search(r"(?s)(.*?)(^[\[{]\s*['\"].*[\]}]\s*$)", body, re.MULTILINE)
+            if match:
+                prefix, literal_str = match.groups()
+                try:
+                    parsed = ast.literal_eval(literal_str.strip())
+                    if isinstance(parsed, (list, dict)):
+                        body = prefix + _format_parsed(parsed)
+                except Exception:
+                    pass
+            elif body.strip().startswith(("['", '["', "{'", '{"')):
+                try:
+                    parsed = ast.literal_eval(body.strip())
+                    if isinstance(parsed, (list, dict)):
+                        body = _format_parsed(parsed)
+                except Exception:
+                    pass
+                    
+            st.markdown(body)
+
+        tab1, tab2, tab3 = st.tabs(["📝 Profile", "📖 Playbook", "🧠 Principles"])
+        with tab1:
+            render_doc("profile.md")
+            st.divider()
+            st.subheader("ElevenLabs Integration")
+            profile_path = expert_dir / "profile.md"
+            current_voice_id = ""
+            if profile_path.exists():
+                from core.frontmatter import read_fm
+                fm_data, _ = read_fm(profile_path)
+                current_voice_id = fm_data.get("elevenlabs_voice_id", "")
+                
+            new_voice_id = st.text_input("Voice ID (e.g. 21m00Tcm4TlvDq8ikWAM)", value=current_voice_id, key=f"voice_id_{slug}")
+            if st.button("Save Voice ID", key=f"save_voice_{slug}"):
+                from core.frontmatter import update_fm
+                if update_fm(profile_path, elevenlabs_voice_id=new_voice_id.strip()):
+                    st.success("Voice ID saved!")
+                    st.rerun()
+                else:
+                    st.error("Failed to save Voice ID.")
+
+        with tab2: render_doc("playbook.md")
+        with tab3: render_doc("principles.md")
