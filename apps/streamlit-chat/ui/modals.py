@@ -371,7 +371,7 @@ def _creator_expert_modal_body() -> None:
         max_videos = 1
         st.info("Single video detected. We will clone the persona from this specific video.")
     else:
-        max_videos = st.number_input("How many recent videos?", min_value=1, max_value=10, value=5)
+        max_videos = st.number_input("How many recent videos?", min_value=1, max_value=50, value=5)
 
     run_ai_summaries = st.checkbox("Run AI Summarization on all videos (Takes longer)", value=False)
 
