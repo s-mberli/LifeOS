@@ -33,7 +33,7 @@ from ui.sidebar import render_sidebar
 
 # ── Page configuration (must be the first Streamlit call) ─────────────────────
 st.set_page_config(
-    page_title="LifeOS",
+    page_title="Demo of LifeOS",
     page_icon="🧭",
     layout="wide",
     initial_sidebar_state="expanded",

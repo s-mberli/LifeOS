@@ -45,7 +45,7 @@ def render_chat_interface() -> None:
 
 def _render_chat_body() -> None:
     """Inner implementation of the chat interface (no error boundary here)."""
-    st.title("🧭 LifeOS")
+    st.title("🧭 Demo of LifeOS")
     st.caption("Local-first personal expert network")
 
     # ── Session state initialisation ────────────────────────────────────────
@@ -114,7 +114,7 @@ def _render_chat_body() -> None:
                             else:
                                 st.error("Failed to save insight.")
                 with action_cols[1]:
-                    if st.button("🎧 Listen", key=f"tts_{idx}"):
+                    if st.button("🎧 Listen (Disabled in Demo)", key=f"tts_{idx}", disabled=True):
                         try:
                             from core.tts import generate_speech
                             expert_slugs = msg.get("expert_slugs")
