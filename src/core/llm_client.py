@@ -11,13 +11,14 @@ import yaml
 
 import requests
 import os
+from src.core.config import get_env
 
 def sanitize_err(e):
     err_str = str(e)
     keys_to_mask = [
-        os.environ.get("AZURE_OPENAI_API_KEY"),
-        os.environ.get("GEMINI_API_KEY"),
-        os.environ.get("OPENROUTER_API_KEY"),
+        get_env("AZURE_OPENAI_API_KEY"),
+        get_env("GEMINI_API_KEY"),
+        get_env("OPENROUTER_API_KEY"),
     ]
     for key in keys_to_mask:
         if key and len(key) > 5:
@@ -25,10 +26,10 @@ def sanitize_err(e):
     return err_str
 
 def call_openrouter(messages: list, max_tokens: int, temperature: float):
-    api_key = os.environ.get("OPENROUTER_API_KEY")
+    api_key = get_env("OPENROUTER_API_KEY")
     if not api_key:
         raise ValueError("OPENROUTER_API_KEY not set")
-    model = os.environ.get("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+    model = get_env("OPENROUTER_MODEL", "openai/gpt-4o-mini")
     
     payload = {
         "model": model,
@@ -52,10 +53,10 @@ def call_openrouter(messages: list, max_tokens: int, temperature: float):
     return content, model, usage
 
 def call_gemini(messages: list, max_tokens: int, temperature: float):
-    api_key = os.environ.get("GEMINI_API_KEY")
+    api_key = get_env("GEMINI_API_KEY")
     if not api_key:
         raise ValueError("GEMINI_API_KEY not set")
-    model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+    model = get_env("GEMINI_MODEL", "gemini-2.5-flash")
     
     gemini_messages = []
     system_instruction = None
@@ -92,10 +93,10 @@ def call_gemini(messages: list, max_tokens: int, temperature: float):
     return content, model, std_usage
 
 def call_azure(messages: list, max_tokens: int, temperature: float):
-    api_key = os.environ.get("AZURE_OPENAI_API_KEY")
-    endpoint = os.environ.get("AZURE_OPENAI_ENDPOINT")
-    deployment = os.environ.get("AZURE_OPENAI_DEPLOYMENT", "gpt-4o")
-    api_version = os.environ.get("AZURE_OPENAI_API_VERSION", "2024-02-15-preview")
+    api_key = get_env("AZURE_OPENAI_API_KEY")
+    endpoint = get_env("AZURE_OPENAI_ENDPOINT")
+    deployment = get_env("AZURE_OPENAI_DEPLOYMENT", "gpt-4o")
+    api_version = get_env("AZURE_OPENAI_API_VERSION", "2024-02-15-preview")
     
     if not api_key or not endpoint:
         raise ValueError("AZURE_OPENAI_API_KEY or AZURE_OPENAI_ENDPOINT not set")
@@ -129,7 +130,7 @@ def try_providers(system_prompt: str, user_prompt: str, max_tokens: int, tempera
     Attempts to call LLM providers in fallback order using explicit requests.
     Returns: tuple (content, provider_name, model_name, usage_dict) or None
     """
-    order_str = os.environ.get("LLM_PROVIDER_ORDER", "azure,gemini,openrouter")
+    order_str = get_env("LLM_PROVIDER_ORDER", "azure,gemini,openrouter")
     providers = [p.strip().lower() for p in order_str.split(",")]
     
     messages = []
