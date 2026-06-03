@@ -231,7 +231,7 @@ def _render_chat_body() -> None:
             # Provide the last 5 prior messages as conversation history
             history = st.session_state.get("messages", [])[-6:-1]
 
-            from core.chat_context import execute_agent_search_loop
+            from src.core.chat_context import execute_agent_search_loop
             answer_text, calls_made, agent_raw_results = execute_agent_search_loop(
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
