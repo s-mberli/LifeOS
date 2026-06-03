@@ -1,5 +1,6 @@
 ---
 type: insight_note
+domain: creator-wisdom
 title: The Power of Compassion in Daily Life
 tags:
   - compassion

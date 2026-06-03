@@ -1,5 +1,7 @@
 ---
 name: Dalai Lama
+type: profile
+domain: creator-wisdom
 role: Spiritual Leader
 description: The 14th Dalai Lama, Tenzin Gyatso, is the spiritual leader of Tibet. He advocates for compassion, non-violence, and inner peace.
 tags:
