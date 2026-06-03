@@ -46,21 +46,23 @@ def _render_sidebar_body() -> None:
         st.title("🧭 Quick Actions")
         st.markdown("Ingest URLs, files, or raw text transcripts into your library.")
 
-        # Ingest uploader and text area side-by-side
-        col_left, col_right = st.columns(2)
-        with col_left:
+        # Ingest via tabs to declutter sidebar
+        tabs = st.tabs(["📝 Paste URL/Text", "📤 Upload Files"])
+        with tabs[0]:
+            pasted_text = st.text_area(
+                "Or paste URL, raw text, or transcript:",
+                height=150,
+                key="unified_text",
+                label_visibility="collapsed",
+            ).strip()
+        with tabs[1]:
             uploaded_files = st.file_uploader(
                 "Drag & drop files (.txt, .md):",
                 accept_multiple_files=True,
                 type=["txt", "md"],
                 key="bulk_uploader",
+                label_visibility="collapsed",
             )
-        with col_right:
-            pasted_text = st.text_area(
-                "Or paste URL, raw text, or transcript:",
-                height=150,
-                key="unified_text",
-            ).strip()
 
         # Check if the pasted text looks like a single-line YouTube URL
         is_yt_url = False
@@ -70,7 +72,7 @@ def _render_sidebar_body() -> None:
                 and "\n" not in pasted_text
             )
 
-        use_ai_bulk = st.checkbox("Run AI Summaries (slow)", value=True, key="use_ai_bulk")
+        use_ai_bulk = st.checkbox("Run AI Summaries", value=True, key="use_ai_bulk")
         st.markdown(
             "ℹ️ *AI summaries generate searchable metadata (tags, key ideas, next actions) "
             "for the library. Skip if you only want raw content immediately available for chat search.*"

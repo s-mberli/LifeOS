@@ -60,8 +60,27 @@ def _render_chat_body() -> None:
 
     # ── Message history ──────────────────────────────────────────────────────
     messages_container = st.container()
+
+    if not st.session_state.messages:
+        with messages_container:
+            st.markdown(
+                """
+                <div style="padding: 1.25rem; border-radius: 8px; background: rgba(30, 41, 59, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); margin: 1rem 0 2rem 0;">
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; text-align: left;">
+                        <span style="font-size: 0.9rem; color: #e2e8f0; font-weight: 500; margin-bottom: 0.25rem;">💡 Onboarding Hints:</span>
+                        <span style="font-size: 0.85rem; color: #94a3b8;">• Ask any question to query your entire knowledge library.</span>
+                        <span style="font-size: 0.85rem; color: #94a3b8;">• Type <b>@</b> in the input to summon a specific expert.</span>
+                        <span style="font-size: 0.85rem; color: #94a3b8;">• Select specific files or experts in the active context below.</span>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
     for idx, msg in enumerate(st.session_state.messages):
-        with messages_container.chat_message(msg["role"]):
+        role = msg["role"]
+        with messages_container.chat_message(role):
+            st.markdown(f'<span class="chat-role-{role}"></span>', unsafe_allow_html=True)
             st.write(msg["content"])
             if msg["role"] == "assistant" and not msg["content"].startswith("[LLM Error]"):
                 # Source attribution popover
@@ -73,13 +92,13 @@ def _render_chat_body() -> None:
                                 f"**{title}** (`{path}`) — Score: `{display_score:.2f}`"
                             )
                 
-                action_cols = st.columns([1, 1, 2])
+                action_cols = st.columns([1.5, 1.2, 4.3])
                 with action_cols[0]:
                     if idx in st.session_state.saved_msg_indices:
                         st.caption("✅ Saved to Library")
                     else:
                         user_prompt = msg.get("user_prompt", "")
-                        if st.button("💾 Save Insight", key=f"save_insight_{idx}"):
+                        if st.button("✨ Save Insight", key=f"save_insight_{idx}"):
                             from core.chat_persistence import save_message_as_insight
                             success, file_path = save_message_as_insight(
                                 user_prompt=user_prompt,
@@ -95,7 +114,7 @@ def _render_chat_body() -> None:
                             else:
                                 st.error("Failed to save insight.")
                 with action_cols[1]:
-                    if st.button("🔊 Read Aloud", key=f"tts_{idx}"):
+                    if st.button("🎧 Listen", key=f"tts_{idx}"):
                         try:
                             from core.tts import generate_speech
                             expert_slugs = msg.get("expert_slugs")
@@ -127,6 +146,7 @@ def _render_chat_body() -> None:
             options=list(options_map.keys()),
             default=[],
             placeholder="Select Experts or Files...",
+            help="Select specific experts or files to narrow down the knowledge base. Leave empty to search everything.",
             label_visibility="collapsed",
         )
     with col2:
@@ -134,17 +154,20 @@ def _render_chat_body() -> None:
             "Response Length",
             options=["Concise", "Standard", "Detailed"],
             index=1,
+            help="Choose how detailed the synthesized response should be.",
             label_visibility="collapsed"
         )
 
     # ── Chat input ───────────────────────────────────────────────────────────
-    prompt = st.chat_input("Ask anything or use @ to call an expert")
+    prompt = st.chat_input("Ask anything or use @ to summon an expert...")
     if not prompt:
         return
 
     # 1. Store and display user message
     st.session_state.messages.append({"role": "user", "content": prompt})
-    messages_container.chat_message("user").write(prompt)
+    with messages_container.chat_message("user"):
+        st.markdown('<span class="chat-role-user"></span>', unsafe_allow_html=True)
+        st.write(prompt)
 
     # 2. Resolve @mention overrides
     from core.chat_context import extract_mention
@@ -163,6 +186,7 @@ def _render_chat_body() -> None:
 
     # 4. Search, synthesise, and stream the response
     with messages_container.chat_message("assistant"):
+        st.markdown('<span class="chat-role-assistant"></span>', unsafe_allow_html=True)
         with st.spinner("Searching and synthesizing..."):
 
             # Auto-route for domain classification (also updates memory log)
