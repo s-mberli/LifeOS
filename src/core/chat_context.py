@@ -33,7 +33,8 @@ def execute_agent_search_loop(
     max_turns: int = 3,
     fts_search_fn=None,
     include_private: bool = False,
-) -> tuple[str, list[tuple[str, str]]]:
+    starting_source_index: int = 1,
+) -> tuple[str, list[tuple[str, str]], list]:
     import re
     tool_instructions = (
         "\n\n=== Tool Access ===\n"
@@ -51,6 +52,8 @@ def execute_agent_search_loop(
 
     current_history = list(history) if history else []
     calls_made = []
+    all_raw_results = []
+    current_source_idx = starting_source_index
 
     for _ in range(max_turns):
         response = ask_llm_chat(augmented_system, user_prompt, history=current_history)
@@ -59,7 +62,7 @@ def execute_agent_search_loop(
 
         match = re.search(r"<call:fts_search>(.*?)</call:fts_search>", response, re.DOTALL)
         if not match:
-            return response, calls_made
+            return response, calls_made, all_raw_results
 
         query = match.group(1).strip()
         # Some fts_search_fn signatures might not support include_private, so handle carefully if needed.
@@ -71,9 +74,12 @@ def execute_agent_search_loop(
         
         if results:
             formatted_list = []
-            for r_title, r_path, r_snippet, _ in results:
-                formatted_list.append(f"{r_title} ({r_path}):\n{r_snippet}")
-            results_str = "\n\n".join(formatted_list)
+            for r in results:
+                r_title, r_path, r_snippet, r_score = r
+                formatted_list.append(f"### Search Result [{current_source_idx}]: {r_title}\nPath: {r_path}\n\n{r_snippet}")
+                all_raw_results.append(r)
+                current_source_idx += 1
+            results_str = "\n\n---\n\n".join(formatted_list)
         else:
             results_str = "No results found in knowledge base."
 
@@ -89,7 +95,7 @@ def execute_agent_search_loop(
         })
 
     final_response = ask_llm_chat(augmented_system, user_prompt, history=current_history)
-    return final_response, calls_made
+    return final_response, calls_made, all_raw_results
 
 def extract_mention(prompt: str, existing_experts: list) -> Optional[dict]:
     """Parse a prompt for @mentions to resolve an expert."""

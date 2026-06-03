@@ -232,14 +232,20 @@ def _render_chat_body() -> None:
             history = st.session_state.get("messages", [])[-6:-1]
 
             from core.chat_context import execute_agent_search_loop
-            answer_text, calls_made = execute_agent_search_loop(
+            answer_text, calls_made, agent_raw_results = execute_agent_search_loop(
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
                 fts_search_fn=fts_search,
                 history=history,
                 allowed_paths=allowed_paths if allowed_paths else None,
                 include_private=True,
+                starting_source_index=len(results) + 1 if results else 1,
             )
+            
+            # Merge agent's searched results with the initial results
+            all_sources = list(results) if results else []
+            if agent_raw_results:
+                all_sources.extend(agent_raw_results)
 
             # Show visual indicators of agent searches
             if calls_made:
@@ -256,8 +262,8 @@ def _render_chat_body() -> None:
                 if target_experts:
                     assistant_msg["expert_slugs"] = [e["slug"] for e in target_experts]
                     assistant_msg["expert_names"] = [e["display_name"] for e in target_experts]
-                if results:
-                    assistant_msg["sources"] = results
+                if all_sources:
+                    assistant_msg["sources"] = all_sources
                 st.session_state.messages.append(assistant_msg)
 
                 # Auto-log to daily chat logs

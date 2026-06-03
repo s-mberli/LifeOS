@@ -3,6 +3,11 @@
 </p>
 
 <p align="center">
+  <!-- The main UI hero shot -->
+  <img src="docs/assets/main-ui.png" alt="LifeOS Chat & Ingestion Interface" width="100%">
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/SQLite-FTS5-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite">
   <img src="https://img.shields.io/badge/Streamlit-UI-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit">
@@ -35,6 +40,18 @@ Most AI tools stop at retrieval. **LifeOS closes the loop**: new knowledge becom
 | **Manual Personal Memory** | User-managed memory system to inject persistent context, preferences, and LLM expert exports directly into the system prompt. |
 | **MCP Server** | Exposes `search_vault` and `get_note` tools via the [Model Context Protocol](https://modelcontextprotocol.io), so any MCP-compatible agent can query your knowledge base. |
 | **Multi-Provider LLM** | Cascading fallback across Azure OpenAI → Gemini → OpenRouter. Swap models without code changes. |
+
+#### 📚 Knowledge Vault & AI Summaries
+The system automatically digests raw transcripts and articles into clean, actionable AI summaries.
+<p align="center"><img src="docs/assets/knowledge-library.png" alt="Knowledge Library Viewer" width="100%"></p>
+
+#### 🧑‍🏫 Synthesized Expert Personas
+LifeOS groups your insights by creator/domain and auto-generates deep, interactive expert personas (`profile`, `playbook`, `principles`).
+<p align="center"><img src="docs/assets/expert-personas.png" alt="Expert Personas" width="100%"></p>
+
+#### 🎥 Automated Bulk Ingestion
+Paste a YouTube Channel URL to instantly download recent transcripts, summarize them, and build an Expert profile in one click.
+<p align="center"><img src="docs/assets/youtube-ingestion.png" alt="YouTube Bulk Ingestion" width="80%"></p>
 
 ### 🔒 Privacy Model
 
