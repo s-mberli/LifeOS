@@ -1,0 +1,21 @@
+# LifeOS Model Configuration
+# Copy this file to config/models.yml and adjust to your preferred models.
+# Available providers: gemini, azure, openrouter (configured in .env)
+
+default_model: gemini-2.5-flash
+
+models:
+  router:
+    model: gemini-2.5-flash
+    temperature: 0.1
+    purpose: Fast, deterministic classification and routing.
+    
+  resource_ingestion:
+    model: gemini-2.5-flash
+    temperature: 0.3
+    purpose: Summarization and metadata extraction.
+
+  creative_modes:
+    model: gemini-2.5-flash
+    temperature: 0.7
+    purpose: Content planning, portfolio ideation, creative writing.

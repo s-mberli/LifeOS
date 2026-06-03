@@ -1,0 +1,56 @@
+/* Center the main app block to 850px */
+.block-container {
+    max-width: 850px !important;
+    padding-top: 3rem !important;
+    padding-bottom: 5rem !important;
+}
+
+/* Subtle typography improvements */
+p, div, span, label, li {
+    line-height: 1.6;
+}
+
+/* Pill and Button hover animations */
+.stSegmentedControl label, .stButton button {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border-radius: 8px !important;
+}
+.stSegmentedControl label:hover, .stButton button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+}
+
+/* Glassmorphic Chat Input */
+[data-testid="stChatInput"] {
+    background: rgba(30, 41, 59, 0.75) !important;
+    backdrop-filter: blur(12px) !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+/* Chat message bubbles */
+[data-testid="stChatMessage"] {
+    border-radius: 12px !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+    margin-bottom: 1rem !important;
+    border: 1px solid rgba(255,255,255,0.05) !important;
+    transition: background-color 0.3s ease;
+}
+
+/* User-specific message styling */
+[data-testid="stChatMessage"]:has(.chat-role-user) {
+    background-color: rgba(30, 41, 59, 0.45) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Assistant-specific message styling */
+[data-testid="stChatMessage"]:has(.chat-role-assistant) {
+    background-color: rgba(51, 65, 85, 0.7) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Hide default streamlit branding in footer */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+

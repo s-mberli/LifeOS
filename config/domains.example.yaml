@@ -1,0 +1,56 @@
+# LifeOS Domain Classification Config (Example)
+# Copy this file to domains.yaml and customize for your own life domains.
+# Maps keywords to storage locations and privacy settings.
+
+domains:
+  ai-platform:
+    primary_mode: research-resource
+    storage_location: data/knowledge/ai-resources/
+    privacy: public
+    secondary_modes: [ai-builder]
+    keywords: [ai, agent, rag, llm, python, vector, embedding, mcp, model]
+
+  wellness:
+    primary_mode: wellness-operator
+    storage_location: data/business/wellness/
+    privacy: public
+    secondary_modes: [content-planner]
+    keywords: [wellness, health, holistic, therapy, healing]
+
+  career:
+    primary_mode: career-brand
+    storage_location: data/career/
+    privacy: public
+    keywords: [linkedin, cv, resume, job, portfolio, interview]
+
+  creator-wisdom:
+    primary_mode: creator-wisdom
+    storage_location: data/knowledge/insights/
+    privacy: public
+    keywords: [youtube creator, channel, transcript, creator profile]
+
+  personal:
+    primary_mode: personal-journal
+    storage_location: data/private/reflections/
+    privacy: private
+    keywords: [routine, reflection, decision, focus, weekly review, thought]
+    sub_categories:
+      journal:
+        path: data/private/journal/
+        keywords: [journal, diary, reflection, thought]
+      goals:
+        path: data/private/goals/
+        keywords: [goal, objective, target, milestone]
+
+  fitness:
+    primary_mode: fitness-tracker
+    storage_location: data/private/fitness/
+    privacy: private
+    keywords: [gym, workout, training, nutrition, recovery]
+    sub_categories:
+      training:
+        path: data/private/fitness/training/
+        keywords: [workout, training, strength, cardio]
+      nutrition:
+        path: data/private/fitness/nutrition/
+        keywords: [nutrition, calories, protein, diet]
