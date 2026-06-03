@@ -93,7 +93,7 @@ def test_ui_chat_input_flow(tmp_project: Path):
          patch("ui.helpers.DB_PATH", tmp_project / "indexes" / "lifeos.db"), \
          patch("ui.sidebar.ROOT", tmp_project), \
          patch("ui.chat.ROOT", tmp_project), \
-         patch("core.chat_context.ask_llm_chat", return_value="I am a chatbot response.") as mock_ask, \
+         patch("src.core.chat_context.ask_llm_chat", return_value="I am a chatbot response.") as mock_ask, \
          patch("ui.chat.auto_route_prompt", return_value={"primary_domain": "general"}):
 
         at = AppTest.from_file(APP_PATH)
@@ -128,7 +128,7 @@ def test_ui_chat_save_insight_flow(tmp_project: Path):
          patch("ui.helpers.DB_PATH", tmp_project / "indexes" / "lifeos.db"), \
          patch("ui.sidebar.ROOT", tmp_project), \
          patch("ui.chat.ROOT", tmp_project), \
-         patch("core.chat_context.ask_llm_chat", return_value="I am a chatbot response.") as mock_ask, \
+         patch("src.core.chat_context.ask_llm_chat", return_value="I am a chatbot response.") as mock_ask, \
          patch("ui.chat.auto_route_prompt", return_value={"primary_domain": "general"}), \
          patch("core.chat_persistence.save_message_as_insight", return_value=(True, "data/knowledge/chat-insights/some-note.md")) as mock_save:
 

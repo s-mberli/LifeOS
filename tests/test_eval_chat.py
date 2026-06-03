@@ -73,7 +73,7 @@ def verify_response_quality(response: str, expected_keyword: str):
 
 def test_short_context():
     sys_prompt = get_system_prompt()
-    response, calls = execute_agent_search_loop(
+    response, calls, _ = execute_agent_search_loop(
         system_prompt=sys_prompt,
         user_prompt="How do I get things done early? (Search the vault first)",
         fts_search_fn=mock_fts_search_short
@@ -84,7 +84,7 @@ def test_short_context():
 
 def test_medium_context():
     sys_prompt = get_system_prompt()
-    response, calls = execute_agent_search_loop(
+    response, calls, _ = execute_agent_search_loop(
         system_prompt=sys_prompt,
         user_prompt="What is a good health protocol for sleeping? (Search the vault first)",
         fts_search_fn=mock_fts_search_medium
@@ -95,7 +95,7 @@ def test_medium_context():
 
 def test_long_context():
     sys_prompt = get_system_prompt()
-    response, calls = execute_agent_search_loop(
+    response, calls, _ = execute_agent_search_loop(
         system_prompt=sys_prompt,
         user_prompt="How to regain purpose after losing motivation? (Search the vault first)",
         fts_search_fn=mock_fts_search_long
