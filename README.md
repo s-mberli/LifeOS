@@ -41,6 +41,10 @@ Most AI tools stop at retrieval. **LifeOS closes the loop**: new knowledge becom
 | **MCP Server** | Exposes `search_vault` and `get_note` tools via the [Model Context Protocol](https://modelcontextprotocol.io), so any MCP-compatible agent can query your knowledge base. |
 | **Multi-Provider LLM** | Cascading fallback across Azure OpenAI → Gemini → OpenRouter. Swap models without code changes. |
 
+#### 💬 Multi-Turn Chat with Citations
+Chat with your synthesized experts or your general knowledge base. Every claim is grounded in your actual notes with inline citations.
+<p align="center"><img src="docs/assets/chat-example.png" alt="Multi-Turn Chat" width="100%"></p>
+
 #### 📚 Knowledge Vault & AI Summaries
 The system automatically digests raw transcripts and articles into clean, actionable AI summaries.
 <p align="center"><img src="docs/assets/knowledge-library.png" alt="Knowledge Library Viewer" width="100%"></p>
