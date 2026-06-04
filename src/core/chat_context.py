@@ -38,15 +38,19 @@ def execute_agent_search_loop(
     import re
     tool_instructions = (
         "\n\n=== Tool Access ===\n"
-        "You have access to a search tool: fts_search.\n"
-        "If you need to query the database/vault for specific facts, insights, or details "
-        "not present in your active context, output an XML tag exactly like this:\n"
-        "<call:fts_search>your query here</call:fts_search>\n"
-        "Do not explain the call, do not output any other text when calling a tool.\n"
-        "After you output the tag, the system will execute it and provide the results.\n"
+        "You have access to two tools:\n\n"
+        "1. fts_search — Query the local knowledge vault for stored notes/transcripts.\n"
+        "   Usage: <call:fts_search>your query here</call:fts_search>\n\n"
+        "2. fetch_web — Fetch the full content of any URL from the live web.\n"
+        "   Use this when you find a link in search results and need its full content.\n"
+        "   Usage: <call:fetch_web>https://example.com/article</call:fetch_web>\n\n"
+        "Rules:\n"
+        "- Output ONLY the XML tag when calling a tool — no surrounding explanation.\n"
+        "- Use at most one tool call per turn.\n"
+        "- After you output a tool call tag, the system will execute it and return results.\n"
     )
     augmented_system = system_prompt + tool_instructions
-    
+
     if fts_search_fn is None:
         from src.core.search_knowledge import fts_search as fts_search_fn
 
@@ -55,44 +59,77 @@ def execute_agent_search_loop(
     all_raw_results = []
     current_source_idx = starting_source_index
 
+    # Compile tool regexes once
+    _fts_re = re.compile(r"<call:fts_search>(.*?)</call:fts_search>", re.DOTALL)
+    _web_re = re.compile(r"<call:fetch_web>(.*?)</call:fetch_web>", re.DOTALL)
+    _WEB_CONTENT_LIMIT = 6000  # chars — keeps token cost predictable
+
     for _ in range(max_turns):
         response = ask_llm_chat(augmented_system, user_prompt, history=current_history)
         if not response:
             break
 
-        match = re.search(r"<call:fts_search>(.*?)</call:fts_search>", response, re.DOTALL)
-        if not match:
+        fts_match = _fts_re.search(response)
+        web_match = _web_re.search(response)
+
+        if not fts_match and not web_match:
+            # No tool call — the LLM is done
             return response, calls_made, all_raw_results
 
-        query = match.group(1).strip()
-        # Some fts_search_fn signatures might not support include_private, so handle carefully if needed.
-        # But we know we are passing the core fts_search which does.
-        try:
-            results = fts_search_fn(query, limit=3, allowed_paths=allowed_paths, include_private=include_private)
-        except TypeError:
-            results = fts_search_fn(query, limit=3, allowed_paths=allowed_paths)
-        
-        if results:
-            formatted_list = []
-            for r in results:
-                r_title, r_path, r_snippet, r_score = r
-                formatted_list.append(f"### Search Result [{current_source_idx}]: {r_title}\nPath: {r_path}\n\n{r_snippet}")
-                all_raw_results.append(r)
-                current_source_idx += 1
-            results_str = "\n\n---\n\n".join(formatted_list)
-        else:
-            results_str = "No results found in knowledge base."
+        if fts_match:
+            query = fts_match.group(1).strip()
+            try:
+                results = fts_search_fn(query, limit=3, allowed_paths=allowed_paths, include_private=include_private)
+            except TypeError:
+                results = fts_search_fn(query, limit=3, allowed_paths=allowed_paths)
 
-        calls_made.append((query, results_str))
+            if results:
+                formatted_list = []
+                for r in results:
+                    r_title, r_path, r_snippet, r_score = r
+                    formatted_list.append(
+                        f"### Search Result [{current_source_idx}]: {r_title}\nPath: {r_path}\n\n{r_snippet}"
+                    )
+                    all_raw_results.append(r)
+                    current_source_idx += 1
+                results_str = "\n\n---\n\n".join(formatted_list)
+            else:
+                results_str = "No results found in knowledge base."
 
-        current_history.append({"role": "assistant", "content": response})
-        current_history.append({
-            "role": "user",
-            "content": (
-                f"<response:fts_search>\n{results_str}\n</response:fts_search>\n"
-                f"Use the above search results to complete your answer."
-            )
-        })
+            calls_made.append((query, results_str))
+            current_history.append({"role": "assistant", "content": response})
+            current_history.append({
+                "role": "user",
+                "content": (
+                    f"<response:fts_search>\n{results_str}\n</response:fts_search>\n"
+                    "Use the above search results to continue your answer."
+                )
+            })
+
+        elif web_match:
+            url = web_match.group(1).strip()
+            try:
+                from src.core.web import fetch_webpage_content
+                _title, _content = fetch_webpage_content(url)
+                if _content:
+                    # Cap content to avoid token overflows
+                    if len(_content) > _WEB_CONTENT_LIMIT:
+                        _content = _content[:_WEB_CONTENT_LIMIT] + "\n\n[... content truncated for length ...]"
+                    web_result = f"### Fetched: {_title or url}\nURL: {url}\n\n{_content}"
+                else:
+                    web_result = f"Could not retrieve content from: {url}"
+            except Exception as exc:
+                web_result = f"fetch_web error for {url}: {exc}"
+
+            calls_made.append((url, web_result))
+            current_history.append({"role": "assistant", "content": response})
+            current_history.append({
+                "role": "user",
+                "content": (
+                    f"<response:fetch_web>\n{web_result}\n</response:fetch_web>\n"
+                    "Use the above web content to continue your answer."
+                )
+            })
 
     final_response = ask_llm_chat(augmented_system, user_prompt, history=current_history)
     return final_response, calls_made, all_raw_results

@@ -55,7 +55,7 @@ def get_system_prompt():
 
 def verify_response_quality(response: str, expected_keyword: str):
     # 1. Not cut off check
-    assert re.search(r'[.!?]\s*$', response) is not None, f"Response appears cut off: {response[-50:]}"
+    assert re.search(r'[.!?]\s*(\[\d+\])?\s*$', response) is not None, f"Response appears cut off: {response[-50:]}"
     
     # 2. Length check
     assert len(response) > 200, f"Response is too short: {len(response)} chars. \nResponse: {response}"
