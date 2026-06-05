@@ -116,6 +116,8 @@ proof-of-concept. Rules:
 ### Step 4: Weekly Dispatch (The Content Creator)
 Produce exactly ONE markdown file per week saved to `data/inbox/content_drafts/`.
 
+For the 5-7 stories you select, you MUST use your `<call:fetch_web>` tool to read the full original article `url` provided in the structured data. Do not rely solely on the short TLDR summary. Write your own original 2-3 sentence summary based on the FULL fetched content.
+
 **Filename format:** `weekly_dispatch_{YYYY_MM_DD}.md`
 
 **Dispatch structure:**
@@ -125,8 +127,9 @@ Produce exactly ONE markdown file per week saved to `data/inbox/content_drafts/`
 ## 🔥 Top Stories This Week
 [Curate the 5-7 most important stories from ALL ingested TLDR topics. For each:]
 ### [Headline] — via TLDR {topic}
-2-3 sentence summary. Why it matters.
-[Source URL]
+[Your original 2-3 sentence summary based on the fetched article. Why it matters.]
+[Original Article URL]
+
 
 ## 🏗️ What I'm Building
 [For each architecture proposal this week:]
