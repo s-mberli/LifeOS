@@ -11,6 +11,16 @@ import yaml
 
 import requests
 import os
+from pathlib import Path
+
+# Load environment variables
+try:
+    from dotenv import load_dotenv
+    ROOT = Path(__file__).resolve().parent.parent.parent
+    load_dotenv(ROOT / ".env", override=True)
+except ImportError:
+    pass
+
 
 def sanitize_err(e):
     err_str = str(e)
@@ -118,11 +128,25 @@ def call_azure(messages: list, max_tokens: int, temperature: float):
     }
     
     resp = requests.post(url, json=payload, headers=headers, timeout=60)
+    if resp.status_code == 400:
+        try:
+            err_data = resp.json()
+            err_msg = err_data.get("error", {}).get("message", "")
+            if "max_tokens" in err_msg or "temperature" in err_msg or "max_completion_tokens" in err_msg:
+                fallback_payload = {
+                    "messages": messages,
+                    "max_completion_tokens": max_tokens
+                }
+                resp = requests.post(url, json=fallback_payload, headers=headers, timeout=60)
+        except Exception:
+            pass
+
     resp.raise_for_status()
     res_body = resp.json()
     content = res_body["choices"][0]["message"]["content"]
     usage = res_body.get("usage", {})
     return content, deployment, usage
+
 
 def try_providers(system_prompt: str, user_prompt: str, max_tokens: int, temperature: float = 0.3):
     """

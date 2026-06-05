@@ -182,6 +182,53 @@ def _fetch_webpage_content_bs4(url: str) -> tuple[str, str]:
         return "", ""
 
 
+def fetch_tldr_direct(url: str) -> tuple[str, str]:
+    """Fetch TLDR newsletter content directly via BeautifulSoup (extremely fast)."""
+    try:
+        import requests
+        from bs4 import BeautifulSoup
+    except ImportError:
+        return "", ""
+
+    try:
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36"
+            )
+        }
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        title_el = soup.find("title")
+        title = title_el.get_text().strip() if title_el else "TLDR Newsletter"
+
+        # Extract articles
+        articles = soup.find_all("article")
+        if not articles:
+            return "", ""
+
+        content_parts = []
+        for art in articles:
+            # Preserve original article URLs by converting <a> tags to Markdown
+            for a in art.find_all("a"):
+                href = a.get("href", "")
+                text = a.get_text(strip=True)
+                if href and text:
+                    a.replace_with(f"[{text}]({href})")
+
+            text = art.get_text(separator=" ").strip()
+            if text:
+                content_parts.append(text)
+
+        return title, "\n\n".join(content_parts)
+    except Exception as exc:
+        print(f"  [!] Direct TLDR fetch failed for {url}: {exc}")
+        return "", ""
+
+
 def fetch_webpage_content(url: str) -> tuple[str, str]:
     """Fetch a web page and return its title and main text content.
 
@@ -194,6 +241,12 @@ def fetch_webpage_content(url: str) -> tuple[str, str]:
     """
     lower_url = url.lower()
     
+    # 0. TLDR specific fast path
+    if "tldr.tech" in lower_url and "/archives" not in lower_url:
+        title, content = fetch_tldr_direct(url)
+        if title or content:
+            return title, content
+
     # 1. Reddit routing
     if "reddit.com" in lower_url or "redd.it" in lower_url:
         title, content = fetch_reddit_json(url)
@@ -207,6 +260,7 @@ def fetch_webpage_content(url: str) -> tuple[str, str]:
 
     # 3. Fallback to BeautifulSoup
     return _fetch_webpage_content_bs4(url)
+
 
 
 def fetch_webpage_metadata(url: str) -> dict:

@@ -538,7 +538,7 @@ def _run_cheap_triage(title: str, source_url: str, content: str, transcript: str
 # Public API
 # ---------------------------------------------------------------------------
 
-def process_one_file(source: str, use_ai: bool = False, status_callback=None) -> dict:
+def process_one_file(source: str, use_ai: bool = False, status_callback=None, rebuild_index_after: bool = True) -> dict:
     from core.youtube import extract_video_id, save_transcript  # type: ignore
     from core.experts import _suggest_experts_for_domain  # type: ignore
 
@@ -731,12 +731,13 @@ def process_one_file(source: str, use_ai: bool = False, status_callback=None) ->
         log(f"Warning: could not write to ingestion log: {exc}")
 
     # 13. Rebuild FTS index
-    try:
-        from src.core.build_fts_index import build_index  # type: ignore
-        idx_res = build_index()
-        log(f"Auto-rebuilt search index: {idx_res.get('indexed', '?')} files indexed.")
-    except Exception as exc:
-        log(f"Auto-rebuild of search index failed: {exc}")
+    if rebuild_index_after:
+        try:
+            from src.core.build_fts_index import build_index  # type: ignore
+            idx_res = build_index()
+            log(f"Auto-rebuilt search index: {idx_res.get('indexed', '?')} files indexed.")
+        except Exception as exc:
+            log(f"Auto-rebuild of search index failed: {exc}")
 
     return result
 

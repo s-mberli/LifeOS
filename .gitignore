@@ -65,6 +65,10 @@ data/inbox/processed/raw/
 data/inbox/imports/
 data/inbox/voice/
 
+# Hermes weekly output (local only — never public)
+data/inbox/proposals/
+data/inbox/content_drafts/
+
 # Personal config (profile.yml contains real personal info)
 # Use profile.example.yml as the template instead
 config/profile.yml
