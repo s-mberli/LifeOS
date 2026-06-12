@@ -19,7 +19,7 @@ Manual summary needed. (LLM integration pending)
 ## Key Ideas
 - Manual extraction needed.
 
-## Why this matters for Markus
+## Why this matters for the user
 - Suggested based on routing to flow-temple.
 
 ## Related Modes

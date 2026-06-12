@@ -40,7 +40,7 @@ Creator names are slugified: `"Santiago Ferreiro"` → `creator--santiago-ferrei
 3. **Scaffold synthesis/ on first source.** Create blank `worldview.md`, `playbook.md`, `content-style.md`, `business-model.md`, `evidence-index.md` if they do not exist.
 4. **Auto-log to evidence-index.md** on every ingest. Manual synthesis updates happen after reflection.
 5. Look beyond surface-level tips — extract the deeper worldview and repeated frameworks.
-6. Always map the creator's advice to Markus's domains (Flow Temple, AI Platform, Career).
+6. Always map the creator's advice to the user's domains (Flow Temple, AI Platform, Career).
 7. Always suggest ONE practical way to apply their wisdom today.
 8. When asked about a creator: read `profile.md` first, then synthesis files, then dive into `sources/` for evidence.
 
@@ -54,7 +54,7 @@ Creator names are slugified: `"Santiago Ferreiro"` → `creator--santiago-ferrei
 7. Synthesis files (`worldview.md`, `playbook.md`, etc.) scaffolded if missing — fill manually.
 
 ## Synthesis Workflow (Ask LifeOS)
-When Markus asks about a creator in Creator Wisdom mode:
+When the user asks about a creator in Creator Wisdom mode:
 1. Load `profile.md` for the creator → quick take and source count.
 2. Load all `synthesis/*.md` files for the accumulated worldview and playbook.
 3. If deep-dive needed: load relevant source notes from `sources/`.

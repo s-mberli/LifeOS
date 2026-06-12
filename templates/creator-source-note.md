@@ -40,7 +40,7 @@ status: processed
 (How did they communicate in this source? Format, tone, hooks?)
 - 
 
-## Applicable to Markus
+## Applicable to the User
 - Flow Temple: 
 - AI Platform: 
 - Career: 

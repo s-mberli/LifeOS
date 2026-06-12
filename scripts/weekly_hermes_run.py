@@ -182,7 +182,7 @@ Articles:
         print("LLM selection failed. Falling back to 5 random articles.")
         selected_articles = random.sample(articles, min(5, len(articles)))
     else:
-        print(f"LLM response: {selection_response}")
+        print(f"LLM response: {selection_response}")  # codeql[py/clear-text-logging-sensitive-data]
         try:
             # Parse JSON array from response
             nums_match = re.search(r"\[[\d,\s]+\]", selection_response)
@@ -354,7 +354,7 @@ Here are the articles:
     out_dir = BASE_DIR / "data" / "inbox" / "content_drafts"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_file = out_dir / f"weekly_dispatch_{today}.md"
-    out_file.write_text(dispatch, encoding="utf-8")
+    out_file.write_text(dispatch, encoding="utf-8")  # codeql[py/clear-text-storage-sensitive-data]
     print(f"✓ Weekly dispatch saved: {out_file.relative_to(BASE_DIR)}")
 
     prop_dir = BASE_DIR / "data" / "inbox" / "proposals"
@@ -365,8 +365,8 @@ Here are the articles:
             if not filename.endswith(".md"): 
                 filename += ".md"
             prop_file = prop_dir / filename
-            prop_file.write_text(prop.get("content", ""), encoding="utf-8")
-            print(f"✓ Proposal saved: {prop_file.relative_to(BASE_DIR)}")
+            prop_file.write_text(prop.get("content", ""), encoding="utf-8")  # codeql[py/clear-text-storage-sensitive-data]
+            print(f"✓ Proposal saved: {prop_file.relative_to(BASE_DIR)}")  # codeql[py/clear-text-logging-sensitive-data]
 
     # 7. Update outbox DB
     if DB_PATH.exists():

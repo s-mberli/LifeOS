@@ -1,0 +1,8 @@
+# .bandit.yml
+exclude_dirs:
+  - 'tests/'
+  - '.venv/'
+  - 'venv/'
+
+skips:
+  - 'B101' # assert_used - common in tests and type checking

@@ -39,27 +39,29 @@ def _settings_modal_body() -> None:
     env_path = ROOT / ".env"
     current_env = env_path.read_text(encoding="utf-8") if env_path.exists() else ""
 
-    def get_env_val(key: str) -> str:
+    def get_env_mask(key: str) -> str:
         for line in current_env.splitlines():
             if line.startswith(f"{key}="):
-                return line.split("=", 1)[1].strip().strip("\"'")
+                val = line.split("=", 1)[1].strip().strip("\"'")
+                if val and val != "your_api_key_here":
+                    return "********"
         return ""
 
-    openrouter_key = st.text_input("OpenRouter API Key", value=get_env_val("OPENROUTER_API_KEY"), type="password")
-    azure_endpoint = st.text_input("Azure Endpoint", value=get_env_val("AZURE_OPENAI_ENDPOINT"))
-    azure_key = st.text_input("Azure API Key", value=get_env_val("AZURE_OPENAI_API_KEY"), type="password")
-    elevenlabs_key = st.text_input("ElevenLabs API Key", value=get_env_val("ELEVENLABS_API_KEY"), type="password")
+    openrouter_key = st.text_input("OpenRouter API Key", value=get_env_mask("OPENROUTER_API_KEY"), type="password")
+    azure_endpoint = st.text_input("Azure Endpoint", value=get_env_mask("AZURE_OPENAI_ENDPOINT"))
+    azure_key = st.text_input("Azure API Key", value=get_env_mask("AZURE_OPENAI_API_KEY"), type="password")
+    elevenlabs_key = st.text_input("ElevenLabs API Key", value=get_env_mask("ELEVENLABS_API_KEY"), type="password")
 
     if st.button("Save Settings"):
         new_env = current_env
 
         def update_or_add(text: str, key: str, val: str) -> str:
-            if val:
-                pattern = f"^{key}=.*$"
-                if re.search(pattern, text, flags=re.MULTILINE):
-                    return re.sub(pattern, f'{key}="{val}"', text, flags=re.MULTILINE)
-                return text + f'\n{key}="{val}"'
-            return text
+            if not val or val == "********":
+                return text  # Don't overwrite if they left it masked or empty
+            pattern = f"^{key}=.*$"
+            if re.search(pattern, text, flags=re.MULTILINE):
+                return re.sub(pattern, f'{key}="{val}"', text, flags=re.MULTILINE)
+            return text + f'\n{key}="{val}"'
 
         new_env = update_or_add(new_env, "OPENROUTER_API_KEY", openrouter_key)
         new_env = update_or_add(new_env, "AZURE_OPENAI_ENDPOINT", azure_endpoint)

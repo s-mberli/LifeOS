@@ -47,7 +47,7 @@ Perform a strict Five-Axis Code Review on the following Python file.
 1. **Correctness** — bugs, edge cases, off-by-one, error handling
 2. **Readability** — naming, structure, dead code, unnecessary complexity
 3. **Architecture** — module boundaries, dependency direction, duplication
-4. **Security** — hardcoded secrets, injection, unsanitised input, auth gaps
+4. **Security** — hardcoded secrets, injection, unsanitised input, auth gaps. **CRITICAL: NEVER allow clear-text logging/printing of `os.environ` or API keys.**
 5. **Performance** — N+1 queries, unbounded loops, large allocations in hot paths
 
 ## Rules

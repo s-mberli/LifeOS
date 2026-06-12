@@ -40,7 +40,7 @@ Most AI tools stop at retrieval. **LifeOS closes the loop**: new knowledge becom
 | **Manual Personal Memory** | User-managed memory system to inject persistent context, preferences, and LLM expert exports directly into the system prompt. |
 | **MCP Server** | Exposes `search_vault` and `get_note` tools via the [Model Context Protocol](https://modelcontextprotocol.io), so any MCP-compatible agent can query your knowledge base. |
 | **Multi-Provider LLM** | Cascading fallback across Azure OpenAI → Gemini → OpenRouter. Swap models without code changes. |
-
+| **AI Code Review Pipeline** | Five-Axis automated code review with AI-powered vulnerability detection, provenance ledger, and mandatory review thresholds. |
 #### 💬 Multi-Turn Chat with Citations
 Chat with your synthesized experts or your general knowledge base. Every claim is grounded in your actual notes with inline citations.
 <p align="center"><img src="docs/assets/chat-example.png" alt="Multi-Turn Chat" width="100%"></p>
@@ -56,6 +56,44 @@ LifeOS groups your insights by creator/domain and auto-generates deep, interacti
 #### 🎥 Automated Bulk Ingestion
 Paste a YouTube Channel URL to instantly download recent transcripts, summarize them, and build an Expert profile in one click.
 <p align="center"><img src="docs/assets/youtube-ingestion.png" alt="YouTube Bulk Ingestion" width="80%"></p>
+
+#### 🛡️ AI Code Review & Security Pipeline
+
+As AI-authored code becomes the majority of contributions, LifeOS treats code provenance as a first-class concern. Every file committed to the vault is tagged with its authorship source (human vs. AI agent) and routed through an enhanced security scanning stage.
+
+**How it works:**
+
+1. **Authorship Tagging** — Every code contribution is labeled with its source (`Human`, `Hermes`, `Prototyper`, or custom agent name).
+2. **Five-Axis Review** — `scripts/ai_code_reviewer.py` performs automated review across Correctness, Readability, Architecture, Security, and Performance. Auto-fixes are applied automatically; manual fixes are flagged.
+3. **Provenance Ledger** — All review results are stored in the `ai_code_provenance` SQLite table, so any production issue can be traced back to the specific agent/model/version that authored the code.
+4. **Adaptive Review Gates** — The higher the AI authorship ratio, the more rigorous the human/AI-judge review threshold before merge.
+
+```mermaid
+flowchart LR
+    A[Code Contribution] --> B{Authorship Tag}
+    B -->|Human| C[Standard Review]
+    B -->|AI Agent| D[Enhanced Five-Axis Review]
+    D --> E[Auto-Fix Issues]
+    E --> F[Provenance Ledger\nai_code_provenance table]
+    F --> G{Review Threshold\nProportional to AI Ratio}
+    G -->|Pass| H[Merge to Main]
+    G -->|Fail| I[Flag for Manual Review]
+    I --> A
+```
+
+**Usage:**
+```bash
+# Review a single file authored by Hermes
+.venv/bin/python scripts/ai_code_reviewer.py Hermes src/core/new_feature.py
+
+# Review multiple files
+.venv/bin/python scripts/ai_code_reviewer.py Prototyper src/a.py src/b.py
+
+# Emergency bypass
+SKIP_AI_REVIEW=1 git commit ...
+```
+
+The pipeline is integrated into the Hermes Proposal Implementation Workflow (Step 4) and runs automatically on all modified `.py` files during feature development. See `AGENTS.md` for the full workflow.
 
 ### 🔒 Privacy Model
 
@@ -294,56 +332,4 @@ This project is licensed under the [MIT License](LICENSE).
   <sub>Built by <a href="https://github.com/s-mberli">@s-mberli</a> — a demonstration of end-to-end AI systems engineering.</sub>
 </p>
 
----
 
-Looking at the diff, this adds an AI Code Review Pipeline with provenance tracking — a new major subsystem that changes the core architecture. It needs a README update.
-
-Here's the new section to add under **⚡ Key Capabilities** table and a corresponding detailed section:
-
----
-
-Add to the **⚡ Key Capabilities** table:
-
-| **AI Code Review Pipeline** | Five-Axis automated code review (Correctness, Readability, Architecture, Security, Performance) with AI-powered vulnerability detection, provenance ledger, and mandatory review thresholds proportional to AI authorship ratio. |
-
-Add a new detailed section after the existing capability subsections (before or after the Hermes Agent section):
-
----
-
-#### 🛡️ AI Code Review & Security Pipeline
-
-As AI-authored code becomes the majority of contributions, LifeOS treats code provenance as a first-class concern. Every file committed to the vault is tagged with its authorship source (human vs. AI agent) and routed through an enhanced security scanning stage.
-
-**How it works:**
-
-1. **Authorship Tagging** — Every code contribution is labeled with its source (`Human`, `Hermes`, `Prototyper`, or custom agent name).
-2. **Five-Axis Review** — `scripts/ai_code_reviewer.py` performs automated review across Correctness, Readability, Architecture, Security, and Performance. Auto-fixes are applied automatically; manual fixes are flagged.
-3. **Provenance Ledger** — All review results are stored in the `ai_code_provenance` SQLite table, so any production issue can be traced back to the specific agent/model/version that authored the code.
-4. **Adaptive Review Gates** — The higher the AI authorship ratio, the more rigorous the human/AI-judge review threshold before merge.
-
-```mermaid
-flowchart LR
-    A[Code Contribution] --> B{Authorship Tag}
-    B -->|Human| C[Standard Review]
-    B -->|AI Agent| D[Enhanced Five-Axis Review]
-    D --> E[Auto-Fix Issues]
-    E --> F[Provenance Ledger\nai_code_provenance table]
-    F --> G{Review Threshold\nProportional to AI Ratio}
-    G -->|Pass| H[Merge to Main]
-    G -->|Fail| I[Flag for Manual Review]
-    I --> A
-```
-
-**Usage:**
-```bash
-# Review a single file authored by Hermes
-.venv/bin/python scripts/ai_code_reviewer.py Hermes src/core/new_feature.py
-
-# Review multiple files
-.venv/bin/python scripts/ai_code_reviewer.py Prototyper src/a.py src/b.py
-
-# Emergency bypass
-SKIP_AI_REVIEW=1 git commit ...
-```
-
-The pipeline is integrated into the Hermes Proposal Implementation Workflow (Step 4) and runs automatically on all modified `.py` files during feature development. See `AGENTS.md` for the full workflow.

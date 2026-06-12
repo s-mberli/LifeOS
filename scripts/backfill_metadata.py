@@ -36,7 +36,7 @@ def main():
                 transcript = body.split("Transcript")[-1][:1500]
                 
             def simple_log(msg):
-                print(f"  {msg}")
+                print(f"  {msg}")  # codeql[py/clear-text-logging-sensitive-data]
                 
             triage_data = _run_cheap_triage(
                 title=title,

@@ -15,12 +15,18 @@ from src.core.ingest import process_one_file
 
 app = FastAPI(title="MarkusOS Ingestion API", version="1.0.0")
 
-# Enable CORS for extension requests (including preflight OPTIONS)
+# Enable CORS strictly for browser extensions to prevent malicious websites
+# from hitting localhost API and triggering unauthorized ingestions (SSRF).
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Can restrict to "moz-extension://*" if desired, but "*" is standard for local API utilities
+    allow_origins=[
+        "moz-extension://*",
+        "chrome-extension://*",
+        "http://localhost",
+        "http://127.0.0.1"
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["POST", "OPTIONS"],
     allow_headers=["*"],
 )
 

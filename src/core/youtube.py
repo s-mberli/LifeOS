@@ -104,7 +104,7 @@ def fetch_video_metadata(url: str) -> dict:
     try:
         result = run_yt_dlp(["-j", "--no-warnings", url], timeout=15)
         if result.returncode != 0:
-            return {"title": "", "uploader": "", "channel": "", "error": result.stderr.strip()}
+            return {"title": "", "uploader": "", "channel": "", "error": "Failed to extract YouTube metadata (yt-dlp error)."}
         data: dict = json.loads(result.stdout)
         return {
             "title": data.get("title", ""),
@@ -114,7 +114,7 @@ def fetch_video_metadata(url: str) -> dict:
     except subprocess.TimeoutExpired:
         return {"title": "", "uploader": "", "channel": "", "error": "yt-dlp timed out (15 s)"}
     except Exception as exc:
-        return {"title": "", "uploader": "", "channel": "", "error": str(exc)}
+        return {"title": "", "uploader": "", "channel": "", "error": "An internal error occurred during YouTube extraction."}
 
 
 def fetch_channel_metadata(channel_url: str) -> dict:
@@ -132,7 +132,7 @@ def fetch_channel_metadata(channel_url: str) -> dict:
             timeout=30,
         )
         if result.returncode != 0:
-            return {"uploader": "Unknown Creator", "error": result.stderr.strip()}
+            return {"uploader": "Unknown Creator", "error": "Failed to extract channel metadata (yt-dlp error)."}
 
         lines = [
             line.strip()
@@ -148,7 +148,7 @@ def fetch_channel_metadata(channel_url: str) -> dict:
     except subprocess.TimeoutExpired:
         return {"uploader": "Unknown Creator", "error": "yt-dlp timed out (30 s)"}
     except Exception as exc:
-        return {"uploader": "Unknown Creator", "error": str(exc)}
+        return {"uploader": "Unknown Creator", "error": "An internal error occurred during channel extraction."}
 
 
 def fetch_recent_videos(channel_url: str, max_videos: int = 5) -> list[str]:

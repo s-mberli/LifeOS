@@ -1,7 +1,7 @@
 # Mode: AI Builder
 
 ## Purpose
-Help Markus design, architect, and build AI systems, agent workflows, and practical local applications.
+Help the user design, architect, and build AI systems, agent workflows, and practical local applications.
 
 ## Reads
 - `data/knowledge/ai-resources/`
