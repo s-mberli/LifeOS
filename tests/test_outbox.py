@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import re
+import datetime
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 import pytest
@@ -127,32 +128,50 @@ def test_weekly_hermes_run(tmp_project: Path):
     note_file.parent.mkdir(parents=True, exist_ok=True)
     note_file.write_text("Use pathlib instead of os.path across the codebase.", encoding="utf-8")
 
-    # Mock subprocess.run
-    mock_run = MagicMock()
-    mock_run.return_value = MagicMock(returncode=0, stdout="Mocked Hermes Success Output", stderr="")
+    # Create a mock TLDR news file so collect_articles_from_notes finds it
+    news_dir = tmp_project / "data" / "knowledge" / "news"
+    news_dir.mkdir(parents=True, exist_ok=True)
+    tldr_file = news_dir / "tldr_test.md"
+    tldr_file.write_text(
+        "Source: https://tldr.tech/\n"
+        "### Test Article\n"
+        "- **URL:** http://example.com/rule\n"
+        "- **Read time:** 5 min\n"
+        "- **TLDR Summary:** Use pathlib instead of os.path.\n",
+        encoding="utf-8"
+    )
 
-    # Mock os.path.exists so it thinks the hermes executable exists
-    original_exists = os.path.exists
-    def mock_exists(path):
-        if "hermes" in str(path):
-            return True
-        return original_exists(path)
+    # Mock call_llm to simulate LLM responses for selection, proposals, and dispatch
+    mock_llm = MagicMock()
+    mock_llm.side_effect = [
+        "[1]", # Selection phase
+        '[{"filename": "proposal_test.md", "content": "# Test Proposal\\n\\nUse pathlib"}]', # Proposals phase
+        "# Weekly Dispatch Test\n\nSome summaries." # Dispatch phase
+    ]
+
+    mock_fetch = MagicMock(return_value=("Cool Title", "Full article content"))
 
     with patch("scripts.weekly_hermes_run.BASE_DIR", tmp_project), \
          patch("scripts.weekly_hermes_run.DB_PATH", db_path), \
+         patch("scripts.weekly_hermes_run.call_llm", mock_llm), \
+         patch("scripts.weekly_hermes_run.fetch_webpage_content", mock_fetch), \
          patch("scripts.triage_outbox.BASE_DIR", tmp_project), \
-         patch("scripts.triage_outbox.DB_PATH", db_path), \
-         patch.dict("os.environ", {"HERMES_BIN": "/fake/hermes-agent/venv/bin/python", "HERMES_SCRIPT": "/fake/hermes-agent/hermes"}), \
-         patch("os.path.exists", side_effect=mock_exists), \
-         patch("subprocess.run", mock_run):
+         patch("scripts.triage_outbox.DB_PATH", db_path):
          
         run_weekly_pipeline()
 
-    # Verify subprocess.run was called with correct command
-    assert mock_run.called
-    cmd_args = mock_run.call_args[0][0]
-    assert "--oneshot" in cmd_args
-    assert "Use pathlib instead of os" in cmd_args[3]
+    # Verify LLM was called
+    assert mock_llm.call_count == 3
+
+    # Verify that the proposal was saved
+    proposal_file = tmp_project / "data" / "inbox" / "proposals" / "proposal_test.md"
+    assert proposal_file.exists()
+    assert "Use pathlib" in proposal_file.read_text(encoding="utf-8")
+
+    # Verify that the dispatch was saved
+    today = datetime.datetime.now().strftime("%Y-%m-%d")
+    dispatch_file = tmp_project / "data" / "inbox" / "content_drafts" / f"weekly_dispatch_{today}.md"
+    assert dispatch_file.exists()
 
     # Verify that the DB was updated with hermes_run_at
     conn = sqlite3.connect(db_path)
