@@ -682,6 +682,23 @@ def _experts_modal_body() -> None:
                 except Exception:
                     pass
                     
+            # Parse Obsidian embeds like ![[principles]] and inject their content
+            def embed_replacer(m):
+                embed_name = m.group(1).strip()
+                if not embed_name.endswith(".md"):
+                    embed_name += ".md"
+                embed_path = expert_dir / embed_name
+                if embed_path.exists():
+                    try:
+                        from src.core.frontmatter import read_fm
+                        _, embed_body = read_fm(embed_path)
+                        return embed_body
+                    except Exception:
+                        return embed_path.read_text(encoding="utf-8")
+                return f"*(Could not load {embed_name})*"
+
+            body = re.sub(r"!\[\[(.*?)\]\]", embed_replacer, body)
+
             st.markdown(body)
 
         tab1, tab2, tab3 = st.tabs(["📝 Profile", "📖 Playbook", "🧠 Principles"])
