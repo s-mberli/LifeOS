@@ -63,6 +63,17 @@ def get_current_readme() -> str:
 # ---------------------------------------------------------------------------
 
 def generate_changelog_entry(proposal: str, diff: str, today: str) -> str:
+    import re
+    # Programmatically extract source URL from the proposal markdown
+    source_url = "N/A"
+    source_match = re.search(r"## Source\s*\n+([^\n]+)", proposal)
+    if source_match:
+        line = source_match.group(1).strip()
+        # Find the first http/https URL in the line
+        url_match = re.search(r"https?://[^\s\)]+", line)
+        if url_match:
+            source_url = url_match.group(0)
+
     prompt = f"""You are a technical writer maintaining a software changelog.
 
 A new feature was just implemented in MarkusOS based on the following proposal:
@@ -78,10 +89,7 @@ Write a concise changelog entry for CHANGELOG.md. Format:
 ## [{today}]
 ### Added
 - **Feature Name:** 1-2 sentence description of what was added and why it matters.
-  - **Source:** [URL to the original article that inspired this proposal]
-
-### Changed (if applicable)
-- List any modified behaviours.
+  - **Source:** {source_url}
 ```
 
 Only include sections that apply. Keep it under 100 words total. Be specific, not generic.
