@@ -4,6 +4,7 @@ Core logic for LifeOS chat context management and agent loops.
 
 from typing import Optional
 from pathlib import Path
+from src.core.agent_harness import execute_with_repair
 
 def ask_llm_chat(
     system_prompt: str,
@@ -25,6 +26,7 @@ def ask_llm_chat(
     except Exception as exc:
         return f"[LLM Error] {exc}"
 
+@execute_with_repair(mode="ui")
 def execute_agent_search_loop(
     system_prompt: str,
     user_prompt: str,

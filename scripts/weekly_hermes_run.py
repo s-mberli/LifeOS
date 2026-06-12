@@ -40,6 +40,7 @@ if str(BASE_DIR) not in sys.path:
 from scripts.triage_outbox import triage_notes
 from src.core.llm_client import call_llm
 from src.core.web import fetch_webpage_content
+from src.core.agent_harness import execute_with_repair
 
 
 # ---------------------------------------------------------------------------
@@ -125,6 +126,7 @@ def build_candidates_prompt(articles: list[dict]) -> str:
 # Main Pipeline
 # ---------------------------------------------------------------------------
 
+@execute_with_repair(mode="background")
 def run_weekly_pipeline():
     today = datetime.datetime.now().strftime("%Y-%m-%d")
     print("--- Starting Weekly Hermes Pipeline ---")
