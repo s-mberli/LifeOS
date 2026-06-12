@@ -174,8 +174,13 @@ def main() -> int:
         print("Usage: .venv/bin/python scripts/update_docs.py <proposal_file> [--no-readme]")
         return 1
 
-    proposal_path = BASE_DIR / args[0]
+    proposal_path = (BASE_DIR / args[0]).resolve()
     update_readme = "--no-readme" not in args
+
+    expected_dir = (BASE_DIR / "data" / "inbox" / "proposals").resolve()
+    if not str(proposal_path).startswith(str(expected_dir)):
+        print(f"Error: Path traversal detected. {proposal_path} must be inside {expected_dir}")
+        return 1
 
     if not proposal_path.exists():
         print(f"Proposal not found: {proposal_path}")

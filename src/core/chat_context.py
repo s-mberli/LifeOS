@@ -110,18 +110,25 @@ def execute_agent_search_loop(
 
         elif web_match:
             url = web_match.group(1).strip()
-            try:
-                from src.core.web import fetch_webpage_content
-                _title, _content = fetch_webpage_content(url)
-                if _content:
-                    # Cap content to avoid token overflows
-                    if len(_content) > _WEB_CONTENT_LIMIT:
-                        _content = _content[:_WEB_CONTENT_LIMIT] + "\n\n[... content truncated for length ...]"
-                    web_result = f"### Fetched: {_title or url}\nURL: {url}\n\n{_content}"
-                else:
-                    web_result = f"Could not retrieve content from: {url}"
-            except Exception as exc:
-                web_result = f"fetch_web error for {url}: {exc}"
+            import urllib.parse
+            parsed_url = urllib.parse.urlparse(url)
+            blocked_hosts = ["localhost", "127.0.0.1", "0.0.0.0", "169.254.169.254"]
+            
+            if parsed_url.hostname in blocked_hosts or (parsed_url.hostname and parsed_url.hostname.startswith(("192.168.", "10.", "172."))):
+                web_result = f"fetch_web error: Access to {parsed_url.hostname} is blocked for security."
+            else:
+                try:
+                    from src.core.web import fetch_webpage_content
+                    _title, _content = fetch_webpage_content(url)
+                    if _content:
+                        # Cap content to avoid token overflows
+                        if len(_content) > _WEB_CONTENT_LIMIT:
+                            _content = _content[:_WEB_CONTENT_LIMIT] + "\n\n[... content truncated for length ...]"
+                        web_result = f"### Fetched: {_title or url}\nURL: {url}\n\n{_content}"
+                    else:
+                        web_result = f"Could not retrieve content from: {url}"
+                except Exception as exc:
+                    web_result = f"fetch_web error for {url}: {exc}"
 
             calls_made.append((url, web_result))
             current_history.append({"role": "assistant", "content": response})
