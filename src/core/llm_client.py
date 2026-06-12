@@ -2,7 +2,7 @@
 scripts/llm_client.py — Multi-provider LLM call wrapper for LifeOS using litellm.
 
 Tries providers in the order specified by the ``LLM_PROVIDER_ORDER``
-environment variable (default: ``azure,gemini,openrouter``).
+environment variable (default: ``openrouter,gemini``).
 """
 import os
 import json
@@ -153,7 +153,7 @@ def try_providers(system_prompt: str, user_prompt: str, max_tokens: int, tempera
     Attempts to call LLM providers in fallback order using explicit requests.
     Returns: tuple (content, provider_name, model_name, usage_dict) or None
     """
-    order_str = os.environ.get("LLM_PROVIDER_ORDER", "azure,gemini,openrouter")
+    order_str = os.environ.get("LLM_PROVIDER_ORDER", "openrouter,gemini")
     providers = [p.strip().lower() for p in order_str.split(",")]
     
     messages = []
@@ -174,6 +174,9 @@ def try_providers(system_prompt: str, user_prompt: str, max_tokens: int, tempera
             else:
                 continue
                 
+            if not content:
+                raise ValueError("Provider returned empty or filtered content")
+
             token_usage = {
                 "prompt_tokens": usage.get("prompt_tokens", 0),
                 "completion_tokens": usage.get("completion_tokens", 0),

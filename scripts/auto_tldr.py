@@ -177,9 +177,76 @@ def get_issue_urls(slug: str, limit: int = BACKFILL_LIMIT) -> list[tuple[str, st
     return results
 
 
-# ---------------------------------------------------------------------------
-# Ingestion
-# ---------------------------------------------------------------------------
+def extract_articles_from_html(html: str, tldr_url: str, label: str, date: str) -> list[dict]:
+    from bs4 import BeautifulSoup
+    import re
+    
+    soup = BeautifulSoup(html, "html.parser")
+    articles = soup.find_all("article")
+    results = []
+    
+    for art in articles:
+        a_tag = art.find("a", class_="font-bold")
+        if not a_tag:
+            continue
+            
+        href = a_tag.get("href", "")
+        h3 = a_tag.find("h3")
+        if not h3:
+            continue
+            
+        full_title = h3.get_text(strip=True)
+        # Filter broken titles
+        if not full_title or len(full_title) < 2 or full_title == ")":
+            continue
+            
+        # Filter sponsors
+        if "(Sponsor)" in full_title or "Sponsor" in full_title:
+            continue
+            
+        # Parse read time if present
+        match = re.search(r"^(.*?)\s*\((\d+\s*minute\s*read)\)\s*$", full_title)
+        if match:
+            clean_title = match.group(1).strip()
+            read_time = match.group(2)
+        else:
+            clean_title = full_title
+            read_time = "Unknown"
+            
+        div = art.find("div", class_="newsletter-html")
+        tldr_summary = div.get_text(separator=" ").strip() if div else ""
+        
+        results.append({
+            "title": clean_title,
+            "url": href,
+            "tldr_summary": tldr_summary,
+            "read_time": read_time,
+            "via": f"TLDR {label}, {date}"
+        })
+        
+    return results
+
+def get_clean_markdown(html: str) -> str:
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(html, "html.parser")
+    articles = soup.find_all("article")
+    if not articles:
+        return ""
+        
+    content_parts = []
+    for art in articles:
+        # Preserve links
+        for a in art.find_all("a"):
+            href = a.get("href", "")
+            text = a.get_text(strip=True)
+            if href and text:
+                a.replace_with(f"[{text}]({href})")
+                
+        text = art.get_text(separator=" ").strip()
+        if text:
+            content_parts.append(text)
+            
+    return "\n\n".join(content_parts)
 
 def ingest_newsletter(
     slug: str,
@@ -201,9 +268,18 @@ def ingest_newsletter(
 
     # 1. Fetch content -------------------------------------------------------
     logger.info("  Fetching content: %s", url)
-    title, content = fetch_webpage_content(url)
+    try:
+        resp = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=15)
+        resp.raise_for_status()
+        html = resp.text
+    except Exception as exc:
+        logger.error("  Failed to fetch HTML for %s: %s", url, exc)
+        return False
 
-    if not content:
+    extracted_articles = extract_articles_from_html(html, url, label, date)
+    clean_text = get_clean_markdown(html)
+
+    if not clean_text and not extracted_articles:
         logger.warning("  Empty content for %s — skipping", url)
         return False
 
@@ -212,7 +288,24 @@ def ingest_newsletter(
     raw_filename = f"tldr_{slug}_{date}.md"
     raw_path = NEWS_DIR / raw_filename
 
-    raw_md = f"# TLDR {label} — {date}\n\nSource: {url}\n\n{content}"
+    md_lines = [
+        f"# TLDR {label} — {date}",
+        f"Source: {url}",
+        "",
+        "## Articles"
+    ]
+    
+    for art in extracted_articles:
+        md_lines.append(f"\n### {art['title']}")
+        md_lines.append(f"- **URL:** {art['url']}")
+        md_lines.append(f"- **Via:** {art['via']}")
+        md_lines.append(f"- **Read time:** {art['read_time']}")
+        md_lines.append(f"- **TLDR Summary:** {art['tldr_summary']}")
+        
+    md_lines.append("\n## Full Text\n")
+    md_lines.append(clean_text)
+
+    raw_md = "\n".join(md_lines)
     raw_path.write_text(raw_md, encoding="utf-8")
     logger.info("  Raw markdown saved: %s", raw_path.relative_to(ROOT))
 
@@ -223,7 +316,7 @@ def ingest_newsletter(
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_file = Path(tmpdir) / raw_filename
         # Put the URL on the first line so _extract_metadata detects it.
-        tmp_file.write_text(f"{url}\n\n# TLDR {label}\n\n{content}", encoding="utf-8")
+        tmp_file.write_text(f"{url}\n\n{raw_md}", encoding="utf-8")
 
         logger.info("  Running ingestion pipeline (use_ai=True)…")
         try:

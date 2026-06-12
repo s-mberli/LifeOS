@@ -293,3 +293,57 @@ This project is licensed under the [MIT License](LICENSE).
 <p align="center">
   <sub>Built by <a href="https://github.com/s-mberli">@s-mberli</a> — a demonstration of end-to-end AI systems engineering.</sub>
 </p>
+
+---
+
+Looking at the diff, this adds an AI Code Review Pipeline with provenance tracking — a new major subsystem that changes the core architecture. It needs a README update.
+
+Here's the new section to add under **⚡ Key Capabilities** table and a corresponding detailed section:
+
+---
+
+Add to the **⚡ Key Capabilities** table:
+
+| **AI Code Review Pipeline** | Five-Axis automated code review (Correctness, Readability, Architecture, Security, Performance) with AI-powered vulnerability detection, provenance ledger, and mandatory review thresholds proportional to AI authorship ratio. |
+
+Add a new detailed section after the existing capability subsections (before or after the Hermes Agent section):
+
+---
+
+#### 🛡️ AI Code Review & Security Pipeline
+
+As AI-authored code becomes the majority of contributions, LifeOS treats code provenance as a first-class concern. Every file committed to the vault is tagged with its authorship source (human vs. AI agent) and routed through an enhanced security scanning stage.
+
+**How it works:**
+
+1. **Authorship Tagging** — Every code contribution is labeled with its source (`Human`, `Hermes`, `Prototyper`, or custom agent name).
+2. **Five-Axis Review** — `scripts/ai_code_reviewer.py` performs automated review across Correctness, Readability, Architecture, Security, and Performance. Auto-fixes are applied automatically; manual fixes are flagged.
+3. **Provenance Ledger** — All review results are stored in the `ai_code_provenance` SQLite table, so any production issue can be traced back to the specific agent/model/version that authored the code.
+4. **Adaptive Review Gates** — The higher the AI authorship ratio, the more rigorous the human/AI-judge review threshold before merge.
+
+```mermaid
+flowchart LR
+    A[Code Contribution] --> B{Authorship Tag}
+    B -->|Human| C[Standard Review]
+    B -->|AI Agent| D[Enhanced Five-Axis Review]
+    D --> E[Auto-Fix Issues]
+    E --> F[Provenance Ledger\nai_code_provenance table]
+    F --> G{Review Threshold\nProportional to AI Ratio}
+    G -->|Pass| H[Merge to Main]
+    G -->|Fail| I[Flag for Manual Review]
+    I --> A
+```
+
+**Usage:**
+```bash
+# Review a single file authored by Hermes
+.venv/bin/python scripts/ai_code_reviewer.py Hermes src/core/new_feature.py
+
+# Review multiple files
+.venv/bin/python scripts/ai_code_reviewer.py Prototyper src/a.py src/b.py
+
+# Emergency bypass
+SKIP_AI_REVIEW=1 git commit ...
+```
+
+The pipeline is integrated into the Hermes Proposal Implementation Workflow (Step 4) and runs automatically on all modified `.py` files during feature development. See `AGENTS.md` for the full workflow.

@@ -1,23 +1,20 @@
 #!/usr/bin/env python3
 """
-Weekly Hermes Runner for LifeOS — Intelligence Agent mode.
+Weekly Hermes Runner for LifeOS
+Synthesizes TLDR newsletters using execute_agent_search_loop.
+Generates Architecture Proposals and a Weekly Dispatch blog post.
 
-Gathers all notes ingested in the last 7 days (focused on TLDR news),
-then invokes the Hermes Agent with the full intelligence-agent system prompt.
-
-Hermes outputs three artefacts (all gitignored, all local):
-  1. data/inbox/proposals/   — Architecture proposals (max 3/week)
-  2. scratch/                — Isolated prototypes for "Small" proposals
-  3. data/inbox/content_drafts/ — Weekly Dispatch markdown (1/week)
+Two-phase approach to stay within LLM token limits:
+  Phase 1: Feed article metadata only → LLM picks top 5-7 stories.
+  Phase 2: Fetch full text of selected URLs → LLM writes dispatch.
 """
 
 import sys
 import os
+import re
 import sqlite3
 import datetime
-import subprocess
 from pathlib import Path
-
 
 def load_env():
     env_path = Path(__file__).resolve().parent.parent / ".env"
@@ -32,7 +29,6 @@ def load_env():
                     val = val.strip().strip("'\"")
                     os.environ[key] = val
 
-
 load_env()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,297 +38,354 @@ if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
 from scripts.triage_outbox import triage_notes
+from src.core.llm_client import call_llm
+from src.core.web import fetch_webpage_content
+
 
 # ---------------------------------------------------------------------------
-# Hermes System Prompt — Intelligence Agent Mode
+# Helpers
 # ---------------------------------------------------------------------------
-HERMES_SYSTEM_PROMPT = """# Hermes — LifeOS Weekly Intelligence Agent
 
-## Identity
-You are Hermes, the Lead Architect and Editor for LifeOS — a local-first personal AI operating system.
-You operate on a weekly cadence. Your job is to synthesize the week's ingested knowledge into
-actionable architecture proposals and a polished weekly dispatch.
-
-## Core Principles
-- **Human-in-the-loop ALWAYS.** You never push code to the public repo. You never open GitHub Issues
-  or PRs. Everything you produce stays local until the human explicitly promotes it.
-- **Signal over noise.** You read 100+ articles/week. Your value is ruthless curation — surfacing only
-  what matters.
-- **Public repo is sacred.** The `src/`, `apps/`, and `tests/` directories are off-limits for writing.
-  You write proposals and prototypes only.
-
-## Weekly Workflow
-
-### Step 1: Gather Intelligence
-Read every note provided in this prompt. Also use your search_vault MCP tool to query for any additional
-TLDR notes from `data/knowledge/news/tldr_*` ingested in the last 7 days. Identify:
-- **Actionable insights:** New libraries, APIs, architecture patterns, performance techniques, or security
-  advisories that could directly improve LifeOS.
-- **Industry trends:** Big launches, funding rounds, shifts in the AI/tech landscape that are interesting
-  but not directly code-actionable.
-
-### Step 2: Architecture Proposals (The Architect)
-For each actionable insight (max 3 per week — quality over quantity), write a formal proposal as a
-Markdown file saved to `data/inbox/proposals/`.
-
-**Filename format:** `proposal_{YYYY_MM_DD}_{slug}.md`
-
-**Proposal structure:**
-```
-# Proposal: [Feature/Improvement Name]
-
-## Source
-[Original article title] — via TLDR {topic}, {date}
-[URL]
-
-## Problem
-What gap or inefficiency exists in LifeOS today?
-
-## Proposed Solution
-How this new technology/pattern could be applied. Be specific — reference actual LifeOS files and functions.
-
-## Pros
-- ...
-
-## Cons / Risks
-- ...
-
-## Effort Estimate
-Small (1-2 hours) / Medium (half day) / Large (1+ days)
-
-## Status
-📋 Proposed
-```
-
-### Step 3: Prototype (The Prototyper)
-If a proposal is marked as "Small" effort and you have high confidence it works, you MAY build an isolated
-proof-of-concept. Rules:
-- Write code ONLY in the `scratch/` directory (gitignored, never public).
-- Never import from or modify files in `src/`, `apps/`, or `tests/`.
-- Name prototypes clearly: `scratch/prototype_{slug}.py`
-- Include a `# HOW TO RUN` comment at the top of every prototype file.
-- If the prototype works, update the proposal's Status to `🔬 Prototype Ready — see scratch/prototype_{slug}.py`.
-
-### Step 4: Weekly Dispatch (The Content Creator)
-Produce exactly ONE markdown file per week saved to `data/inbox/content_drafts/`.
-
-For the 5-7 stories you select, you MUST use your `<call:fetch_web>` tool to read the full original article `url` provided in the structured data. Do not rely solely on the short TLDR summary. Write your own original 2-3 sentence summary based on the FULL fetched content.
-
-**Filename format:** `weekly_dispatch_{YYYY_MM_DD}.md`
-
-**Dispatch structure:**
-```
-# LifeOS Weekly Dispatch — {Month Day, Year}
-
-## 🔥 Top Stories This Week
-[Curate the 5-7 most important stories from ALL ingested TLDR topics. For each:]
-### [Headline] — via TLDR {topic}
-[Your original 2-3 sentence summary based on the fetched article. Why it matters.]
-[Original Article URL]
-
-
-## 🏗️ What I'm Building
-[For each architecture proposal this week:]
-- **[Proposal Name]:** 1-2 sentence summary. Status: 📋 Proposed / 🔬 Prototyping / ✅ Implemented / ❌ Rejected
-
-## 💡 Takeaway of the Week
-[One opinionated paragraph synthesizing the biggest theme. First person, conversational — draft for the human to edit.]
-```
-
-**Dispatch rules:**
-- NEVER write one post per article. Everything is aggregated into this single weekly file.
-- ALWAYS include original source links for every story referenced.
-- Prioritize diversity across topics.
-- Keep total length under 800 words. Scannable. No walls of text.
-
-## Security Override
-If ANY ingested article mentions a critical security vulnerability, CVE, or deprecation affecting a Python
-package or JS library that LifeOS uses (check `requirements.txt`):
-- Flag it at the TOP of the Weekly Dispatch under a `⚠️ Security Alert` section.
-- Write an immediate alert to `data/inbox/proposals/security_alert_{date}.md`.
-
-## Output Directories
-| Output | Directory |
-|--------|-----------|
-| Architecture Proposals | `data/inbox/proposals/` |
-| Prototypes | `scratch/` |
-| Weekly Dispatch Drafts | `data/inbox/content_drafts/` |
-| Security Alerts | `data/inbox/proposals/` |
-
-## What You Must NEVER Do
-- Open GitHub Issues or Pull Requests on the public repo.
-- Modify any file in `src/`, `apps/`, `tests/`, or `config/`.
-- Publish or push anything to the internet.
-- Write more than 3 proposals per week.
-- Write more than 1 dispatch per week.
-- Fabricate or hallucinate article links — only use URLs found in ingested notes.
-"""
-
-
-def _ensure_output_dirs():
-    """Ensure all Hermes output directories exist."""
-    dirs = [
-        BASE_DIR / "data" / "inbox" / "proposals",
-        BASE_DIR / "data" / "inbox" / "content_drafts",
-        BASE_DIR / "scratch",
-    ]
-    for d in dirs:
-        d.mkdir(parents=True, exist_ok=True)
-        gitkeep = d / ".gitkeep"
-        if not gitkeep.exists():
-            gitkeep.touch()
-
-
-def _gather_recent_notes(days: int = 7) -> str:
-    """Read TLDR news notes from the last N days and return aggregated text."""
-    cutoff = datetime.date.today() - datetime.timedelta(days=days)
+def collect_articles_from_notes(days: int = 7) -> list[dict]:
+    """Scan TLDR notes from last N days and extract article metadata."""
     news_dir = BASE_DIR / "data" / "knowledge" / "news"
-    notes_text = ""
-
     if not news_dir.exists():
-        return notes_text
+        return []
 
-    note_files = sorted(news_dir.glob("tldr_*.md"), reverse=True)
-    included = 0
-    for note_file in note_files:
-        # Parse date from filename e.g. tldr_ai_2026-06-04.md
-        parts = note_file.stem.split("_")
-        date_str = "_".join(parts[-3:]) if len(parts) >= 4 else parts[-1]
-        try:
-            note_date = datetime.date.fromisoformat(date_str)
-        except ValueError:
+    now = datetime.datetime.now()
+    cutoff = now - datetime.timedelta(days=days)
+    articles = []
+
+    for f in sorted(news_dir.glob("tldr_*.md")):
+        mtime = datetime.datetime.fromtimestamp(f.stat().st_mtime)
+        if mtime < cutoff:
             continue
-        if note_date < cutoff:
-            continue
-        try:
-            content = note_file.read_text(encoding="utf-8")
-            notes_text += f"\n\n{'='*60}\n"
-            notes_text += f"File: {note_file.relative_to(BASE_DIR)}\n"
-            notes_text += f"{'='*60}\n"
-            notes_text += content
-            included += 1
-        except Exception as e:
-            print(f"  [!] Could not read {note_file.name}: {e}")
 
-    print(f"  Gathered {included} TLDR note(s) from the last {days} days.")
-    return notes_text
+        content = f.read_text(encoding="utf-8")
+        source_match = re.search(r"Source:\s*(https?://\S+)", content)
+        source_url = source_match.group(1) if source_match else f.name
+
+        # Try NEW structured format first (## Articles with ### blocks)
+        structured = re.findall(
+            r"### (.+?)\n- \*\*URL:\*\* (.+?)\n.*?- \*\*Read time:\*\* (.+?)\n- \*\*TLDR Summary:\*\* (.+?)(?=\n###|\n## |$)",
+            content, re.DOTALL
+        )
+        if structured:
+            for title, url, read_time, summary in structured:
+                articles.append({
+                    "title": title.strip(),
+                    "url": url.strip(),
+                    "read_time": read_time.strip(),
+                    "summary": summary.strip()[:300],
+                    "source": source_url,
+                })
+        else:
+            # OLD format: extract what we can from flat text
+            # Try to find linked article references with markdown links
+            links = re.findall(r"\[([^\]]+)\]\((https?://[^\)]+)\)", content)
+            for text, url in links:
+                # Skip TLDR internal links and sponsor links
+                if "tldr.tech" in url or "sponsor" in text.lower():
+                    continue
+                articles.append({
+                    "title": text.strip()[:120],
+                    "url": url.strip(),
+                    "read_time": "Unknown",
+                    "summary": "",
+                    "source": source_url,
+                })
+
+    # Deduplicate by URL
+    seen = set()
+    unique = []
+    for a in articles:
+        if a["url"] not in seen:
+            seen.add(a["url"])
+            unique.append(a)
+
+    return unique
 
 
-def _gather_outbox_notes() -> tuple[list, str]:
-    """Return (rows, notes_text) from the automation_outbox for unprocessed actionable notes."""
-    if not DB_PATH.exists():
-        return [], ""
-
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT id, note_path, source_url FROM automation_outbox
-        WHERE is_actionable = 1 AND processed_at IS NOT NULL AND hermes_run_at IS NULL
-    """)
-    rows = cursor.fetchall()
-    conn.close()
-
-    notes_text = ""
-    for row_id, note_path, source_url in rows:
-        full_path = BASE_DIR / note_path
-        if full_path.exists():
-            try:
-                content = full_path.read_text(encoding="utf-8")
-                notes_text += f"\n### Outbox Note: {note_path}\nSource: {source_url or 'N/A'}\n\n{content}\n"
-            except Exception as e:
-                print(f"  [!] Could not read outbox note {note_path}: {e}")
-    return rows, notes_text
+def build_candidates_prompt(articles: list[dict]) -> str:
+    """Build a compact article list for LLM selection."""
+    lines = []
+    for i, a in enumerate(articles, 1):
+        lines.append(f"{i}. **{a['title']}**")
+        lines.append(f"   Source: {a['source']}")
+        lines.append(f"   URL: {a['url']}")
+        if a["summary"]:
+            lines.append(f"   Summary: {a['summary'][:200]}")
+        if a["read_time"] != "Unknown":
+            lines.append(f"   Read time: {a['read_time']}")
+        lines.append("")
+    return "\n".join(lines)
 
 
-def _mark_hermes_done(rows: list):
-    """Mark outbox rows as processed by Hermes."""
-    if not rows or not DB_PATH.exists():
-        return
-    now_str = datetime.datetime.now(datetime.timezone.utc).astimezone().isoformat()
-    row_ids = [r[0] for r in rows]
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute(
-        f"UPDATE automation_outbox SET hermes_run_at = ? WHERE id IN ({','.join('?' for _ in row_ids)})",
-        [now_str] + row_ids,
-    )
-    conn.commit()
-    conn.close()
-    print(f"  Marked {len(row_ids)} outbox item(s) as processed by Hermes.")
-
+# ---------------------------------------------------------------------------
+# Main Pipeline
+# ---------------------------------------------------------------------------
 
 def run_weekly_pipeline():
-    print("--- Starting Weekly Hermes Intelligence Pipeline ---")
+    today = datetime.datetime.now().strftime("%Y-%m-%d")
+    print("--- Starting Weekly Hermes Pipeline ---")
 
-    _ensure_output_dirs()
-
-    # 1. Triage the outbox first (cheap keyword pass)
-    print("[1/4] Running outbox triage...")
+    # 1. Run outbox triage
+    print("Running outbox triage...")
     triage_notes()
 
-    # 2. Gather this week's TLDR notes
-    print("[2/4] Gathering recent TLDR notes (last 7 days)...")
-    recent_news = _gather_recent_notes(days=7)
+    # 2. Collect article candidates
+    print("Collecting articles from last 7 days...")
+    articles = collect_articles_from_notes(days=7)
+    print(f"Found {len(articles)} unique article candidates.")
 
-    # 3. Gather any additional actionable outbox notes
-    print("[3/4] Gathering actionable outbox notes...")
-    outbox_rows, outbox_notes = _gather_outbox_notes()
-
-    if not recent_news and not outbox_notes:
-        print("No new notes to process this week. Hermes run skipped.")
+    if not articles:
+        print("No articles found. Exiting.")
         return
 
-    today = datetime.date.today().isoformat()
-    user_prompt = f"""Today is {today}. Please execute your full weekly workflow:
+    # 3. Phase 1: LLM selects top 5-7 stories
+    candidates_text = build_candidates_prompt(articles)
+    # Cap candidates to ~60k chars (~15k tokens) to stay safe
+    if len(candidates_text) > 60000:
+        candidates_text = candidates_text[:60000] + "\n\n[... truncated ...]"
 
-1. Read all the ingested notes below.
-2. Write up to 3 architecture proposals to `data/inbox/proposals/` for actionable insights.
-3. If any proposal is Small effort, build a prototype in `scratch/`.
-4. Produce ONE weekly dispatch to `data/inbox/content_drafts/weekly_dispatch_{today.replace('-','_')}.md`.
-5. Flag any security vulnerabilities at the top of the dispatch.
+    selection_prompt = f"""You are Hermes, a senior tech intelligence analyst.
 
-Working directory: {BASE_DIR}
+Below is a list of {len(articles)} articles from this week's tech newsletters.
 
-## This Week's TLDR News Notes
-{recent_news if recent_news else "(none)"}
+Pick the 5-7 most important, high-signal stories that a senior software engineer and CTO would care about. 
 
-## Additional Actionable Notes from Knowledge Vault
-{outbox_notes if outbox_notes else "(none)"}
-"""
+CRITICAL DIVERSITY RULE: You MUST select stories from at least 4 different newsletter sources/topics (look at the Source URL). Do not let AI and Tech dominate the entire list. Pick from InfoSec, Web Dev, Founders, Design, Data, etc.
 
-    # 4. Invoke Hermes
-    hermes_bin = os.environ.get("HERMES_BIN", "")
-    hermes_script = os.environ.get("HERMES_SCRIPT", "")
+Prioritize:
+- Breakthrough research or paradigm shifts
+- Security advisories or CVEs
+- Major product launches or API changes
+- Architectural patterns or best practices
 
-    if not hermes_bin or not hermes_script:
-        print("[4/4] HERMES_BIN or HERMES_SCRIPT not set in .env — Hermes invocation skipped.")
-        print("      Set these to enable the live Hermes loop.")
-        print("\n--- Dry-run: printing constructed prompt instead ---")
-        print(f"\nSYSTEM PROMPT (first 500 chars):\n{HERMES_SYSTEM_PROMPT[:500]}...")
-        print(f"\nUSER PROMPT (first 500 chars):\n{user_prompt[:500]}...")
-        return
+Respond with ONLY a JSON array of the selected article numbers (1-indexed). Example: [3, 7, 12, 15, 22]
 
-    if not os.path.exists(hermes_bin) or not os.path.exists(hermes_script):
-        print(f"[4/4] Hermes executable not found (HERMES_BIN={hermes_bin}). Exiting.")
-        return
+Articles:
+{candidates_text}"""
 
-    print(f"[4/4] Invoking Hermes Agent in oneshot mode...")
-    full_prompt = f"{HERMES_SYSTEM_PROMPT}\n\n---\n\n{user_prompt}"
-    cmd = [hermes_bin, hermes_script, "--oneshot", full_prompt]
+    print("Phase 1: Asking LLM to select top stories...")
+    selection_response = call_llm(
+        prompt=selection_prompt,
+        system_prompt="You are a tech analyst. Respond with only a JSON array of numbers.",
+        max_tokens=200,
+        temperature=0.2,
+    )
 
-    try:
-        result = subprocess.run(cmd, cwd=str(BASE_DIR), capture_output=True, text=True, check=True)
-        print("--- Hermes Execution Complete ---")
-        print(result.stdout)
-        if result.stderr:
-            print("Stderr:", result.stderr)
-        _mark_hermes_done(outbox_rows)
-    except subprocess.CalledProcessError as err:
-        print(f"Hermes failed (exit {err.returncode}):\n{err.stdout}\n{err.stderr}")
-    except Exception as e:
-        print(f"Unexpected error: {e}")
+    import random
+    if not selection_response:
+        print("LLM selection failed. Falling back to 5 random articles.")
+        selected_articles = random.sample(articles, min(5, len(articles)))
+    else:
+        print(f"LLM response: {selection_response}")
+        try:
+            # Parse JSON array from response
+            nums_match = re.search(r"\[[\d,\s]+\]", selection_response)
+            if nums_match:
+                indices = [int(x) for x in re.findall(r"\d+", nums_match.group())]
+                selected_articles = [articles[i - 1] for i in indices if 0 < i <= len(articles)]
+            else:
+                selected_articles = random.sample(articles, min(5, len(articles)))
+        except Exception:
+            selected_articles = random.sample(articles, min(5, len(articles)))
 
-    print("--- Pipeline Run Completed ---")
+    print(f"Selected {len(selected_articles)} articles for deep fetch.")
+
+    # 4. Phase 2: Fetch full text of selected articles
+    enriched = []
+    for art in selected_articles:
+        print(f"  Fetching: {art['title'][:60]}...")
+        try:
+            title, full_text = fetch_webpage_content(art["url"])
+            # Cap to 1000 chars per article to fit inside gpt-5-nano's tiny context window
+            if full_text and len(full_text) > 1000:
+                full_text = full_text[:1000] + "\n\n[... truncated ...]"
+            art["full_text"] = full_text or art.get("summary", "")
+            enriched.append(art)
+        except Exception as exc:
+            print(f"    Failed: {exc}")
+            art["full_text"] = art.get("summary", "No content available.")
+            enriched.append(art)
+
+    # 5. Phase 2: LLM writes Proposals
+    articles_block = ""
+    for i, art in enumerate(enriched, 1):
+        articles_block += f"\n--- Article {i} ---\n"
+        articles_block += f"Title: {art['title']}\n"
+        articles_block += f"Source: {art['source']}\n"
+        articles_block += f"URL: {art['url']}\n"
+        articles_block += f"Full Text:\n{art['full_text']}\n"
+
+    proposal_prompt = f"""You are Hermes, the LifeOS Intelligence Agent and private CTO.
+Review the following {len(enriched)} articles.
+Write up to 3 short Architecture Proposals for LifeOS improvements based on insights from these articles.
+
+You MUST respond with a valid JSON array of objects. Do NOT wrap the JSON in markdown code blocks, just raw JSON.
+If no articles provide actionable architecture insights, return an empty array: []
+
+Each object in the array must have two keys:
+1. "filename": A short, snake_case filename for the proposal (e.g., "proposal_agent_judge.md").
+2. "content": The full Markdown content of the proposal.
+
+The Markdown content MUST strictly follow this exact template:
+
+# [Proposal Title]
+
+## Problem
+[Description of the problem based on the article]
+
+## Proposed Solution
+[How LifeOS can implement this]
+
+## Source
+[URL from the article]
+
+## Status
+Proposed
+
+## Effort
+[Small/Medium/Large]
+
+Articles:
+{articles_block}"""
+
+    print("Phase 2a: Generating architecture proposals...")
+    from src.core.llm_client import parse_json_safely
+    proposals_raw = call_llm(
+        prompt=proposal_prompt,
+        system_prompt="You are Hermes, a brilliant CTO. Respond ONLY with valid JSON.",
+        max_tokens=3000,
+        temperature=0.2,
+    )
+    
+    proposals_list = []
+    if proposals_raw:
+        proposals_list = parse_json_safely(proposals_raw)
+        if not isinstance(proposals_list, list):
+            proposals_list = []
+
+    # 6. Phase 2: LLM writes the Dispatch
+    dispatch_prompt = f"""You are Hermes, the LifeOS Intelligence Agent and private CTO.
+Write a Weekly Dispatch blog post for the week of {today}.
+
+You have the full text of {len(enriched)} carefully selected articles below.
+For each article, write your OWN original 2-3 sentence summary based on the full content (NOT the TLDR blurb).
+
+CRITICAL INSTRUCTIONS:
+1. Top Stories: Curate the 5-7 most important stories. You MUST pull from at least 4 different topics (e.g., AI, Web Dev, InfoSec, Founders, Design). Do not let AI and Tech dominate the entire list.
+2. Simplicity: When writing the Architecture Case Studies, explain the process simply and accessibly, as if teaching a junior developer. Make it easy to understand how one could apply it.
+3. LifeOS Context: Do not hallucinate fake agents (like "Planner Agent"). LifeOS currently only has "Hermes" (analyst) and "Prototyper" (coder). Keep your design explorations grounded.
+
+Structure your output EXACTLY matching this Markdown template:
+
+# LifeOS Weekly Dispatch — {today}
+
+> *Sample dispatch generated for format review — this is what Hermes will produce automatically each Sunday.*
+
+---
+
+## 🔥 Top Stories This Week
+*Curated from the excellent daily [TLDR Newsletters](https://tldr.tech/).*
+
+- **[[Article Title]](Original Article URL)**
+  [Your original 2-3 sentence summary. Why it matters.]
+
+[Repeat for each article]
+
+---
+
+## 🏗️ Architecture Case Studies
+
+[For exactly 2 actionable insights this week, write a technical case study. Make the theory universal, but use LifeOS as the practical implementation example.]
+
+### [Concept/Pattern Name]
+*Inspired by: [[Article Name]](Original Article URL)*
+
+#### The Core Concept
+[2-3 paragraphs of accessible, easy-to-understand technical prose explaining the mechanism thoroughly. Make the theory universal so any developer can learn from it.]
+
+#### Architecture Diagram
+```mermaid
+[Mermaid block diagram illustrating the flow or architecture of this concept. Keep it simple and clean. IMPORTANT: Do not use parentheses `()` or special characters inside node labels unless you wrap the label in double quotes (e.g., `A["Node Label (extra)"]`).]
+```
+
+#### LifeOS Application
+[1-2 paragraphs of clear prose explaining how this applies to LifeOS. This is a design exploration, serving as a blueprint for how one might implement this pattern in a real-world system without hallucinating fake agents.]
+
+#### Trade-offs
+[Brief paragraph discussing pros and cons]
+
+[Repeat for exactly 2 case studies]
+
+---
+
+## 💡 Takeaway of the Week
+[One opinionated paragraph synthesizing the biggest theme across all the week's news. Written in first person, conversational tone.]
+
+---
+
+*Generated by Hermes — LifeOS Weekly Intelligence Agent*
+*Review, edit, and publish at your discretion. Nothing here goes public automatically.*
+
+Here are the articles:
+{articles_block}"""
+
+    print("Phase 2b: Generating dispatch...")
+    dispatch = call_llm(
+        prompt=dispatch_prompt,
+        system_prompt="You are Hermes, a brilliant CTO writing a weekly newsletter. Do not include literal instructions in your output.",
+        max_tokens=4000,
+        temperature=0.4,
+    )
+
+    if not proposals_list:
+        print("WARNING: LLM failed to generate proposals (or returned empty list). Skipping proposals.")
+
+    if not dispatch:
+        print("WARNING: LLM failed to generate dispatch (possible content filter). Using placeholder.")
+        dispatch = "_No dispatch generated this week due to content filters or API errors._"
+
+    # 7. Save outputs separately
+    out_dir = BASE_DIR / "data" / "inbox" / "content_drafts"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_file = out_dir / f"weekly_dispatch_{today}.md"
+    out_file.write_text(dispatch, encoding="utf-8")
+    print(f"✓ Weekly dispatch saved: {out_file.relative_to(BASE_DIR)}")
+
+    prop_dir = BASE_DIR / "data" / "inbox" / "proposals"
+    prop_dir.mkdir(parents=True, exist_ok=True)
+    if proposals_list:
+        for prop in proposals_list:
+            filename = prop.get("filename", f"proposal_{today}.md")
+            if not filename.endswith(".md"): 
+                filename += ".md"
+            prop_file = prop_dir / filename
+            prop_file.write_text(prop.get("content", ""), encoding="utf-8")
+            print(f"✓ Proposal saved: {prop_file.relative_to(BASE_DIR)}")
+
+    # 7. Update outbox DB
+    if DB_PATH.exists():
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id FROM automation_outbox
+            WHERE is_actionable = 1 AND processed_at IS NOT NULL AND hermes_run_at IS NULL
+        """)
+        row_ids = [r[0] for r in cursor.fetchall()]
+        if row_ids:
+            now_str = datetime.datetime.now(datetime.timezone.utc).astimezone().isoformat()
+            cursor.execute(
+                f"UPDATE automation_outbox SET hermes_run_at = ? WHERE id IN ({','.join('?' for _ in row_ids)})",
+                [now_str] + row_ids,
+            )
+            conn.commit()
+            print(f"✓ Marked {len(row_ids)} outbox items as processed.")
+        conn.close()
+
+    print("--- Pipeline Complete ---")
 
 
 if __name__ == "__main__":
