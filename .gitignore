@@ -106,3 +106,7 @@ scratch_*.py
 !**/example-*.md
 !**/.gitkeep
 
+
+# LaunchAgents
+*.plist
+!*.example.plist
