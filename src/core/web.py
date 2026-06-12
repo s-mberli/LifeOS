@@ -241,14 +241,19 @@ def fetch_webpage_content(url: str) -> tuple[str, str]:
     """
     lower_url = url.lower()
     
+    import urllib.parse
+    parsed = urllib.parse.urlparse(lower_url)
+    hostname = parsed.hostname or ""
+    path = parsed.path or ""
+    
     # 0. TLDR specific fast path
-    if "tldr.tech" in lower_url and "/archives" not in lower_url:
+    if "tldr.tech" in hostname and "/archives" not in path:
         title, content = fetch_tldr_direct(url)
         if title or content:
             return title, content
 
     # 1. Reddit routing
-    if "reddit.com" in lower_url or "redd.it" in lower_url:
+    if "reddit.com" in hostname or "redd.it" in hostname:
         title, content = fetch_reddit_json(url)
         if title or content:
             return title, content

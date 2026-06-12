@@ -19,7 +19,7 @@ Manual summary needed. (LLM summarization skipped)
 ## Key Ideas
 - Manual extraction needed.
 
-## Why this matters for Markus
+## Why this matters for the user
 - Suggested based on routing to unknown.
 
 ## Related Modes

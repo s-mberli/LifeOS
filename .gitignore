@@ -110,3 +110,9 @@ scratch_*.py
 # LaunchAgents
 *.plist
 !*.example.plist
+
+# Git mailmap (contains real author identity)
+.git-mailmap
+
+# Backup files
+*.bak

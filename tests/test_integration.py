@@ -179,7 +179,10 @@ def test_reddit_and_jina_ingestion_e2e(tmp_project: Path):
     def mock_requests_get(url, *args, **kwargs):
         resp = MagicMock()
         resp.status_code = 200
-        if "reddit.com" in url or "redd.it" in url:
+        import urllib.parse
+        parsed = urllib.parse.urlparse(url)
+        hostname = parsed.hostname or ""
+        if "reddit.com" in hostname or "redd.it" in hostname:
             resp.json.return_value = mock_reddit_response
         elif "r.jina.ai" in url:
             resp.headers = {"X-Title": "Jina Scraped Article"}

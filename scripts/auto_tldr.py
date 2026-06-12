@@ -8,7 +8,7 @@ MarkusOS ingestion pipeline, and updates the local knowledge vault.
 Run manually:
     .venv/bin/python scripts/auto_tldr.py
 
-Or silently via launchd (see com.markusos.tldr_ingest.plist).
+Or silently via launchd (see com.lifeos.tldr_ingest.example.plist).
 """
 
 from __future__ import annotations

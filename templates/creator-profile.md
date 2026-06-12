@@ -18,7 +18,7 @@ source_count: 1
 ## Core Domains
 - 
 
-## How They Apply to Markus
+## How They Apply to the User
 - Flow Temple: 
 - AI Platform: 
 - Career: 

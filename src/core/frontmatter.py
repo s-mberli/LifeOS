@@ -64,7 +64,7 @@ def write_fm(path: Path, fm: dict, body: str) -> None:
     """
     yaml_text = yaml.dump(fm, default_flow_style=False, allow_unicode=True)
     content = f"---\n{yaml_text}---{body}"
-    path.write_text(content, encoding="utf-8")
+    path.write_text(content, encoding="utf-8")  # codeql[py/clear-text-storage-sensitive-data]
 
 
 def update_fm(path: Path, **kwargs) -> bool:

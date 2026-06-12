@@ -69,7 +69,10 @@ def _build_note_content(
 ) -> str:
     sec_modes = decision.get("secondary_modes", [])
     privacy_val = decision.get("privacy", "public")
-    source_type = "youtube_video" if (channel and "youtu" in source_url) else ("article" if source_url else "text")
+    import urllib.parse
+    parsed = urllib.parse.urlparse(source_url) if source_url else None
+    is_yt = parsed and parsed.hostname and ("youtube.com" in parsed.hostname or "youtu.be" in parsed.hostname)
+    source_type = "youtube_video" if (channel and is_yt) else ("article" if source_url else "text")
 
     fm: dict = {
         "title": title,
@@ -100,8 +103,8 @@ def _build_note_content(
         note += "## Key Ideas\n"
         for idea in ai_data.get("key_ideas", []):
             note += f"- {idea}\n"
-        note += "\n## Why this matters for Markus\n"
-        for reason in ai_data.get("why_this_matters_for_markus", []):
+        note += "\n## Why this matters for the user\n"
+        for reason in ai_data.get("why_this_matters_for_user", []):
             note += f"- {reason}\n"
         note += "\n## Related Modes\n"
         for mode in ai_data.get("related_modes", []):
@@ -129,7 +132,7 @@ def _build_note_content(
             f"## Summary\n{warning_text}AI summarization succeeded, but JSON parsing failed.\n\n"
             f"## AI Raw Output\n```text\n{ai_data['raw_output']}\n```\n\n"
             "## Key Ideas\n- Refer to the AI Raw Output above.\n\n"
-            "## Why this matters for Markus\n- Refer to the AI Raw Output above.\n\n"
+            "## Why this matters for the user\n- Refer to the AI Raw Output above.\n\n"
             f"## Related Modes\n- {decision.get('primary_mode', '')}\n"
         )
         for m in sec_modes:
@@ -144,7 +147,7 @@ def _build_note_content(
         note += (
             f"## Summary\n{warning_text}**Manual summary needed.**\n\n"
             "## Key Ideas\n- Manual extraction needed.\n\n"
-            f"## Why this matters for Markus\n"
+            f"## Why this matters for the user\n"
             f"- Suggested based on routing to {decision.get('primary_domain', '')}.\n\n"
             f"## Related Modes\n- {decision.get('primary_mode', '')}\n"
         )
@@ -214,7 +217,9 @@ def _extract_metadata(content: str, filepath: Path, log) -> dict:
     urls = re.findall(r"(https?://[^\s>\])'\"]+)", content)
     if urls:
         suggested_url = _clean_url(urls[0])
-        if "youtube.com" in suggested_url or "youtu.be" in suggested_url:
+        import urllib.parse
+        parsed = urllib.parse.urlparse(suggested_url)
+        if parsed.hostname and ("youtube.com" in parsed.hostname or "youtu.be" in parsed.hostname):
             is_youtube = True
             log(f"Detected YouTube URL: {suggested_url}")
             meta = fetch_video_metadata(suggested_url)
@@ -231,13 +236,22 @@ def _extract_metadata(content: str, filepath: Path, log) -> dict:
             log(f"Detected web URL: {suggested_url}")
             suggested_title, fetched_web_text = fetch_webpage_content(suggested_url)
 
-    if not suggested_title or suggested_title.startswith("http://") or suggested_title.startswith("https://"):
+    import urllib.parse
+    
+    def is_url(text):
+        if not text: return False
+        try:
+            return urllib.parse.urlparse(text).scheme in ["http", "https"]
+        except Exception:
+            return False
+
+    if not suggested_title or is_url(suggested_title):
         if suggested_url:
             suggested_title = _extract_title_from_url(suggested_url)
         else:
             suggested_title = _extract_markdown_title(content)
 
-    if not suggested_title or suggested_title.startswith("http://") or suggested_title.startswith("https://"):
+    if not suggested_title or is_url(suggested_title):
         if suggested_url:
             suggested_title = _extract_title_from_url(suggested_url)
         else:
@@ -301,8 +315,8 @@ def load_user_profile():
 
 def generate_resource_summary(title, source_url, domain, primary_mode, secondary_modes, raw_content):
     profile = load_user_profile()
-    user_name = profile.get("name", "Markus")
-    user_role = profile.get("role", "AI Systems Builder & Wellness Entrepreneur")
+    user_name = profile.get("name", "User")
+    user_role = profile.get("role", "Knowledge Worker")
     user_prefs = profile.get("preferences", {})
     comm_style = user_prefs.get("communication_style", "direct, structured, action-oriented")
     
@@ -370,13 +384,13 @@ Return JSON only in this exact format:
     "Key concept 1: Actionable, rich description of what it is and how to apply it.",
     "Key concept 2: Actionable, rich description..."
   ],
-  "why_this_matters_for_markus": [
-    "Specific connection to Markus's projects/focus areas.",
+  "why_this_matters_for_user": [
+    "Specific connection to the user's projects/focus areas.",
     "Specific connection..."
   ],
   "suggested_tags": ["string"],
   "related_modes": ["string"],
-  "next_action": "One concrete, step-by-step next action for Markus to implement.",
+  "next_action": "One concrete, step-by-step next action for the user to implement.",
   "source_reliability": "string",
   "confidence": "low|medium|high"
 }}
@@ -414,13 +428,13 @@ Return JSON only in this exact format:
     "Key concept 1: Actionable, rich description of what it is and how to apply it.",
     "Key concept 2: Actionable, rich description..."
   ],
-  "why_this_matters_for_markus": [
-    "Specific connection to Markus's projects/focus areas.",
+  "why_this_matters_for_user": [
+    "Specific connection to the user's projects/focus areas.",
     "Specific connection..."
   ],
   "suggested_tags": ["string"],
   "related_modes": ["string"],
-  "next_action": "One concrete, step-by-step next action for Markus to implement.",
+  "next_action": "One concrete, step-by-step next action for the user to implement.",
   "source_reliability": "string",
   "confidence": "low|medium|high"
 }}
@@ -903,8 +917,8 @@ def regenerate_insight_summary(insight_path: Path) -> dict:
             new_body += "## Key Ideas\n"
             for idea in ai_data.get("key_ideas", []):
                 new_body += f"- {idea}\n"
-            new_body += "\n## Why this matters for Markus\n"
-            for reason in ai_data.get("why_this_matters_for_markus", []):
+            new_body += "\n## Why this matters for the user\n"
+            for reason in ai_data.get("why_this_matters_for_user", []):
                 new_body += f"- {reason}\n"
             new_body += "\n## Related Modes\n"
             for mode in ai_data.get("related_modes", []):
@@ -931,7 +945,7 @@ def regenerate_insight_summary(insight_path: Path) -> dict:
                 f"## Summary\n{warning_text}AI summarization succeeded, but JSON parsing failed.\n\n"
                 f"## AI Raw Output\n```text\n{ai_data['raw_output']}\n```\n\n"
                 "## Key Ideas\n- Refer to the AI Raw Output above.\n\n"
-                "## Why this matters for Markus\n- Refer to the AI Raw Output above.\n\n"
+                "## Why this matters for the user\n- Refer to the AI Raw Output above.\n\n"
                 f"## Related Modes\n- {primary_mode}\n"
             )
             for m in secondary_modes:

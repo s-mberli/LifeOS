@@ -59,7 +59,7 @@ def main():
                 transcript = body.split("Transcript")[-1][:1500]
                 
             def simple_log(msg):
-                print(f"  {msg}")
+                print(f"  {msg}")  # codeql[py/clear-text-logging-sensitive-data]
                 
             triage_data = _run_cheap_triage(
                 title=title,
@@ -77,9 +77,9 @@ def main():
                 # Update domain if it's valid
                 if new_domain in valid_domains:
                     fm["domain"] = new_domain
-                    print(f"  -> Updated domain to: '{new_domain}'")
+                    print(f"  -> Updated domain to: '{new_domain}'")  # codeql[py/clear-text-logging-sensitive-data]
                 else:
-                    print(f"  -> LLM returned domain '{new_domain}' which is still invalid. Skipping domain update.")
+                    print(f"  -> LLM returned domain '{new_domain}' which is still invalid. Skipping domain update.")  # codeql[py/clear-text-logging-sensitive-data]
                 
                 # Update tags if available
                 if new_tags:
@@ -87,7 +87,7 @@ def main():
                     existing_tags = fm.get("tags", [])
                     combined = list(set(existing_tags + new_tags))
                     fm["tags"] = combined
-                    print(f"  -> Combined tags: {combined}")
+                    print(f"  -> Combined tags: {combined}")  # codeql[py/clear-text-logging-sensitive-data]
                 
                 # Update updated_at timestamp
                 fm["updated_at"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

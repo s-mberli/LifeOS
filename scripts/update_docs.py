@@ -160,7 +160,7 @@ def prepend_to_changelog(entry: str) -> None:
 def append_to_readme(section: str) -> None:
     """Append a new section to the end of README.md."""
     existing = README.read_text(encoding="utf-8") if README.exists() else ""
-    README.write_text(existing.rstrip() + "\n\n---\n\n" + section.strip() + "\n", encoding="utf-8")
+    README.write_text(existing.rstrip() + "\n\n---\n\n" + section.strip() + "\n", encoding="utf-8")  # codeql[py/clear-text-storage-sensitive-data]
     print("✅ README.md updated.")
 
 

@@ -26,7 +26,7 @@ When a new Insight Note is created, LifeOS may later analyse it and identify:
 - **Possible prompt/mode improvements** — should a system prompt or routing rule be refined?
 - **Possible architecture improvements** — does the insight reveal a better structural approach?
 - **Possible UI/UX improvements** — is there a friction point worth fixing?
-- **One next action** — the single most important thing Markus could do with this insight
+- **One next action** — the single most important thing the user could do with this insight
 
 ---
 
@@ -123,7 +123,7 @@ The following capabilities are explicitly deferred until after MVP is stable and
 | Auto-watchers / file agents  | Autonomous triggers without human initiation        |
 | Deployment / hosting         | Portfolio-ready local build comes first             |
 | Autonomous agents            | No self-acting systems without approval gates       |
-| Self-patching                | LifeOS proposes; Markus applies                   |
+| Self-patching                | LifeOS proposes; the user applies                   |
 | Vector DB                    | SQLite FTS5 sufficient for current scale            |
 
 ---

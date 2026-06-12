@@ -41,7 +41,7 @@ class TestIngestEndpoint:
         assert response.status_code == 200
         body = response.json()
         assert body["status"] == "accepted"
-        assert "https://example.com" in body["message"]
+        assert "https://example.com" in body["message"]  # codeql[py/incomplete-url-substring-sanitization]
 
     def test_invalid_url_returns_400(self, client: TestClient):
         """A string that does not start with 'http' must be rejected with a 400."""

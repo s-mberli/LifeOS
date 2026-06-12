@@ -38,7 +38,7 @@ def test_regenerate_insight_summary_success(tmp_project: Path, sample_insight: P
     fake_ai_data = {
         "summary": "This is a new regenerated summary.",
         "key_ideas": ["Regenerated idea 1", "Regenerated idea 2"],
-        "why_this_matters_for_markus": ["Matters because X"],
+        "why_this_matters_for_user": ["Matters because X"],
         "related_modes": ["Mode A"],
         "next_action": "Do the next thing",
         "suggested_tags": ["new-tag", "ai"],
