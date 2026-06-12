@@ -78,6 +78,7 @@ Write a concise changelog entry for CHANGELOG.md. Format:
 ## [{today}]
 ### Added
 - **Feature Name:** 1-2 sentence description of what was added and why it matters.
+  - **Source:** [URL to the original article that inspired this proposal]
 
 ### Changed (if applicable)
 - List any modified behaviours.
