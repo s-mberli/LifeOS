@@ -49,3 +49,50 @@ Run all unit and integration tests before submitting changes:
 .venv/bin/pytest
 ```
 All new core logic must include unit tests in the `tests/` directory. Mock external network/LLM calls.
+
+---
+
+## 🚀 Hermes Proposal Implementation Workflow
+
+When the user says **"implement this proposal"** (or references a file in `data/inbox/proposals/`), you MUST follow this exact workflow. No skipping steps.
+
+### Step 0: Activate Skills
+1. Activate `/caveman` — ultra-compressed communication to reduce token usage.
+2. Activate `/spec-driven-development` — validate architecture before writing code.
+3. Activate `/code-review-and-quality` — Five-Axis Review on all code produced.
+
+### Step 1: Branch
+- **NEVER work on `main` directly.**
+- Create a feature branch: `git checkout -b feat/<proposal-slug>`
+- All work happens on this branch until the user approves the merge.
+
+### Step 2: Spec & Plan
+- Read the proposal file from `data/inbox/proposals/`.
+- Write a formal spec following the spec-driven-development template (Objective, Commands, Structure, Boundaries, Success Criteria).
+- Present the implementation plan to the user for approval before writing any code.
+
+### Step 3: Implement
+- Build the feature incrementally (one task at a time).
+- Write unit tests for all new logic in `tests/`. Mock external calls.
+- Run `.venv/bin/pytest` after each change to confirm nothing breaks.
+
+### Step 4: Code Review
+- Run `scripts/ai_code_reviewer.py` on all modified `.py` files.
+- The reviewer performs a Five-Axis Review (Correctness, Readability, Architecture, Security, Performance).
+- Auto-fixes are applied automatically. Manual fixes are flagged.
+
+### Step 5: Documentation
+- Run `scripts/update_docs.py` to automatically:
+  - Append the new feature to `CHANGELOG.md`.
+  - Update `README.md` if the feature changes the core architecture.
+  - Generate a Mermaid architecture diagram for the new feature.
+
+### Step 6: Merge
+- Commit all changes on the feature branch.
+- Present a summary to the user.
+- **WAIT for explicit user approval** before merging to `main`.
+- **NEVER push to GitHub** without explicit user approval.
+
+### Step 7: Proposal Status Update
+- After merge, update the proposal file's `## Status` from `Proposed` to `✅ Implemented`.
+- If the proposal was rejected during review, update to `❌ Rejected` with a reason.
