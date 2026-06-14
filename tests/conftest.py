@@ -6,6 +6,7 @@ that are reused across all test modules.
 """
 import pytest
 from pathlib import Path
+from unittest.mock import patch
 
 
 @pytest.fixture
@@ -48,3 +49,21 @@ def sample_insight(tmp_project: Path) -> Path:
         encoding="utf-8",
     )
     return note
+
+
+@pytest.fixture(autouse=True)
+def mock_embeddings():
+    """Stub out get_embeddings for all tests to avoid real HTTP calls.
+
+    Returns a zero vector (768 dims) by default so any test relying on
+    semantic similarity can still exercise the code path without a live
+    OpenRouter connection.  Tests that need specific embedding values should
+    apply their own ``patch("src.core.llm_client.get_embeddings", ...)``
+    context manager inside the test body, which takes precedence over this
+    autouse fixture.
+    """
+    _zero = [0.0] * 768
+    with patch("src.core.llm_client.get_embeddings", return_value=_zero), \
+         patch("src.core.build_fts_index.get_embeddings", return_value=_zero, create=True), \
+         patch("src.core.search_knowledge.get_embeddings", return_value=_zero, create=True):
+        yield

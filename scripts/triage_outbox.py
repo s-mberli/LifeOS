@@ -6,13 +6,18 @@ Scores unprocessed notes in automation_outbox cheaply without using an LLM.
 
 import os
 import re
-import sqlite3
+import sys
 import datetime
 from pathlib import Path
 
 # Setup paths relative to script location
 BASE_DIR = Path(__file__).resolve().parent.parent
 DB_PATH = BASE_DIR / "indexes" / "lifeos.db"
+
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+from src.core.db import get_db_connection
 
 KEYWORDS = ["AI", "Architecture", "Github", "Python", "SQLite", "Performance", "Agent", "LLM"]
 
@@ -21,7 +26,7 @@ def triage_notes():
         print(f"Database does not exist at {DB_PATH}. Exiting.")
         return
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_db_connection(DB_PATH)
     cursor = conn.cursor()
 
     # Get unprocessed items
@@ -39,6 +44,7 @@ def triage_notes():
     print(f"Found {len(rows)} pending note(s) to triage.")
     now_str = datetime.datetime.now(datetime.timezone.utc).astimezone().isoformat()
 
+    actionable_notes = []
     for row_id, note_path, source_url, word_count in rows:
         full_path = BASE_DIR / note_path
         score = 0
@@ -65,6 +71,7 @@ def triage_notes():
                 # Determine actionable: must have at least one code/architecture keyword match
                 if len(matching_keywords) >= 1:
                     is_actionable = 1
+                    actionable_notes.append(full_path)
                     
                 print(f"Triaged '{note_path}': score={score}, is_actionable={is_actionable}, keywords={matching_keywords}")
             except Exception as e:
@@ -82,8 +89,28 @@ def triage_notes():
             WHERE id = ?
         """, (now_str, score, is_actionable, row_id))
 
+        if is_actionable == 1:
+            try:
+                from src.core.build_fts_index import index_file
+                index_file(DB_PATH, full_path)
+                print(f"Indexed note successfully: {note_path}")
+            except Exception as e:
+                print(f"Error indexing note {note_path}: {e}")
+
     conn.commit()
     conn.close()
+
+    if actionable_notes:
+        import threading
+        from src.core.build_fts_index import index_file
+        threads = []
+        for note_path in actionable_notes:
+            t = threading.Thread(target=index_file, args=(str(DB_PATH), str(note_path)))
+            t.start()
+            threads.append(t)
+        for t in threads:
+            t.join()
+
     print("Triage run completed.")
 
 if __name__ == "__main__":

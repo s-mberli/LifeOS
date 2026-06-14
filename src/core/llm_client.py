@@ -249,3 +249,61 @@ def split_text(text: str, chunk_size: int = 12000, overlap: int = 1000) -> list[
         chunks.append(text[start:end])
         start += chunk_size - overlap
     return chunks
+
+def get_embeddings(texts: str | list[str], batch_size: int = 500) -> list[list[float]] | list[float]:
+    """Generates 768-dimensional embeddings for texts via OpenRouter.
+    Model: nomic-ai/nomic-embed-text-v1.5
+    Endpoint: https://openrouter.ai/api/v1/embeddings
+    """
+    is_single = isinstance(texts, str)
+    if is_single:
+        texts = [texts]
+    if not texts:
+        return []
+    
+    # Truncate text if too long (exceeds LLM token limit)
+    truncated_texts = []
+    for text in texts:
+        if len(text) > 8000:
+            text = text[:8000]
+        truncated_texts.append(text)
+    texts = truncated_texts
+    
+    api_key = os.environ.get("OPENROUTER_API_KEY")
+    if not api_key:
+        raise ValueError("OPENROUTER_API_KEY not set")
+        
+    embeddings = []
+    for i in range(0, len(texts), batch_size):
+        batch = texts[i:i+batch_size]
+        response = requests.post(
+            "https://openrouter.ai/api/v1/embeddings",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+                "HTTP-Referer": "https://github.com/s-mberli/LifeOS",
+                "X-Title": "MarkusOS",
+            },
+            json={
+                "model": "nomic-ai/nomic-embed-text-v1.5",
+                "input": batch
+            },
+            timeout=60
+        )
+        if response.status_code == 429:
+            raise Exception("Rate limit exceeded (429)")
+        response.raise_for_status()
+        data = response.json()
+        if "data" not in data:
+            raise ValueError("missing 'data' field")
+        if not isinstance(data["data"], list):
+            raise ValueError("data is not a list")
+        for item in data["data"]:
+            if not isinstance(item, dict) or "embedding" not in item:
+                raise ValueError("missing embedding field")
+            embeddings.append(item["embedding"])
+            
+    if is_single:
+        return embeddings[0] if embeddings else [0.0] * 768
+    return embeddings
+

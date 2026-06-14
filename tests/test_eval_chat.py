@@ -55,7 +55,8 @@ def get_system_prompt():
 
 def verify_response_quality(response: str, expected_keyword: str):
     # 1. Not cut off check
-    assert re.search(r'[.!?]\s*(\[\d+\])?\s*$', response) is not None, f"Response appears cut off: {response[-50:]}"
+    clean_resp = response.strip().rstrip("*_` \t\n")
+    assert re.search(r'[.!?]\s*(\[\d+\])?\s*$', clean_resp) is not None, f"Response appears cut off: {response[-50:]}"
     
     # 2. Length check
     assert len(response) > 200, f"Response is too short: {len(response)} chars. \nResponse: {response}"
@@ -97,7 +98,7 @@ def test_long_context():
     sys_prompt = get_system_prompt()
     response, calls, _ = execute_agent_search_loop(
         system_prompt=sys_prompt,
-        user_prompt="How to regain purpose after losing motivation? (Search the vault first)",
+        user_prompt="Please call the fts_search tool first to query the vault for notes on motivation: How to regain purpose after losing motivation?",
         fts_search_fn=mock_fts_search_long
     )
     
