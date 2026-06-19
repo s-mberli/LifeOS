@@ -37,6 +37,8 @@ DB_PATH = BASE_DIR / "indexes" / "lifeos.db"
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
+from src.core.db import get_db_connection
+
 from scripts.triage_outbox import triage_notes
 from src.core.llm_client import call_llm
 from src.core.web import fetch_webpage_content
@@ -370,7 +372,7 @@ Here are the articles:
 
     # 7. Update outbox DB
     if DB_PATH.exists():
-        conn = sqlite3.connect(DB_PATH)
+        conn = get_db_connection(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("""
             SELECT id FROM automation_outbox

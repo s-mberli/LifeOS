@@ -678,24 +678,12 @@ def process_one_file(source: str, use_ai: bool = False, status_callback=None, re
         
         # Queue in automation_outbox
         try:
-            import sqlite3
+            from src.core.db import get_db_connection, init_db
             db_path = ROOT / "indexes" / "lifeos.db"
-            db_path.parent.mkdir(parents=True, exist_ok=True)
-            with sqlite3.connect(db_path) as conn:
+            conn = get_db_connection(db_path)
+            try:
+                init_db(conn)
                 cursor = conn.cursor()
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS automation_outbox (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        note_path TEXT,
-                        source_url TEXT,
-                        word_count INTEGER,
-                        added_at TEXT,
-                        processed_at TEXT,
-                        score INTEGER,
-                        is_actionable INTEGER,
-                        hermes_run_at TEXT
-                    )
-                """)
                 relative_note_path = str(out_filepath.relative_to(ROOT))
                 cursor.execute("""
                     INSERT INTO automation_outbox (note_path, source_url, word_count, added_at)
@@ -703,6 +691,8 @@ def process_one_file(source: str, use_ai: bool = False, status_callback=None, re
                 """, (relative_note_path, source_url, len(note_content.split()), now_str))
                 conn.commit()
                 log(f"Queued in automation_outbox: {relative_note_path}")
+            finally:
+                conn.close()
         except Exception as db_exc:
             log(f"Warning: failed to queue note in automation_outbox: {db_exc}")
             

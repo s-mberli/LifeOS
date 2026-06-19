@@ -1,12 +1,12 @@
-import sqlite3
 import datetime
 import time
 import functools
 from typing import Callable, Any, Optional
 from pathlib import Path
+from src.core.db import get_db_connection, init_db
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-DB_PATH = BASE_DIR / "indexes" / "lifeOS.db"
+DB_PATH = BASE_DIR / "indexes" / "lifeos.db"
 
 # ── Constants ────────────────────────────────────────────────────────────────
 MODE_BACKGROUND = "background"
@@ -37,21 +37,6 @@ def _classify_repair_strategy(exc: Exception) -> str:
     return STRATEGY_UNKNOWN
 
 
-def _ensure_agent_repair_logs_table(cursor: sqlite3.Cursor) -> None:
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS agent_repair_logs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            timestamp TEXT,
-            function_name TEXT,
-            mode TEXT,
-            error_type TEXT,
-            error_message TEXT,
-            attempt INTEGER,
-            repair_strategy TEXT
-        )
-    """)
-
-
 def log_repair_attempt(
     function_name: str,
     mode: str,
@@ -67,9 +52,10 @@ def log_repair_attempt(
     db_path.parent.mkdir(parents=True, exist_ok=True)
     now = datetime.datetime.now(datetime.timezone.utc).astimezone().isoformat()
 
-    with sqlite3.connect(db_path) as conn:
+    conn = get_db_connection(db_path)
+    try:
+        init_db(conn)
         cursor = conn.cursor()
-        _ensure_agent_repair_logs_table(cursor)
         cursor.execute(
             """INSERT INTO agent_repair_logs
                (timestamp, function_name, mode, error_type, error_message, attempt, repair_strategy)
@@ -77,6 +63,8 @@ def log_repair_attempt(
             (now, function_name, mode, error_type, safe_message, attempt, repair_strategy),
         )
         conn.commit()
+    finally:
+        conn.close()
 
 
 def execute_with_repair(

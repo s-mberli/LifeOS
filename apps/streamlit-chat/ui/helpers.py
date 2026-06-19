@@ -28,20 +28,9 @@ if _SCRIPTS_DIR not in sys.path:
 
 def _get_db_conn():
     """Get a SQLite connection and ensure the user_memory table exists."""
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS user_memory (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT,
-            content TEXT,
-            is_active BOOLEAN DEFAULT 1,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    conn.commit()
+    from src.core.db import get_db_connection, init_db
+    conn = get_db_connection(DB_PATH)
+    init_db(conn)
     return conn
 
 def get_user_memories(active_only: bool = False) -> list[dict]:

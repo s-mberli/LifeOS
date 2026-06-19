@@ -30,6 +30,8 @@ DB_PATH = BASE_DIR / "indexes" / "lifeos.db"
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
+from src.core.db import get_db_connection, init_db
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -67,19 +69,6 @@ Perform a strict Five-Axis Code Review on the following Python file.
 # Database helpers
 # ---------------------------------------------------------------------------
 
-def _ensure_table(cursor: sqlite3.Cursor) -> None:
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS ai_code_provenance (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            file_path TEXT UNIQUE,
-            author_agent TEXT,
-            model TEXT,
-            created_at TEXT,
-            review_status TEXT
-        )
-    """)
-
-
 def log_provenance(
     file_path: str,
     author_agent: str,
@@ -91,9 +80,10 @@ def log_provenance(
     db_path.parent.mkdir(parents=True, exist_ok=True)
     now = datetime.datetime.now(datetime.timezone.utc).astimezone().isoformat()
 
-    with sqlite3.connect(db_path) as conn:
+    conn = get_db_connection(db_path)
+    try:
+        init_db(conn)
         cursor = conn.cursor()
-        _ensure_table(cursor)
         cursor.execute(
             "SELECT id FROM ai_code_provenance WHERE file_path = ?",
             (file_path,),
@@ -114,6 +104,8 @@ def log_provenance(
                 (file_path, author_agent, "auto", now, review_status),
             )
         conn.commit()
+    finally:
+        conn.close()
 
 
 # ---------------------------------------------------------------------------
