@@ -99,19 +99,8 @@ def triage_notes():
 
     conn.commit()
     conn.close()
-
-    if actionable_notes:
-        import threading
-        from src.core.build_fts_index import index_file
-        threads = []
-        for note_path in actionable_notes:
-            t = threading.Thread(target=index_file, args=(str(DB_PATH), str(note_path)))
-            t.start()
-            threads.append(t)
-        for t in threads:
-            t.join()
-
     print("Triage run completed.")
+
 
 if __name__ == "__main__":
     triage_notes()
