@@ -1,5 +1,10 @@
 # Changelog
 
+## [2026-06-20]
+### Added
+- **Unified Memory Core (sqlite-vec + FTS5 RRF hybrid RAG):** Re-architected storage and retrieval layer for scale. Added dynamic loading of `sqlite-vec` extension and schema definitions for vector/chunk mapping (`vec_docs` and `doc_chunks` tables). Implemented hybrid search combining FTS5 keyword and sqlite-vec KNN queries with Reciprocal Rank Fusion (RRF). Added OpenRouter-based embedding generation (`nomic-embed-text-v1.5`) and LLM context briefing synthesis. Removed redundant threaded re-indexing in `triage_outbox.py`.
+  - **Source:** [X.com Post: mem0ai unified memory](https://x.com/mem0ai/status/2061822612398014782?utm_source=tldrai)
+
 ## [2026-06-12]
 ### Added
 - **Self-Repairing Agent Harness:** New `src/core/agent_harness.py` module with `execute_with_repair` decorator that catches agent failures (JSON parsing errors, timeouts) and applies repair strategies. Supports `background` mode (exponential backoff, up to 3 retries) for unattended scripts and `ui` mode (fast-fail, 1 retry) for interactive apps. Repair logs stored in `agent_repair_logs` SQLite table.

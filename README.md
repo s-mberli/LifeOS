@@ -34,7 +34,7 @@ Most AI tools stop at retrieval. **LifeOS closes the loop**: new knowledge becom
 | **Expert Synthesis** | Groups content by creator/domain and auto-generates `playbook.md`, `principles.md`, and `profile.md` for each expert persona. |
 | **Multi-Turn Chat with Citations** | Chat with your synthesized experts. Every claim is backed by a specific Markdown note reference. |
 | **YouTube & Web Ingestion** | Drop a URL → LifeOS downloads the transcript or scrapes the page, summarizes it, and indexes it locally. |
-| **Local SQLite FTS5 Search** | Lightning-fast, fully offline full-text indexing. No vector DB setup required. |
+| **Hybrid RAG & Vector Search** | Combines SQLite FTS5 keyword search and `sqlite-vec` semantic search via Reciprocal Rank Fusion (RRF) for 10k+ scale. |
 | **Autonomous Self-Improvement** | The [Hermes Agent](#-autonomous-hermes-loop) triages new notes for architecture/coding insights, reviews the codebase weekly, and opens GitHub PRs. |
 | **Browser Clipper** | 1-click Firefox extension to capture any URL directly into your knowledge vault. |
 | **Manual Personal Memory** | User-managed memory system to inject persistent context, preferences, and LLM expert exports directly into the system prompt. |
@@ -117,7 +117,7 @@ flowchart TB
         Transcript --> MD["Markdown + YAML Frontmatter"]
         CleanText --> MD
         Text --> MD
-        MD --> DB[("SQLite FTS5 Index")]
+        MD --> DB[("Unified Memory SQLite<br>(FTS5 + sqlite-vec)")]
         MD --> Outbox[("automation_outbox")]
     end
 
@@ -239,7 +239,7 @@ lifeos/
 
 | Layer | Technology | Purpose |
 |:------|:-----------|:--------|
-| **Search** | SQLite FTS5 | Full-text search over all ingested notes |
+| **Search** | SQLite FTS5 + `sqlite-vec` | Hybrid keyword and semantic vector search over all notes |
 | **Storage** | Markdown + YAML frontmatter | Human-readable, git-friendly note format |
 | **UI** | Streamlit | Multi-turn chat interface with expert routing |
 | **API** | FastAPI + Uvicorn | Sidecar server for browser clipper ingestion |
@@ -318,7 +318,7 @@ See [**ROADMAP.md**](ROADMAP.md) for the full product roadmap. Current status:
 - ✅ **Phase 1** — Ingestion & Expert Profiles (MVP)
 - ✅ **Phase 2** — Testing, Refactoring & Cleanup
 - 🔄 **Phase 3** — Enhanced Expert Management & Bulk Ingestion
-- 🔮 **Phase 4** — Hybrid Retrieval & Offline LLMs
+- 🔄 **Phase 4** — Hybrid Retrieval (sqlite-vec + FTS5 RRF) & Offline LLMs
 
 ---
 
