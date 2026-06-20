@@ -51,6 +51,7 @@ Thumbs.db
 
 # Scratch / one-off dev scripts (never commit these)
 scratch/
+.agents/
 
 # SQLite indexes (rebuilt at startup)
 indexes/*.db
