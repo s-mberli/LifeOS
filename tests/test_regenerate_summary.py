@@ -49,9 +49,11 @@ def test_regenerate_insight_summary_success(tmp_project: Path, sample_insight: P
     }
 
     try:
-        with patch("src.core.ingest.generate_resource_summary", return_value=fake_ai_data):
+        with patch("src.core.ingest.generate_resource_summary", return_value=fake_ai_data), \
+             patch("src.core.build_fts_index.build_index") as mock_build:
             res = regenerate_insight_summary(sample_insight)
             assert res["success"] is True
+            mock_build.assert_called_once()
 
         # Read back frontmatter and body
         from src.core.frontmatter import read_fm

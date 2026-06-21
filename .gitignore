@@ -49,6 +49,18 @@ htmlcov/
 .AppleDouble
 Thumbs.db
 
+# Syncthing files
+.stfolder/
+.stignore
+**/.stignore
+**/.stfolder/
+**/.syncthing*
+**/.stversions/
+
+# UI & State cache
+data/expert_chat_state.json
+data/tracking/lenny_ingest.json
+
 # Scratch / one-off dev scripts (never commit these)
 scratch/
 .agents/
@@ -99,9 +111,9 @@ scratch_*.py
 !config/models.example.yml
 !config/domains.example.yaml
 !config/domain_map.yaml
-!.env.example
-!README.md
-!AGENTS.md
+!/.env.example
+!/README.md
+!/AGENTS.md
 !data/README.md
 !data/knowledge/creator-profiles/README.md
 !**/example-*.md

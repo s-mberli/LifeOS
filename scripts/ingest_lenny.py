@@ -231,13 +231,14 @@ def main():
             repo_dir = Path(tmpdir) / "repo"
             logger.info(f"Cloning repository to {tmpdir}...")
             
+            git_bin = shutil.which("git") or "git"
             try:
                 subprocess.run(
-                    ["git", "clone", "--depth", "1", REPO_URL, str(repo_dir)],
+                    [git_bin, "clone", "--depth", "1", REPO_URL, str(repo_dir)],
                     check=True,
                     capture_output=True,
                     text=True
-                )
+                )  # nosec B603
             except subprocess.CalledProcessError as e:
                 logger.error(f"Git clone failed: {e.stderr}")
                 return

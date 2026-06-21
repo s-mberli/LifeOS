@@ -13,11 +13,10 @@ import datetime
 import json
 import logging
 import re
-import ssl
+import requests
 import subprocess
 import sys
-import urllib.request
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET  # nosec B405
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -89,11 +88,10 @@ def main():
 
     # 1. Fetch RSS Feed
     try:
-        context = ssl._create_unverified_context()  # nosec B323
-        req = urllib.request.Request(RSS_URL, headers={'User-Agent': 'Mozilla/5.0'})
         logger.info(f"Fetching RSS feed from {RSS_URL}...")
-        with urllib.request.urlopen(req, context=context) as response:  # nosec B310
-            xml_data = response.read()
+        response = requests.get(RSS_URL, headers={'User-Agent': 'Mozilla/5.0'}, timeout=30)
+        response.raise_for_status()
+        xml_data = response.content
     except Exception as e:
         logger.error(f"Failed to fetch RSS feed: {e}")
         sys.exit(1)
@@ -173,7 +171,7 @@ def main():
             capture_output=True,
             text=True,
             check=True
-        )
+        )  # nosec B603
         logger.info("ingest_lenny.py completed successfully.")
         # Log its output at debug level or info if we want
         logger.debug(res.stdout)

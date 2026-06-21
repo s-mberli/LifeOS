@@ -157,10 +157,16 @@ class TestCreateEmptyExpert:
 
     @pytest.fixture(autouse=True)
     def _import_core(self):
-        """Import the core experts module."""
+        """Import the core experts module and mock index rebuilding."""
         import src.core.experts as experts_mod
         self._mod = experts_mod
         self._fn = experts_mod.create_empty_expert
+
+        from unittest.mock import patch
+        patcher = patch("src.core.build_fts_index.build_index")
+        patcher.start()
+        yield
+        patcher.stop()
 
     def test_creates_empty_expert_scaffold(self, tmp_project: Path):
         """Must create expert directory and empty profile, playbook, principles, and evidence files."""
