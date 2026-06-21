@@ -313,40 +313,51 @@ class HumanitixScraper(EventScraper):
 
 
 class FacebookScraper(EventScraper):
-    """Scrape Facebook events using public page scraping."""
+    """Monitor user-submitted Facebook event URLs for changes.
+
+    Free FB scrape impossible without login. Instead:
+    - User pastes FB event URLs in config
+    - This checks if page is publicly accessible (some are)
+    - If inaccessible (login-wall), logs a note once per URL
+    """
 
     def search(self, category: str, keywords: list[str]) -> list[dict]:
-        pages = self.config.get("sources", {}).get("facebook", {}).get("pages", [])
-        if not pages:
+        urls = self.config.get("sources", {}).get("facebook", {}).get("event_urls", [])
+        if not urls:
             return []
 
         events = []
-        for page_url in pages:
+        for event_url in urls:
+            key = f"facebook:{event_url}"
+            if not is_new(key, {}):
+                continue  # already tracked, skip poll
             try:
-                resp = requests.get(page_url, headers=HEADERS, timeout=15)
+                resp = requests.get(event_url, headers=HEADERS, timeout=15, allow_redirects=True)
                 resp.raise_for_status()
                 soup = BeautifulSoup(resp.text, "html.parser")
 
-                # Look for event links
-                for link in soup.find_all("a", href=re.compile(r"/events/\d+")):
-                    event_url = link.get("href", "")
-                    if not event_url.startswith("http"):
-                        event_url = "https://www.facebook.com" + event_url
+                title_el = soup.find(["h1", "h2", "title"])
+                title = clean_text(title_el.get_text()) if title_el else event_url.split("/")[-1]
 
-                    title = clean_text(link.get_text())
+                date_el = soup.find(string=re.compile(r"\d{1,2} \w+ \d{4}|\w+ \d{1,2}, \d{4}"))
+                date_str = date_el.strip() if date_el else ""
 
-                    if title and event_url and len(title) > 5:
-                        events.append({
-                            "title": title,
-                            "url": event_url,
-                            "date": "",
-                            "venue": "",
-                            "description": "",
-                            "source": "facebook",
-                            "category": category,
-                        })
+                events.append({
+                    "title": title,
+                    "url": event_url,
+                    "date": date_str,
+                    "venue": "",
+                    "description": "",
+                    "source": "facebook",
+                    "category": category,
+                })
+            except requests.HTTPError as exc:
+                if exc.response and exc.response.status_code in (401, 403):
+                    self.logger.debug("FB event login-wall: %s", event_url)
+                else:
+                    self.logger.debug("FB event error %s: %s", event_url, exc)
             except Exception as exc:
-                self.logger.error("Facebook error for '%s': %s", page_url, exc)
+                self.logger.debug("FB event error: %s — %s", event_url, exc)
 
         return events
 

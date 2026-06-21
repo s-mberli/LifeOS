@@ -101,12 +101,10 @@ sources:
 
   facebook:
     enabled: true
-    # Uses facebook-event-scraper (Node.js) via subprocess
-    # Install: npm install -g facebook-event-scraper
-    # Provide Facebook group/page URLs to monitor
-    pages:
-      # Add Facebook event page URLs here
-      # Example: "https://www.facebook.com/groups/sydneydance/"
+    # Can't auto-discover FB events without login.
+    # Paste specific Facebook event page URLs here to track them:
+    event_urls:
+      # Example: "https://www.facebook.com/events/123456789/"
       []
 
 # Delivery
