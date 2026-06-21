@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-EXPERTS_DIR = ROOT / "data" / "experts"
+EXPERTS_DIR = ROOT / "experts"
 
 # Ensure src/ is importable
 sys.path.insert(0, str(ROOT / "src"))

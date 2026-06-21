@@ -1,0 +1,127 @@
+---
+actionability: high
+attached_experts: []
+channel_name: ''
+created_at: '2026-06-05T08:51:37.807411+10:00'
+domain: unknown
+expert_status: unattached
+primary_mode: router
+privacy: public
+review_status: new
+secondary_modes: []
+source_type: article
+source_url: https://tldr.tech/infosec/2026-05-15
+status: processed
+suggested_experts: []
+tags: []
+title: OpenAI Confirms Breach 🤖, 18-Year NGINX Rift RCE 🌐, Two New Windows 0-Days
+  🪟
+transcript_path: ''
+type: insight_note
+updated_at: '2026-06-05T08:51:37.807411+10:00'
+---
+
+# OpenAI Confirms Breach 🤖, 18-Year NGINX Rift RCE 🌐, Two New Windows 0-Days 🪟
+
+## Summary
+AI summarization succeeded, but JSON parsing failed.
+
+## AI Raw Output
+```text
+Final synthesis failed.
+```
+
+## Key Ideas
+- Refer to the AI Raw Output above.
+
+## Why this matters for Markus
+- Refer to the AI Raw Output above.
+
+## Related Modes
+- router
+
+## AI Generation Data
+- Provider: Unknown
+- Model: Unknown
+
+## Next Action
+- [ ] Review raw AI output and extract action items manually.
+
+## Source Reliability
+AI summarization was performed but parsing failed.
+
+## Original Content
+### Raw User Input
+https://tldr.tech/infosec/2026-05-15
+
+Last chance to see Cato, Microsoft, and Forrester on AI security at SASEfy 2026 (Sponsor) AI and risk go hand in hand. But at  SASEfy 2026 , you'll learn how to keep the risk at arm's length.  Join Cato Networks, Microsoft, Forrester, and Dayforce for this  free virtual summit  focused on the ways leaders secure AI in practice.  Join live on May 20 to learn how to:  1️⃣ Identify where AI risk exists  2️⃣ Secure and govern AI without added complexity  3️⃣ Adapt Zero Trust for agentic AI  Can't attend?  Register for the recording
+
+One Is a Fluke, 3 Is a Pattern: MCP Back-End Vulnerabilities (4 minute read) Akamai researchers reviewed about 300 MCP servers and found concrete back-end flaws in Apache Doris, Apache Pinot, and Alibaba RDS implementations, including exploitable SQL injection, unauthenticated HTTP access to tools, and unauthenticated retrieval of RAG table structures. Attackers who can reach exposed MCP endpoints can run arbitrary SELECT queries or inject SQL into Doris via an unchecked db_name parameter, and exfiltrate schema metadata from Alibaba's RDS MCP.
+
+OpenAI Confirms Security Breach in TanStack Supply Chain Attack (2 minute read) OpenAI published a security advisory stating that two employees' devices were compromised as part of the TanStack supply chain compromise. OpenAI said the incident did not impact customer data, production systems, intellectual property, or deployed software, but is rotating code signing certificates as a precaution.
+
+Hackers Exploit Auth Bypass Flaw in Burst Statistics WordPress Plugin (2 minute read) WordPress security company WordFence is reporting a new authentication bypass vulnerability in the Burst Statistics plugin. Burst Statistics is a privacy-focused analytics plugin that is active on over 200k sites. The vulnerability stems from the plugin incorrectly interpreting the `wp_authenticate_application_password` function and could be abused by attackers to authenticate as any admin whose username they know.
+
+Meet Bluekit: The AI-Powered All-in-One Phishing Kit (3 minute read) Varonis Threat Labs recently discovered a new phishing kit called Bluekit that advertises 40+ website templates, automated domain purchase and registration, 2FA support, spoofing, geolocation emulation, Telegram and browser notifications, antibot cloaking, and an AI assistant. It obtained access to the toolkit to test the AI assistant and discovered that it offers an abliterated Llama default alongside commercial offerings like GPT-4.1, Sonnet 4, Gemini, and Deepseek variants. Varonis found that the actual capabilities were much more limited than expected and that only a generic campaign draft was generated, with many placeholders.
+
+NGINX Rift: Achieving NGINX Remote Code Execution via an 18-Year-Old Vulnerability (10 minute read) Depthfirst's analysis of NGINX found four remote memory corruption bugs, including the heap overflow CVE-2026-42945 in the rewrite/set script engine, which has been present since 2008 in widely deployed NGINX and F5 products. The bug lets a crafted rewrite plus set sequence miscompute buffer length, then overflow heap data with escaped URI bytes, which attackers use to corrupt ngx_pool cleanup pointers and execute commands via the system. Reliable exploitation leverages deterministic worker heaps, cross-request heap feng shui, and binary POST body sprays, so anyone running vulnerable NGINX with rewrite/set needs urgent patching and config review.
+
+The Danger of Multi-SSO AWS Cognito User Pools (7 minute read) Doyensec detailed four attack patterns against multi-tenant AWS Cognito User Pools that accept tenant-supplied OIDC/SAML IdPs: JIT ghost identity injection when PreSignUp_ExternalProvider lacks domain checks, trigger-source gaps where constraints applied only to PreAuthentication_Authentication skip first federated logins, sub-splitting attacks against ProviderName_sub userName parsing, and IdpIdentifier hijacks (e.g., claiming gmail.com) when domain ownership is not verified. Homoglyph collisions in ProviderName (Cyrillic е vs ASCII e) further enable split-identity confusion across Hosted UI, audit logs, and Lambda consumers. Defenders should branch PreSignUp logic across all triggerSource values, parse usernames with split("_", 1) consistently in both guard and consumer, derive tenant/role attributes server-side rather than via AttributeMapping, and gate IdpIdentifier claims behind verified domain ownership; Doyensec also released maSSO, a weaponized OIDC/SAML/SCIM IdP for SP testing.
+
+Run the AI your team is already using, securely (Sponsor) Agents spun up without governance have zero visibility and no audit trail. Give them a sanctioned path with  Agent Foundry by Prompt Security . Run every agent instance in a SentinelOne-protected container on isolated K8 pods with centralized policy, audit, and real-time runtime protection.  Join the waitlist
+
+Sweet Security - Sweet Attack (Product Launch) Sweet Attack is an automated red teaming platform that maps each customer's runtime environment and continuously tests real attack paths using indexed topology, L7 exposure, code, identities, and live behavior to surface exploitable chains and concrete remediation steps.
+
+Microsoft AntiSSRF (GitHub Repo) The Microsoft AntiSSRF library is a securely developed, exhaustively tested secure code library that provides robust URL validation to mitigate the risks of Server-Side Request Forgery (SSRF).
+
+OpenAIPot (GitHub Repo) OpenAIPot is a deceptive OpenAPI gateway that serves as a honeypot to detect unauthorized API usage.
+
+Signal Threatens Canada Exit Over New Law (3 minute read) Signal has warned that it will leave Canada if forced to comply with the proposed Bill C-22, known as the lawful access bill. Among other provisions, this bill would allow the Canadian government to create encryption backdoors to access confidential communications. Apple has also stated that it will not add a backdoor to its end-to-end encryption and may be unable to release certain features in Canada if the law passes.
+
+Fragnesia: Linux Kernel Local Privilege Escalation via ESP-in-TCP (2 minute read) Fragnesia is a Linux kernel LPE bug in XFRM ESP-in-TCP that corrupts page-cache data by decrypting queued TCP data in-place, letting an unprivileged user flip bytes in file-backed pages and hijack binaries like /usr/bin/su for a root shell. Mitigation focuses on kernel patches, disabling esp4/esp6/rxrpc, tightening unprivileged namespaces, and monitoring XFRM and AF_ALG activity.
+
+Mystery Microsoft bug leaker keeps the zero-days coming (3 minute read) YellowKey is a BitLocker bypass that requires physical access via USB, and GreenPlasma, a privilege escalation flaw granting SYSTEM access. It grants unrestricted shell access to BitLocker-protected machines, turning stolen laptops into breach notifications. It can be mitigated with a BitLocker PIN and BIOS password. There is no current mitigation.
+
+KongTuke hackers now use Microsoft Teams for corporate breaches (2 minute read) Initial access broker KongTuke is rotating through five Microsoft 365 tenants to impersonate IT staff in external Teams chats and trick employees into running PowerShell that pulls a Dropbox ZIP and launches an evolved ModeloRAT with a five-server C2 pool, reverse shell and TCP backdoor fallbacks, and a SYSTEM-level scheduled task that survives the implant's own self-destruct routine.
+
+High-Severity Vulnerability Patched in VMware Fusion (1 minute read) Broadcom shipped an update to VMware Fusion to fix CVE-2026-41702, a TOCTOU bug in a SETUID binary that lets a local non-admin user escalate to root on macOS hosts.
+
+TeamPCP Claims Sale of Mistral AI Repositories Amid Mini Shai-Hulud Attack (3 minute read) A TeamPCP-linked forum account is selling roughly 5GB of allegedly internal Mistral AI source code spanning ~450 repositories for $25,000, surfacing days after the same actor was tied to the Mini Shai-Hulud supply chain campaign that hijacked OpenID Connect tokens to poison npm and PyPI packages.
+
+### Fetched Web Text
+Last chance to see Cato, Microsoft, and Forrester on AI security at SASEfy 2026 (Sponsor) AI and risk go hand in hand. But at  SASEfy 2026 , you'll learn how to keep the risk at arm's length.  Join Cato Networks, Microsoft, Forrester, and Dayforce for this  free virtual summit  focused on the ways leaders secure AI in practice.  Join live on May 20 to learn how to:  1️⃣ Identify where AI risk exists  2️⃣ Secure and govern AI without added complexity  3️⃣ Adapt Zero Trust for agentic AI  Can't attend?  Register for the recording
+
+One Is a Fluke, 3 Is a Pattern: MCP Back-End Vulnerabilities (4 minute read) Akamai researchers reviewed about 300 MCP servers and found concrete back-end flaws in Apache Doris, Apache Pinot, and Alibaba RDS implementations, including exploitable SQL injection, unauthenticated HTTP access to tools, and unauthenticated retrieval of RAG table structures. Attackers who can reach exposed MCP endpoints can run arbitrary SELECT queries or inject SQL into Doris via an unchecked db_name parameter, and exfiltrate schema metadata from Alibaba's RDS MCP.
+
+OpenAI Confirms Security Breach in TanStack Supply Chain Attack (2 minute read) OpenAI published a security advisory stating that two employees' devices were compromised as part of the TanStack supply chain compromise. OpenAI said the incident did not impact customer data, production systems, intellectual property, or deployed software, but is rotating code signing certificates as a precaution.
+
+Hackers Exploit Auth Bypass Flaw in Burst Statistics WordPress Plugin (2 minute read) WordPress security company WordFence is reporting a new authentication bypass vulnerability in the Burst Statistics plugin. Burst Statistics is a privacy-focused analytics plugin that is active on over 200k sites. The vulnerability stems from the plugin incorrectly interpreting the `wp_authenticate_application_password` function and could be abused by attackers to authenticate as any admin whose username they know.
+
+Meet Bluekit: The AI-Powered All-in-One Phishing Kit (3 minute read) Varonis Threat Labs recently discovered a new phishing kit called Bluekit that advertises 40+ website templates, automated domain purchase and registration, 2FA support, spoofing, geolocation emulation, Telegram and browser notifications, antibot cloaking, and an AI assistant. It obtained access to the toolkit to test the AI assistant and discovered that it offers an abliterated Llama default alongside commercial offerings like GPT-4.1, Sonnet 4, Gemini, and Deepseek variants. Varonis found that the actual capabilities were much more limited than expected and that only a generic campaign draft was generated, with many placeholders.
+
+NGINX Rift: Achieving NGINX Remote Code Execution via an 18-Year-Old Vulnerability (10 minute read) Depthfirst's analysis of NGINX found four remote memory corruption bugs, including the heap overflow CVE-2026-42945 in the rewrite/set script engine, which has been present since 2008 in widely deployed NGINX and F5 products. The bug lets a crafted rewrite plus set sequence miscompute buffer length, then overflow heap data with escaped URI bytes, which attackers use to corrupt ngx_pool cleanup pointers and execute commands via the system. Reliable exploitation leverages deterministic worker heaps, cross-request heap feng shui, and binary POST body sprays, so anyone running vulnerable NGINX with rewrite/set needs urgent patching and config review.
+
+The Danger of Multi-SSO AWS Cognito User Pools (7 minute read) Doyensec detailed four attack patterns against multi-tenant AWS Cognito User Pools that accept tenant-supplied OIDC/SAML IdPs: JIT ghost identity injection when PreSignUp_ExternalProvider lacks domain checks, trigger-source gaps where constraints applied only to PreAuthentication_Authentication skip first federated logins, sub-splitting attacks against ProviderName_sub userName parsing, and IdpIdentifier hijacks (e.g., claiming gmail.com) when domain ownership is not verified. Homoglyph collisions in ProviderName (Cyrillic е vs ASCII e) further enable split-identity confusion across Hosted UI, audit logs, and Lambda consumers. Defenders should branch PreSignUp logic across all triggerSource values, parse usernames with split("_", 1) consistently in both guard and consumer, derive tenant/role attributes server-side rather than via AttributeMapping, and gate IdpIdentifier claims behind verified domain ownership; Doyensec also released maSSO, a weaponized OIDC/SAML/SCIM IdP for SP testing.
+
+Run the AI your team is already using, securely (Sponsor) Agents spun up without governance have zero visibility and no audit trail. Give them a sanctioned path with  Agent Foundry by Prompt Security . Run every agent instance in a SentinelOne-protected container on isolated K8 pods with centralized policy, audit, and real-time runtime protection.  Join the waitlist
+
+Sweet Security - Sweet Attack (Product Launch) Sweet Attack is an automated red teaming platform that maps each customer's runtime environment and continuously tests real attack paths using indexed topology, L7 exposure, code, identities, and live behavior to surface exploitable chains and concrete remediation steps.
+
+Microsoft AntiSSRF (GitHub Repo) The Microsoft AntiSSRF library is a securely developed, exhaustively tested secure code library that provides robust URL validation to mitigate the risks of Server-Side Request Forgery (SSRF).
+
+OpenAIPot (GitHub Repo) OpenAIPot is a deceptive OpenAPI gateway that serves as a honeypot to detect unauthorized API usage.
+
+Signal Threatens Canada Exit Over New Law (3 minute read) Signal has warned that it will leave Canada if forced to comply with the proposed Bill C-22, known as the lawful access bill. Among other provisions, this bill would allow the Canadian government to create encryption backdoors to access confidential communications. Apple has also stated that it will not add a backdoor to its end-to-end encryption and may be unable to release certain features in Canada if the law passes.
+
+Fragnesia: Linux Kernel Local Privilege Escalation via ESP-in-TCP (2 minute read) Fragnesia is a Linux kernel LPE bug in XFRM ESP-in-TCP that corrupts page-cache data by decrypting queued TCP data in-place, letting an unprivileged user flip bytes in file-backed pages and hijack binaries like /usr/bin/su for a root shell. Mitigation focuses on kernel patches, disabling esp4/esp6/rxrpc, tightening unprivileged namespaces, and monitoring XFRM and AF_ALG activity.
+
+Mystery Microsoft bug leaker keeps the zero-days coming (3 minute read) YellowKey is a BitLocker bypass that requires physical access via USB, and GreenPlasma, a privilege escalation flaw granting SYSTEM access. It grants unrestricted shell access to BitLocker-protected machines, turning stolen laptops into breach notifications. It can be mitigated with a BitLocker PIN and BIOS password. There is no current mitigation.
+
+KongTuke hackers now use Microsoft Teams for corporate breaches (2 minute read) Initial access broker KongTuke is rotating through five Microsoft 365 tenants to impersonate IT staff in external Teams chats and trick employees into running PowerShell that pulls a Dropbox ZIP and launches an evolved ModeloRAT with a five-server C2 pool, reverse shell and TCP backdoor fallbacks, and a SYSTEM-level scheduled task that survives the implant's own self-destruct routine.
+
+High-Severity Vulnerability Patched in VMware Fusion (1 minute read) Broadcom shipped an update to VMware Fusion to fix CVE-2026-41702, a TOCTOU bug in a SETUID binary that lets a local non-admin user escalate to root on macOS hosts.
+
+TeamPCP Claims Sale of Mistral AI Repositories Amid Mini Shai-Hulud Attack (3 minute read) A TeamPCP-linked forum account is selling roughly 5GB of allegedly internal Mistral AI source code spanning ~450 repositories for $25,000, surfacing days after the same actor was tied to the Mini Shai-Hulud supply chain campaign that hijacked OpenID Connect tokens to poison npm and PyPI packages.
+
+### Source URL
+https://tldr.tech/infosec/2026-05-15

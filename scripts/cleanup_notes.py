@@ -25,9 +25,9 @@ def slugify(title: str) -> str:
 
 def cleanup_notes():
     directories = [
-        ROOT / "data" / "inbox",
-        ROOT / "data" / "knowledge",
-        ROOT / "data" / "private"
+        ROOT / "inbox",
+        ROOT / "knowledge",
+        ROOT / "private"
     ]
     
     modified = False

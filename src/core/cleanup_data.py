@@ -6,7 +6,7 @@ from collections import defaultdict
 from src.core.frontmatter import read_fm
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-knowledge_dir = ROOT / "data" / "knowledge"
+knowledge_dir = ROOT / "knowledge"
 
 def get_frontmatter(path: Path) -> dict:
     try:

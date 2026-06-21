@@ -1,0 +1,29 @@
+# TLDR Marketing — 2026-05-18
+
+Source: https://tldr.tech/marketing/2026-05-18
+
+Consumers want less AI, more human: data from 2.3K social media users + 1.2K marketers (Sponsor) Sprout Social's  2026 Social Media Content Strategy Report  lays out the data from 2.3K consumers and 1.2K marketers so you don't have to feel your way to a content plan. One key takeaway? Next time you post on social, let ChatGPT and Claude sit out the actual content creation. Consumers say brands should  make human-generated content their #1 priority . (You should still use AI to generate audience insights, though!) Read the full report to learn what content to prioritize across major networks, how to strike the right balance between volume and value, and where social investment pays off Get the free report
+
+The Creator Economy's Next Chapter: 7 Lessons from Scalable Summit (7 minute read) Creator marketing now favors storytelling quality over volume. Brands gain more from niche creators with expertise and searchable content than from mass reach. TikTok reports that strong storytelling leads to 23X more views and 70X faster follower growth. ROI is often undercounted since 40% of YouTube views and 30% of clicks occur after 30 days, making short attribution windows misleading.
+
+Lifecycle Signal: The industry is hitting “stack saturation” (3 minute read) Lifecycle marketing is reaching stack saturation, with many discussions focused on turning systems off rather than adding new ones. Win-back flows can harm sender reputation when overused, pushing teams toward shorter re-permissioning windows and suppression lists. Organic social is increasingly used to move users into owned channels like WhatsApp or SMS through direct opt-ins. Transactional emails are often underused as engagement signals.
+
+Less cognitive load, 41% more conversions (2 minute read) Reducing cognitive load on high-stakes purchase pages can increase conversions. A travel marketplace simplified its booking widget, boosting conversions by 41%. User testing showed visitors repeatedly switched between the main content and an expanded itinerary sidebar, which slowed decisions. The redesign used progressive disclosure with accordion sections that revealed details on demand. It also added edit links and inline navigation so the widget guided users through the page instead of competing for attention.
+
+When Gamification Pays Off—and When It Doesn't (10 minute read) Game-based rewards like points and levels drive higher engagement than discounts, especially when users are close to earning them. These rewards interact with value rewards like discounts or credits tied to ads and purchases. Deep flow reduces conversion into value-generating actions. Simultaneous game and value rewards can reduce motivation by resetting progress in both systems. Separating reward timing and linking game mechanics to value-creating actions helps maintain momentum.
+
+Be TLDR's first VP Marketing ($300k-$400k, Fully Remote) TLDR is hiring a VP of Marketing to scale growth, pipeline, and brand across 8M+ subscribers, 13 newsletters, and advertisers like AWS, Google Cloud, Microsoft, and Anthropic.  Apply here .
+
+Optimizing your website for generative AI features on Google Search (8 minute read) Google published a new resource to help SEOs and developers understand how to optimize their content for appearance in generative AI features in Google Search. It includes guidance on valuable content, common AEO/GEO misconceptions, and SEO best practices that remain relevant.
+
+New Edits features (1 minute read) Meta is adding granular controls to the Edits app to improve video quality and platform fit. New transition pacing helps tailor content rhythm. Text and sticker opacity settings offer more control over overlays and calls to action. Support for iOS live photos and 200 sound effects expands what can be created in-app. More templates, preference controls, and AI creative tools are planned next.
+
+AI Connectors Might Put Your Clients at Risk (2 minute read) Meta's AI Connectors let advertisers link Ads Manager to Claude or ChatGPT, but the setup can create unintended risk. Access is granted at the business portfolio level, which includes all connected ad accounts, with no control over individual accounts. This means AI tools may access client accounts not explicitly intended. The only safeguard is relying on instructions within the AI tool, shifting control away from platform settings.
+
+How Mutti turned tinned tomatoes into a status symbol (3 minute read) Premiumization is reshaping even basic pantry items. Mutti has turned tinned tomatoes into a higher-end product. It's set to overtake Napolina in the UK. This is driven by marketing and a rise in home cooking. Consumers are trading up on ingredients and eating out less. Growth faces pressure from energy costs, packaging, and climate risks. These factors are tightening margins across the category.
+
+AI Will Not Make Everyone More Productive (3 minute read) AI doesn't boost productivity evenly. It helps skilled people move faster, but often increases output without increasing value. The real bottleneck is attention and decision quality, not volume. More AI-generated content can shift work onto others and raise coordination costs. Incentives also limit gains since workers may hide efficiency. Small teams benefit faster while large organizations risk scaling noise. The gap will grow between those who reduce work with AI and those who create more of it.
+
+SEO & AI Tip: A single Query Fan-Out misses most of what Google and ChatGPT are actually searching (1 minute read) Instead of running a fan-out query once, run it repeatedly until no new sub-queries appear to get your full topical space.
+
+General Catalyst posted VC rage bait and it worked, especially on a16z (2 minute read) A Mac vs. PC-style marketing parody hit 2.4M views and pulled Andreessen into a multi-post response on X.

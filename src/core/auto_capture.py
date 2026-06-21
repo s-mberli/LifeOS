@@ -86,7 +86,7 @@ def capture_input(text: str, decision: dict = None) -> str:
     # Write to file
     from pathlib import Path
     ROOT = Path(__file__).resolve().parent.parent.parent
-    capture_dir = ROOT / "data" / "private" / "raw-capture" / date_str
+    capture_dir = ROOT / "private" / "raw-capture" / date_str
     capture_dir.mkdir(parents=True, exist_ok=True)
     
     file_path = capture_dir / f"capture-{safe_time}.md"

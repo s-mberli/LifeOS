@@ -634,7 +634,7 @@ def process_one_file(source: str, use_ai: bool = False, status_callback=None, re
     saved_transcript_path = ""
     if is_youtube:
         if transcript:
-            raw_transcript_dir = ROOT / "data" / "knowledge" / "ai-resources" / "raw"
+            raw_transcript_dir = ROOT / "knowledge" / "ai-resources" / "raw"
             transcript_file = save_transcript(transcript, f"{saved_stem}_transcript", raw_transcript_dir)
             saved_transcript_path = str(transcript_file)
             result["transcript_path"] = saved_transcript_path
@@ -702,7 +702,7 @@ def process_one_file(source: str, use_ai: bool = False, status_callback=None, re
         return result
 
     # 11. Move raw file to processed/raw
-    processed_inbox = ROOT / "data" / "inbox" / "processed" / "raw"
+    processed_inbox = ROOT / "inbox" / "processed" / "raw"
     dest = _get_unique_filepath(processed_inbox, filename)
     try:
         shutil.move(str(filepath), str(dest))

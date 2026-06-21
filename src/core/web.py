@@ -148,37 +148,47 @@ def fetch_jina_reader(url: str) -> tuple[str, str]:
 
         return title, content
     except Exception as exc:
-        print(f"  [!] Jina Reader failed for {url}: {exc}")
+        # Silently fail — Playwright is primary fetcher now
         return "", ""
 
 
 def _fetch_webpage_content_bs4(url: str) -> tuple[str, str]:
-    """Fallback scraper using requests and BeautifulSoup4."""
+    """Fetch webpage using Playwright (headless Chromium) — bypasses most bot blocks."""
     try:
-        import requests  # type: ignore
-        from bs4 import BeautifulSoup  # type: ignore
+        from playwright.sync_api import sync_playwright
     except ImportError:
-        print(
-            "  [!] 'requests' or 'beautifulsoup4' not installed. "
-            "Web content extraction unavailable."
-        )
+        print("  [!] playwright not installed. Run: pip install playwright && playwright install chromium")
         return "", ""
 
     try:
-        headers = {"User-Agent": "Mozilla/5.0"}
-        response = requests.get(url, headers=headers, timeout=10)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, "html.parser")
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True, args=['--no-sandbox', '--disable-setuid-sandbox'])
+            context = browser.new_context(
+                user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                viewport={'width': 1280, 'height': 720},
+            )
+            page = context.new_page()
+            page.goto(url, timeout=15000, wait_until='domcontentloaded')
+            page.wait_for_timeout(2000)  # Let JS render
 
-        title = soup.title.string.strip() if soup.title and soup.title.string else ""
+            title = page.title()
 
-        for tag in soup(["script", "style", "nav", "footer", "header"]):
-            tag.decompose()
-        content_text = soup.get_text(separator="\n", strip=True)
+            # Remove junk elements
+            page.evaluate("""() => {
+                for (const el of document.querySelectorAll('script, style, nav, footer, header, aside, .ad, .ads, .cookie, .popup, .modal, [role=banner], [role=complementary]')) {
+                    el.remove();
+                }
+            }""")
 
-        return title, content_text
+            content = page.inner_text('body')
+            browser.close()
+
+            if not content or len(content.strip()) < 100:
+                return "", ""
+
+            return title.strip(), content.strip()
     except Exception as exc:
-        print(f"  [!] Failed to fetch web content from {url} via BeautifulSoup: {exc}")
+        # Silent fail
         return "", ""
 
 
@@ -258,13 +268,17 @@ def fetch_webpage_content(url: str) -> tuple[str, str]:
         if title or content:
             return title, content
 
-    # 2. General web page routing (Jina Reader API)
+    # 2. Try direct fetch first (faster on VPS, works for most sites)
+    title, content = _fetch_webpage_content_bs4(url)
+    if title or content:
+        return title, content
+
+    # 3. Fallback to Jina Reader API
     title, content = fetch_jina_reader(url)
     if title or content:
         return title, content
 
-    # 3. Fallback to BeautifulSoup
-    return _fetch_webpage_content_bs4(url)
+    return "", ""
 
 
 

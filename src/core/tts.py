@@ -29,7 +29,7 @@ def generate_speech(text: str, voice_id: str | None = None) -> bytes:
     voice_id = voice_id or os.getenv("ELEVENLABS_DEFAULT_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")
 
     # Check local cache first
-    cache_dir = ROOT / "data" / "tts_cache"
+    cache_dir = ROOT / "tts_cache"
     cache_key = hashlib.sha256(f"{voice_id}:{text}".encode("utf-8")).hexdigest()
     cache_path = cache_dir / f"{cache_key}.mp3"
 

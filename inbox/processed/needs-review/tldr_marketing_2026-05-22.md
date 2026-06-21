@@ -1,0 +1,118 @@
+---
+actionability: high
+attached_experts: []
+channel_name: ''
+created_at: '2026-06-05T09:18:18.918986+10:00'
+domain: unknown
+expert_status: unattached
+primary_mode: router
+privacy: public
+review_status: new
+secondary_modes: []
+source_type: article
+source_url: https://tldr.tech/marketing/2026-05-22
+status: processed
+suggested_experts: []
+tags: []
+title: Teen media renaissance 📰, fix attribution reporting 📊, 50 design prompts 🎨
+transcript_path: ''
+type: insight_note
+updated_at: '2026-06-05T09:18:18.918986+10:00'
+---
+
+# Teen media renaissance 📰, fix attribution reporting 📊, 50 design prompts 🎨
+
+## Summary
+AI summarization succeeded, but JSON parsing failed.
+
+## AI Raw Output
+```text
+Final synthesis failed.
+```
+
+## Key Ideas
+- Refer to the AI Raw Output above.
+
+## Why this matters for Markus
+- Refer to the AI Raw Output above.
+
+## Related Modes
+- router
+
+## AI Generation Data
+- Provider: Unknown
+- Model: Unknown
+
+## Next Action
+- [ ] Review raw AI output and extract action items manually.
+
+## Source Reliability
+AI summarization was performed but parsing failed.
+
+## Original Content
+### Raw User Input
+https://tldr.tech/marketing/2026-05-22
+
+Reach 7 million engaged tech professionals (Sponsor) Ads get ignored on social media but not in TLDR! Reach developers, PMs, marketers, founders and other tech leaders where they actually pay attention.  Learn more about sponsorship opportunities.
+
+Value creation, bullshit jobs and the future of work (3 minute read) Jobs exist because someone with hiring authority decides the value created exceeds the wages paid, and AI is now shifting that calculus by performing many tasks cheaper and faster than humans. The parallel to the Luddite-era displacement of weavers is instructive, since while handmade clothing became unaffordable, entirely new job categories emerged over time. The key difference now is speed, with workforce transitions that once took decades compressing into months, making resilience and continuous value creation the best strategy for navigating the shift.
+
+The Hunt for Identity and the Teen Media Renaissance (11 minute read) Teen magazines once helped young people explore interests and build identity outside peer pressure and mass audiences. Today, social media compresses identity into trends and comparison while pushing commentary and advertising before firsthand experience. Expression is constantly visible and judged, which limits experimentation and private discovery. Interest in print and offline experiences is rising as alternatives that reduce algorithmic pressure. These spaces are seen as a way to restore independent exploration and healthier identity development.
+
+Direct and organic should not be channels in your attribution reporting (5 minute read) Most attribution reports hide tracking gaps inside direct and organic traffic, which leads marketers to overcredit channels that did not drive discovery. Branded organic search often makes up 70%+ of SEO conversions, so teams should separate recall from acquisition and use tools like Search Console to identify inflated performance. Combine survey data, vanity URLs, landing page rules, and email-based identity stitching to recover attribution signals from channels where UTMs fail or disappear. Exclude noisy touchpoints like brand search and existing user revisits so you can make cleaner budget decisions. A practical benchmark is to investigate attribution quality when direct and referral exceed 10% of conversions or when “other” responses in surveys rise above 10% to 15%.
+
+Your campaign needs more on-ramps (4 minute read) Algorithms have collapsed the linear timeline that traditional campaign rollouts depend on, making it likely that a viewer's first exposure to a campaign could be any post in the sequence. The solution is building "on-ramps" rather than story arcs, where each piece of content works as a standalone entry point that draws people deeper into the campaign. Golf brand Malbon applied this during The Masters by launching a separate account and producing 300 pieces of content, including a 25-episode standalone series, to reach 7M organic views in under a week.
+
+AI Search Readiness Checklist (Sponsor) Most brands still optimize only for Google search results while AI answers reshape how buyers find solutions.  AirOps  and Mike King from iPullRank built a 7-step checklist covering what actually drives LLM retrieval. Includes the full webinar recording and a scorecard you can run today. Get the checklist
+
+50 design prompts from ex-Warner designer (Nano Banana Pro) (7 minute read) A collection of reusable prompts and workflows for creative and design tasks. It organizes ready-to-use materials across categories like branding, illustrations, icons, and mockups.
+
+Supahero (Website) A design inspiration gallery focused on website hero sections and landing page layouts for UI ideas.
+
+SEO & AI Tip: Your webpages can call Chrome's local LLM with one line of JavaScript (2 minute read) Chrome's Prompt API allows webpages and extensions to run Gemini Nano locally with one line of JavaScript without API costs. High-volume workflows can run on the user's machine instead of a paid API. There's also a privacy advantage since sensitive data never has to leave the browser. The strongest use cases are lightweight tasks like rewriting, scoring, and short passage summarization, while long-context and deep reasoning should still use cloud models.
+
+How Access Surface Shapes LLM Search and Citation Behavior (16 minute read) Petra Labs shows GEO research can mislead because outputs vary by access point, so many studies optimize for the wrong reality. Free ChatGPT over-indexes on Reddit while paid ChatGPT leans toward editorial publishers, meaning logged-out findings do not reflect real user experience. Brand visibility also shifts across ChatGPT and API environments, with some brands appearing in conversations but not in API outputs. Logged-in experiences favor earned media, while the API skews toward retail and product pages.
+
+Nourish and the Decade of Consumer Health (11 minute read) Nourish built a fast-growing healthcare business by combining consumer-grade UX, insurance coverage, and measurable health outcomes into one platform. It used telehealth adoption, AI, and the rise of GLP-1 drugs to target chronic disease through nutrition, then proved ROI to payers with results like 8% weight loss and more than $2,000 in annual savings per patient. The company avoided overreliance on DTC by building referrals through 250+ health systems and a 100-person field sales team, which lowered CAC risk and expanded reach. The broader strategy is to evolve from a telenutrition product into an AI-powered metabolic care platform that combines providers, prescriptions, labs, wearables, and coaching into a full-stack healthcare system.
+
+Disguised AI ads outperform human ones (2 minute read) AI-generated ads match human performance overall, but those that look human-made drive the highest click-through rates. When ads are recognized as AI, performance drops, and human ads that look artificial perform the worst. This shows perception matters more than origin. Most people misidentify AI images, often associating polished visuals and prominent faces with human work.
+
+Why Apple Released Behind-The-Scenes Footage for an Ad (2 minute read) Apple's decision signals a broader shift where demonstrating human craftsmanship in creative work becomes a competitive differentiator as AI-generated content proliferates.
+
+B2B buyers trust AI less than marketers think (2 minute read) While nearly half of B2B buyers use generative AI tools to research vendors, more than half have encountered misleading information, and 69% still rely on sales reps to validate what they found.
+
+Chrome's documentation on their new Agentic Browsing audits (1 minute read) Chrome's Lighthouse will check for a machine-readable summary at the domain root, interpreted as llms.txt, as part of evaluating AI readiness.
+
+### Fetched Web Text
+Reach 7 million engaged tech professionals (Sponsor) Ads get ignored on social media but not in TLDR! Reach developers, PMs, marketers, founders and other tech leaders where they actually pay attention.  Learn more about sponsorship opportunities.
+
+Value creation, bullshit jobs and the future of work (3 minute read) Jobs exist because someone with hiring authority decides the value created exceeds the wages paid, and AI is now shifting that calculus by performing many tasks cheaper and faster than humans. The parallel to the Luddite-era displacement of weavers is instructive, since while handmade clothing became unaffordable, entirely new job categories emerged over time. The key difference now is speed, with workforce transitions that once took decades compressing into months, making resilience and continuous value creation the best strategy for navigating the shift.
+
+The Hunt for Identity and the Teen Media Renaissance (11 minute read) Teen magazines once helped young people explore interests and build identity outside peer pressure and mass audiences. Today, social media compresses identity into trends and comparison while pushing commentary and advertising before firsthand experience. Expression is constantly visible and judged, which limits experimentation and private discovery. Interest in print and offline experiences is rising as alternatives that reduce algorithmic pressure. These spaces are seen as a way to restore independent exploration and healthier identity development.
+
+Direct and organic should not be channels in your attribution reporting (5 minute read) Most attribution reports hide tracking gaps inside direct and organic traffic, which leads marketers to overcredit channels that did not drive discovery. Branded organic search often makes up 70%+ of SEO conversions, so teams should separate recall from acquisition and use tools like Search Console to identify inflated performance. Combine survey data, vanity URLs, landing page rules, and email-based identity stitching to recover attribution signals from channels where UTMs fail or disappear. Exclude noisy touchpoints like brand search and existing user revisits so you can make cleaner budget decisions. A practical benchmark is to investigate attribution quality when direct and referral exceed 10% of conversions or when “other” responses in surveys rise above 10% to 15%.
+
+Your campaign needs more on-ramps (4 minute read) Algorithms have collapsed the linear timeline that traditional campaign rollouts depend on, making it likely that a viewer's first exposure to a campaign could be any post in the sequence. The solution is building "on-ramps" rather than story arcs, where each piece of content works as a standalone entry point that draws people deeper into the campaign. Golf brand Malbon applied this during The Masters by launching a separate account and producing 300 pieces of content, including a 25-episode standalone series, to reach 7M organic views in under a week.
+
+AI Search Readiness Checklist (Sponsor) Most brands still optimize only for Google search results while AI answers reshape how buyers find solutions.  AirOps  and Mike King from iPullRank built a 7-step checklist covering what actually drives LLM retrieval. Includes the full webinar recording and a scorecard you can run today. Get the checklist
+
+50 design prompts from ex-Warner designer (Nano Banana Pro) (7 minute read) A collection of reusable prompts and workflows for creative and design tasks. It organizes ready-to-use materials across categories like branding, illustrations, icons, and mockups.
+
+Supahero (Website) A design inspiration gallery focused on website hero sections and landing page layouts for UI ideas.
+
+SEO & AI Tip: Your webpages can call Chrome's local LLM with one line of JavaScript (2 minute read) Chrome's Prompt API allows webpages and extensions to run Gemini Nano locally with one line of JavaScript without API costs. High-volume workflows can run on the user's machine instead of a paid API. There's also a privacy advantage since sensitive data never has to leave the browser. The strongest use cases are lightweight tasks like rewriting, scoring, and short passage summarization, while long-context and deep reasoning should still use cloud models.
+
+How Access Surface Shapes LLM Search and Citation Behavior (16 minute read) Petra Labs shows GEO research can mislead because outputs vary by access point, so many studies optimize for the wrong reality. Free ChatGPT over-indexes on Reddit while paid ChatGPT leans toward editorial publishers, meaning logged-out findings do not reflect real user experience. Brand visibility also shifts across ChatGPT and API environments, with some brands appearing in conversations but not in API outputs. Logged-in experiences favor earned media, while the API skews toward retail and product pages.
+
+Nourish and the Decade of Consumer Health (11 minute read) Nourish built a fast-growing healthcare business by combining consumer-grade UX, insurance coverage, and measurable health outcomes into one platform. It used telehealth adoption, AI, and the rise of GLP-1 drugs to target chronic disease through nutrition, then proved ROI to payers with results like 8% weight loss and more than $2,000 in annual savings per patient. The company avoided overreliance on DTC by building referrals through 250+ health systems and a 100-person field sales team, which lowered CAC risk and expanded reach. The broader strategy is to evolve from a telenutrition product into an AI-powered metabolic care platform that combines providers, prescriptions, labs, wearables, and coaching into a full-stack healthcare system.
+
+Disguised AI ads outperform human ones (2 minute read) AI-generated ads match human performance overall, but those that look human-made drive the highest click-through rates. When ads are recognized as AI, performance drops, and human ads that look artificial perform the worst. This shows perception matters more than origin. Most people misidentify AI images, often associating polished visuals and prominent faces with human work.
+
+Why Apple Released Behind-The-Scenes Footage for an Ad (2 minute read) Apple's decision signals a broader shift where demonstrating human craftsmanship in creative work becomes a competitive differentiator as AI-generated content proliferates.
+
+B2B buyers trust AI less than marketers think (2 minute read) While nearly half of B2B buyers use generative AI tools to research vendors, more than half have encountered misleading information, and 69% still rely on sales reps to validate what they found.
+
+Chrome's documentation on their new Agentic Browsing audits (1 minute read) Chrome's Lighthouse will check for a machine-readable summary at the domain root, interpreted as llms.txt, as part of evaluating AI readiness.
+
+### Source URL
+https://tldr.tech/marketing/2026-05-22

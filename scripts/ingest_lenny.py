@@ -33,9 +33,9 @@ from src.core.db import get_db_connection, init_db
 # ---------------------------------------------------------------------------
 
 REPO_URL = "https://github.com/ChatPRD/lennys-podcast-transcripts.git"
-TRACKING_FILE = ROOT / "data" / "tracking" / "lenny_ingest.json"
-PODCAST_DIR = ROOT / "data" / "knowledge" / "lenny-podcast"
-TOPICS_DIR = ROOT / "data" / "knowledge" / "lenny-topics"
+TRACKING_FILE = ROOT / "tracking" / "lenny_ingest.json"
+PODCAST_DIR = ROOT / "knowledge" / "lenny-podcast"
+TOPICS_DIR = ROOT / "knowledge" / "lenny-topics"
 LOG_FILE = ROOT / "logs" / "lenny_ingest.log"
 DB_PATH = ROOT / "indexes" / "lifeos.db"
 

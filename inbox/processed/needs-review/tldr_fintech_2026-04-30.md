@@ -1,0 +1,119 @@
+---
+actionability: high
+attached_experts: []
+channel_name: ''
+created_at: '2026-06-05T09:43:54.613325+10:00'
+domain: unknown
+expert_status: unattached
+primary_mode: router
+privacy: public
+review_status: new
+secondary_modes: []
+source_type: article
+source_url: https://tldr.tech/fintech/2026-04-30
+status: processed
+suggested_experts: []
+tags: []
+title: Hyperliquid's prediction markets 🪙, Robinhood profit rises 🚀, Mercury secured
+  OCC charter 🤝
+transcript_path: ''
+type: insight_note
+updated_at: '2026-06-05T09:43:54.613325+10:00'
+---
+
+# Hyperliquid's prediction markets 🪙, Robinhood profit rises 🚀, Mercury secured OCC charter 🤝
+
+## Summary
+AI summarization succeeded, but JSON parsing failed.
+
+## AI Raw Output
+```text
+Final synthesis failed.
+```
+
+## Key Ideas
+- Refer to the AI Raw Output above.
+
+## Why this matters for Markus
+- Refer to the AI Raw Output above.
+
+## Related Modes
+- router
+
+## AI Generation Data
+- Provider: Unknown
+- Model: Unknown
+
+## Next Action
+- [ ] Review raw AI output and extract action items manually.
+
+## Source Reliability
+AI summarization was performed but parsing failed.
+
+## Original Content
+### Raw User Input
+https://tldr.tech/fintech/2026-04-30
+
+Your AI Stack Is Spending. Do You Know Where? (Sponsor) AI infrastructure costs are on every board's agenda, but billing data alone can't tell you if your Bedrock models are oversized, your PTUs are wasted, or your GPUs are sitting idle. Join AWS & PointFive on May 12 for a live 30-minute session on what GenAI cost optimization actually looks like in practice. See PointFive's DeepWaste AI detect waste across Bedrock, SageMaker, and Azure OpenAI, plus a real customer story with concrete results. Save your spot.
+
+Mercury nabs conditional OCC charter (2 minute read) Mercury has secured conditional approval from the Office of the Comptroller of the Currency to launch its own national bank, marking a major step toward owning its financial infrastructure. The move allows the startup-focused fintech to expand into lending, payments, and services like Zelle while reducing reliance on partner banks, though it still needs final sign-offs from regulators including the FDIC and Federal Reserve. If completed, the charter positions Mercury to compete more directly with full-stack digital banks, signaling a broader trend of fintechs seeking deeper control over their economics and product stack.
+
+Hyperliquid expands into prediction markets, challenging Kalshi and Polymarket (3 minute read) Hyperliquid is moving into prediction markets, leveraging its high-volume, multi-asset trading platform to compete with incumbents like Kalshi and Polymarket. Its approach integrates event-based contracts alongside crypto, commodities, and equities within a single trading system, offering immediate distribution and portfolio-level strategies. The move highlights growing convergence between derivatives and prediction markets, with competition intensifying across both regulated and decentralized platforms.
+
+Robinhood profit rises on boost from prediction markets, gold subscriptions (4 minute read) Robinhood is seeing stronger financial performance as newer revenue streams like event-based wagering and premium memberships begin to offset weaker trading activity. Subscription revenue from its Gold tier jumped 32% while overall revenue rose 15%, helping cushion declines in crypto trading, which fell sharply year over year. The company's broader push into diversified financial products signals a shift toward a more resilient model, though its reliance on retail engagement still leaves it exposed to market swings.
+
+AI is creating new markets beyond labor replacement narratives (4 minute read) AI should not be valued purely as a substitute for human labor, but as a driver of entirely new markets shaped by lower costs and dramatically higher demand. While AI compresses the price of work, it expands volume through new use cases and always-on availability, often growing total market size beyond both software and labor baselines. The result is a new TAM framework where AI expands economic output rather than simply displacing it.
+
+Stablecoins hit inflection point as Coinbase positions as full-stack payments platform (3 minute read) Stablecoins are scaling rapidly, with over $33 trillion in annual transaction volume and $300 billion in circulation, positioning them as a foundational payment layer for the internet. Coinbase is positioning itself as the full-stack infrastructure provider, combining USDC distribution, its Base network, and developer tools to power global, programmable payments for businesses and AI agents. As AI-driven transactions grow and traditional finance integrates crypto rails, the next phase shifts from adoption to where and how stablecoins are actually used at scale.cfio
+
+Finance foundation models emerge as next battleground for banks and fintechs (4 minute read) Fintechs like Revolut, Nubank, and Mastercard are building domain-specific foundation models trained on massive transaction datasets, delivering major performance gains across credit scoring, fraud detection, and personalization. These models consolidate multiple ML systems into a single architecture and could redefine banking's core competitive advantage: risk and decisioning. As tooling becomes accessible, the challenge shifts from research to execution, with long-term differentiation likely moving beyond models to proprietary data and agentic workflows.
+
+Backbase rolls out AI-native Banking OS for unified frontline operations (5 minute read) Backbase has introduced a new AI-driven platform designed to unify how banks manage customer interactions, internal teams, and automated agents within a single operating environment. The system layers on top of existing infrastructure to coordinate workflows, enforce permissions, and generate real-time insights, targeting the fragmented “in-between” processes that make up most frontline banking work. If it delivers, the approach could significantly reduce operational overhead while enabling banks to scale services without adding headcount.
+
+Visa expands Agentic Ready programme to Asia Pacific and Latin America (5 minute read) Visa announced the expansion of its global Agentic Ready program to clients in Asia Pacific and Latin America. First launched with banks and issuing partners across Europe, including the UK, Agentic Ready is designed to support the payments ecosystem as it prepares for the emergence of agent-led commerce.
+
+Tempo adds subscription billing and reconciliation tools for stablecoin payments (2 minute read) Tempo has introduced new enterprise payment features on its stablecoin-native blockchain, including subscriptions, auto-pay, usage-based billing, and virtual addresses for deposit attribution and reconciliation. These capabilities address key gaps in recurring payments and multi-tenant wallet management, enabling businesses to run full payment workflows onchain with lower operational overhead. The update pushes stablecoins closer to supporting end-to-end enterprise financial operations beyond one-time transfers.
+
+Customers Bank announces strategic collaboration with OpenAI to redefine the commercial banking operating model (4 minute read) Customers Bank is partnering with OpenAI in a multi-year effort to embed advanced AI across its core operations, aiming to transform how a regional bank runs day to day. The initiative focuses on automating workflows in lending, deposits, and payments, with custom-built models trained on internal data and deployed under strict governance standards. If successful, the move could shift bankers away from manual tasks toward client-facing work, offering a glimpse into how mid-sized institutions might compete in an increasingly AI-native financial landscape.
+
+CFOs increase AI spending as gap widens between pilots and scaled adoption (3 minute read) CFOs are increasing AI budgets across the enterprise and within finance, with 83% planning boosts within two years, despite mixed early results. The key differentiator is scale: finance teams that have deployed AI into production report significantly stronger outcomes than those stuck in pilot mode. Speed and faster cycle times are the primary benefits, while the main barriers have shifted from technology to change management, talent, and workflow redesign.
+
+Goldman backs Kashable with $60M to scale employer-based lending (2 minute read) Kashable raised a $60 million Series C led by Goldman Sachs Alternatives, highlighting investor interest in employer-integrated lending models. The company offers lower-cost personal loans and financial wellness tools by leveraging payroll data, which improves underwriting and reduces default risk. With $2 billion in loans issued, profitability, and 40% growth, Kashable's model positions it as a structured alternative to high-interest consumer credit.
+
+Stripe Sessions spotlights AI, stablecoins, and next-gen commerce (2 minute read) Stripe's Internet Economy conference (April 29–30) will focus on how AI, agentic commerce, and crypto are reshaping payments and business models.
+
+TikTok and Visa launch debit card to speed payouts to UK creators (3 minute read) TikTok is rolling out a new financial tool that lets UK livestreamers access their earnings more quickly by linking directly to their creator accounts.
+
+### Fetched Web Text
+Your AI Stack Is Spending. Do You Know Where? (Sponsor) AI infrastructure costs are on every board's agenda, but billing data alone can't tell you if your Bedrock models are oversized, your PTUs are wasted, or your GPUs are sitting idle. Join AWS & PointFive on May 12 for a live 30-minute session on what GenAI cost optimization actually looks like in practice. See PointFive's DeepWaste AI detect waste across Bedrock, SageMaker, and Azure OpenAI, plus a real customer story with concrete results. Save your spot.
+
+Mercury nabs conditional OCC charter (2 minute read) Mercury has secured conditional approval from the Office of the Comptroller of the Currency to launch its own national bank, marking a major step toward owning its financial infrastructure. The move allows the startup-focused fintech to expand into lending, payments, and services like Zelle while reducing reliance on partner banks, though it still needs final sign-offs from regulators including the FDIC and Federal Reserve. If completed, the charter positions Mercury to compete more directly with full-stack digital banks, signaling a broader trend of fintechs seeking deeper control over their economics and product stack.
+
+Hyperliquid expands into prediction markets, challenging Kalshi and Polymarket (3 minute read) Hyperliquid is moving into prediction markets, leveraging its high-volume, multi-asset trading platform to compete with incumbents like Kalshi and Polymarket. Its approach integrates event-based contracts alongside crypto, commodities, and equities within a single trading system, offering immediate distribution and portfolio-level strategies. The move highlights growing convergence between derivatives and prediction markets, with competition intensifying across both regulated and decentralized platforms.
+
+Robinhood profit rises on boost from prediction markets, gold subscriptions (4 minute read) Robinhood is seeing stronger financial performance as newer revenue streams like event-based wagering and premium memberships begin to offset weaker trading activity. Subscription revenue from its Gold tier jumped 32% while overall revenue rose 15%, helping cushion declines in crypto trading, which fell sharply year over year. The company's broader push into diversified financial products signals a shift toward a more resilient model, though its reliance on retail engagement still leaves it exposed to market swings.
+
+AI is creating new markets beyond labor replacement narratives (4 minute read) AI should not be valued purely as a substitute for human labor, but as a driver of entirely new markets shaped by lower costs and dramatically higher demand. While AI compresses the price of work, it expands volume through new use cases and always-on availability, often growing total market size beyond both software and labor baselines. The result is a new TAM framework where AI expands economic output rather than simply displacing it.
+
+Stablecoins hit inflection point as Coinbase positions as full-stack payments platform (3 minute read) Stablecoins are scaling rapidly, with over $33 trillion in annual transaction volume and $300 billion in circulation, positioning them as a foundational payment layer for the internet. Coinbase is positioning itself as the full-stack infrastructure provider, combining USDC distribution, its Base network, and developer tools to power global, programmable payments for businesses and AI agents. As AI-driven transactions grow and traditional finance integrates crypto rails, the next phase shifts from adoption to where and how stablecoins are actually used at scale.cfio
+
+Finance foundation models emerge as next battleground for banks and fintechs (4 minute read) Fintechs like Revolut, Nubank, and Mastercard are building domain-specific foundation models trained on massive transaction datasets, delivering major performance gains across credit scoring, fraud detection, and personalization. These models consolidate multiple ML systems into a single architecture and could redefine banking's core competitive advantage: risk and decisioning. As tooling becomes accessible, the challenge shifts from research to execution, with long-term differentiation likely moving beyond models to proprietary data and agentic workflows.
+
+Backbase rolls out AI-native Banking OS for unified frontline operations (5 minute read) Backbase has introduced a new AI-driven platform designed to unify how banks manage customer interactions, internal teams, and automated agents within a single operating environment. The system layers on top of existing infrastructure to coordinate workflows, enforce permissions, and generate real-time insights, targeting the fragmented “in-between” processes that make up most frontline banking work. If it delivers, the approach could significantly reduce operational overhead while enabling banks to scale services without adding headcount.
+
+Visa expands Agentic Ready programme to Asia Pacific and Latin America (5 minute read) Visa announced the expansion of its global Agentic Ready program to clients in Asia Pacific and Latin America. First launched with banks and issuing partners across Europe, including the UK, Agentic Ready is designed to support the payments ecosystem as it prepares for the emergence of agent-led commerce.
+
+Tempo adds subscription billing and reconciliation tools for stablecoin payments (2 minute read) Tempo has introduced new enterprise payment features on its stablecoin-native blockchain, including subscriptions, auto-pay, usage-based billing, and virtual addresses for deposit attribution and reconciliation. These capabilities address key gaps in recurring payments and multi-tenant wallet management, enabling businesses to run full payment workflows onchain with lower operational overhead. The update pushes stablecoins closer to supporting end-to-end enterprise financial operations beyond one-time transfers.
+
+Customers Bank announces strategic collaboration with OpenAI to redefine the commercial banking operating model (4 minute read) Customers Bank is partnering with OpenAI in a multi-year effort to embed advanced AI across its core operations, aiming to transform how a regional bank runs day to day. The initiative focuses on automating workflows in lending, deposits, and payments, with custom-built models trained on internal data and deployed under strict governance standards. If successful, the move could shift bankers away from manual tasks toward client-facing work, offering a glimpse into how mid-sized institutions might compete in an increasingly AI-native financial landscape.
+
+CFOs increase AI spending as gap widens between pilots and scaled adoption (3 minute read) CFOs are increasing AI budgets across the enterprise and within finance, with 83% planning boosts within two years, despite mixed early results. The key differentiator is scale: finance teams that have deployed AI into production report significantly stronger outcomes than those stuck in pilot mode. Speed and faster cycle times are the primary benefits, while the main barriers have shifted from technology to change management, talent, and workflow redesign.
+
+Goldman backs Kashable with $60M to scale employer-based lending (2 minute read) Kashable raised a $60 million Series C led by Goldman Sachs Alternatives, highlighting investor interest in employer-integrated lending models. The company offers lower-cost personal loans and financial wellness tools by leveraging payroll data, which improves underwriting and reduces default risk. With $2 billion in loans issued, profitability, and 40% growth, Kashable's model positions it as a structured alternative to high-interest consumer credit.
+
+Stripe Sessions spotlights AI, stablecoins, and next-gen commerce (2 minute read) Stripe's Internet Economy conference (April 29–30) will focus on how AI, agentic commerce, and crypto are reshaping payments and business models.
+
+TikTok and Visa launch debit card to speed payouts to UK creators (3 minute read) TikTok is rolling out a new financial tool that lets UK livestreamers access their earnings more quickly by linking directly to their creator accounts.
+
+### Source URL
+https://tldr.tech/fintech/2026-04-30

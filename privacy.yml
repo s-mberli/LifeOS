@@ -1,0 +1,8 @@
+privacy_level: strict
+
+rules:
+  - Do not upload files from the `data/private` directory to external non-secure APIs.
+  - Local models or highly secure APIs preferred for Life Kompass data.
+  - Always ask for human approval before publishing anything to social media or sending emails.
+  - Ask before making paid API calls above a certain threshold.
+  - Do not silently overwrite user-layer markdown files; always append or propose changes.

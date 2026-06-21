@@ -88,7 +88,7 @@ def get_existing_experts(root: Path) -> list[dict]:
     Returns:
         List of dicts with keys ``slug``, ``display_name``, and ``path``.
     """
-    experts_dir = root / "data" / "experts"
+    experts_dir = root / "experts"
     if not experts_dir.is_dir():
         return []
 
@@ -145,7 +145,7 @@ def assign_insight_to_expert(
     from src.core.frontmatter import read_fm, write_fm, update_fm  # type: ignore
 
     try:
-        expert_dir = ROOT / "data" / "experts" / expert_slug
+        expert_dir = ROOT / "experts" / expert_slug
         sources_dir = expert_dir / "sources"
         profile_path = expert_dir / "profile.md"
 
@@ -404,7 +404,7 @@ def generate_expert_update_suggestion(expert_slug: str, root: Path) -> dict:
     """
     from src.core.frontmatter import read_fm  # type: ignore
 
-    expert_dir = root / "data" / "experts" / expert_slug
+    expert_dir = root / "experts" / expert_slug
     sources_dir = expert_dir / "sources"
     outputs_dir = root / "outputs" / "expert-updates"
     outputs_dir.mkdir(parents=True, exist_ok=True)
@@ -560,7 +560,7 @@ def create_empty_expert(expert_name: str) -> dict:
     """
     try:
         expert_slug = slugify_expert_name(expert_name)
-        expert_dir = ROOT / "data" / "experts" / expert_slug
+        expert_dir = ROOT / "experts" / expert_slug
         sources_dir = expert_dir / "sources"
         profile_path = expert_dir / "profile.md"
 
@@ -665,7 +665,7 @@ def _suggest_experts_for_domain(
     Returns:
         List of up to three expert slug strings.
     """
-    experts_dir = root / "data" / "experts"
+    experts_dir = root / "experts"
     if not experts_dir.is_dir():
         return []
 

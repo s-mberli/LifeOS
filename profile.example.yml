@@ -1,0 +1,28 @@
+# LifeOS User Profile — Example Configuration
+# -----------------------------------------------
+# Copy this file to config/profile.yml and fill in your real details.
+# config/profile.yml is ignored by .gitignore — it will NOT be committed.
+
+name: YourName
+role: Your Role (e.g., AI Systems Builder & Wellness Entrepreneur)
+
+core_domains:
+  - id: ai-platform
+    name: AI Brain & Projects
+    focus: [Agent architecture, workflows, portfolio projects, open-source tools]
+  - id: flow-temple
+    name: Your Business Name
+    focus: [Your business focus areas, e.g., TCM, Yoga, E-commerce]
+  - id: career
+    name: Career Brand
+    focus: [Your positioning, e.g., LinkedIn, CV, consulting]
+  - id: life-kompass
+    name: Life Kompass
+    focus: [Reducing idea overload, daily focus, routines]
+
+preferences:
+  communication_style: direct, structured, action-oriented
+  output_requirements:
+    - Always provide ONE clear next action
+    - No generic corporate speak
+    - Show routing logic explicitly

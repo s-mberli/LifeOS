@@ -13,11 +13,16 @@ import requests
 import os
 from pathlib import Path
 
-# Load environment variables
+# Load environment variables — LifeOS .env first, then Hermes .env as fallback
 try:
     from dotenv import load_dotenv
     ROOT = Path(__file__).resolve().parent.parent.parent
+    # Load LifeOS .env (overrides)
     load_dotenv(ROOT / ".env", override=True)
+    # Load Hermes .env as fallback (doesn't override existing)
+    hermes_env = Path("/root/.hermes/.env")
+    if hermes_env.exists():
+        load_dotenv(hermes_env, override=False)
 except ImportError:
     pass
 
@@ -101,6 +106,32 @@ def call_gemini(messages: list, max_tokens: int, temperature: float):
     }
     return content, model, std_usage
 
+def call_deepseek(messages: list, max_tokens: int, temperature: float):
+    """Call DeepSeek official API."""
+    api_key = os.environ.get("DEEPSEEK_API_KEY")
+    if not api_key:
+        raise ValueError("DEEPSEEK_API_KEY not set")
+    model = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
+
+    payload = {
+        "model": model,
+        "messages": messages,
+        "max_tokens": max_tokens,
+        "temperature": temperature,
+    }
+    base_url = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1")
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+    resp = requests.post(f"{base_url}/chat/completions", json=payload, headers=headers, timeout=60)
+    resp.raise_for_status()
+    res_body = resp.json()
+    content = res_body["choices"][0]["message"]["content"]
+    usage = res_body.get("usage", {})
+    return content, model, usage
+
+
 def call_azure(messages: list, max_tokens: int, temperature: float):
     api_key = os.environ.get("AZURE_OPENAI_API_KEY")
     endpoint = os.environ.get("AZURE_OPENAI_ENDPOINT")
@@ -167,6 +198,8 @@ def try_providers(system_prompt: str, user_prompt: str, max_tokens: int, tempera
         try:
             if provider == "openrouter":
                 content, model_str, usage = call_openrouter(messages, max_tokens, temperature)
+            elif provider == "deepseek":
+                content, model_str, usage = call_deepseek(messages, max_tokens, temperature)
             elif provider == "gemini":
                 content, model_str, usage = call_gemini(messages, max_tokens, temperature)
             elif provider == "azure":

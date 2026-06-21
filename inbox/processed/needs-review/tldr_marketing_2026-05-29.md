@@ -1,0 +1,110 @@
+---
+actionability: high
+attached_experts: []
+channel_name: ''
+created_at: '2026-06-05T09:15:18.907991+10:00'
+domain: unknown
+expert_status: unattached
+primary_mode: router
+privacy: public
+review_status: new
+secondary_modes: []
+source_type: article
+source_url: https://tldr.tech/marketing/2026-05-29
+status: processed
+suggested_experts: []
+tags: []
+title: A doom-free social algo ☺️, TikTok visibility tip 📈, mystery marketing 🔮
+transcript_path: ''
+type: insight_note
+updated_at: '2026-06-05T09:15:18.907991+10:00'
+---
+
+# A doom-free social algo ☺️, TikTok visibility tip 📈, mystery marketing 🔮
+
+## Summary
+AI summarization succeeded, but JSON parsing failed.
+
+## AI Raw Output
+```text
+Final synthesis failed.
+```
+
+## Key Ideas
+- Refer to the AI Raw Output above.
+
+## Why this matters for Markus
+- Refer to the AI Raw Output above.
+
+## Related Modes
+- router
+
+## AI Generation Data
+- Provider: Unknown
+- Model: Unknown
+
+## Next Action
+- [ ] Review raw AI output and extract action items manually.
+
+## Source Reliability
+AI summarization was performed but parsing failed.
+
+## Original Content
+### Raw User Input
+https://tldr.tech/marketing/2026-05-29
+
+Can We Take the Doom Out of Scrolling? (5 minute read) Researchers at Kellogg tested an alternative social media algorithm on 2,000 Bluesky users around the 2024 US election and found it reduced toxic and politically extreme content without moderating any specific posts. The algorithm worked by simply limiting the outsized influence of a small number of highly engaged accounts, making feeds more representative of the broader conversation on the platform. Users on engagement-based feeds saw 57.3% more political posts after the election compared to those on chronological feeds, and they significantly overestimated partisan animosity in their networks. Participants using the alternative algorithm reported enjoying the platform more, challenging the industry assumption that engagement-driven content is necessary to retain users.
+
+Americans Are About to Pay Even More at the Grocery Store (4 minute read) US grocery prices are rising again as food inflation runs above average. Costs are being pushed up by extreme weather, tariffs, a shrinking US cattle herd that sent beef to record highs, and supply disruptions that also lifted items like tomatoes by 33% in recent months. The outlook will worsen into 2027 as drought spreads across major crop regions, fertilizer prices are up 20% since the Iran war, and a likely El Niño threatens global harvests. With wages softening, savings falling, and household debt rising, grocery bills are set to keep outpacing incomes.
+
+Building an AI-Native Paid Ads System (5 minute read) A guide to combining media buying, creative testing, reporting, and competitive research into a single workflow inside Claude. The strategy centers on connecting live Meta ad data, automated competitor monitoring, and AI-generated creative so you can audit accounts, spot fatigue, and launch new tests without switching tools. The biggest advantage comes from systemizing context through brand-specific Claude skills, shared GitHub learnings, and scheduled research tasks so every campaign builds on past performance instead of starting from scratch. It also allows for faster creative iteration since teams can generate and refine new ad concepts in seconds, then tie those outputs directly to live campaign dashboards and performance data.
+
+Update TikTok video keywords after posting (1 minute read) A drop in TikTok views can happen when the algorithm lacks enough signals to categorize a video. TikTok now allows keywords to be added after posting, offering a cleaner way to guide distribution without forcing SEO into captions or visuals. Updating keywords helps the algorithm better understand content, and in some cases, has revived videos that previously had little reach.
+
+Be TLDR's first VP Marketing ($300k-$400k, Fully Remote) TLDR is hiring a VP of Marketing to scale growth, pipeline, and brand across 8M+ subscribers, 13 newsletters, and advertisers like AWS, Google Cloud, Microsoft, and Anthropic.  Apply here .
+
+Should You Run Marketing Like a Product Team (51 minute podcast) This podcast episode explains why marketing teams often slow down as they grow. It could be driven by context switching, scattered priorities, or constant incoming requests. It lays out a product-style operating system using 2-week sprints, a prioritized backlog, and lightweight intake rules to keep work focused and moving. It also covers ways to push back on random requests and use standups and reviews to improve visibility across the company.
+
+Ahrefs AI Search Benchmark Report (4 minute read) The Ahrefs AI Search Benchmark Report analyzes 100M+ data points across AI Overviews, AI Mode, and ChatGPT. It covers AI citations, visibility signals, user traffic behavior, and more. The research finds that YouTube mentions correlated most strongly with AI visibility, and Google sends 190x more traffic than ChatGPT.
+
+Yelp is the Top Source for AI Local Search (6 minute read) AI platforms overwhelmingly rely on Yelp when answering local business queries, citing it 3.4 times more than the next closest competitor across four major AI models, according to an analysis of 28 million responses in Q4 2025. Yelp captured 72.5% of all local discovery citations on Google AI Mode and held a 62.1% share on Perplexity. Nearly all citations stemmed from category-level queries like "best cleaning service near me" rather than brand searches.
+
+How Crocs Turned 'Ugly' Into Cultural Cool ft. CMO Terence Reilly (4 minute read) Crocs CMO Terence Reilly leaned into the brand's reputation as "ugly" footwear, reframing widespread ridicule as proof of awareness that could be converted into cultural relevance. He credits frontline employees for some of the brand's biggest moves, including the Post Malone partnership, which started when an intern flagged a photo of the artist wearing Crocs. Reilly pushes teams to take risks by publicly celebrating both wins and failures, arguing that most organizations talk about failing fast but structurally punish it. His track record includes a similar turnaround at Stanley, where a single TikTok-driven campaign generated $50 million in revenue and 100 million views.
+
+Mystery is the best marketing (7 minute read) Mystery is driving modern cultural breakout. The strongest campaigns leave gaps that audiences fill with theories, edits, and lore. Backrooms shows how unfinished narratives become shared worlds where the story expands through community participation. Breakthrough now comes from participation, not reach. People want to feel early, decode meaning, and share discoveries before they fully spread. The more brands hold back and trust audiences to connect the dots, the more culture forms around them.
+
+Google launches Real-Time Policy Reviews for faster ad approvals (1 minute read) The new feature gives advertisers instant policy feedback while building ads, replacing the traditional post-submission review queue that often delays campaign launches.
+
+10 ways to write a great headline (1 minute read) Great copy starts with a clear message, then uses simple literary devices to make it stick.
+
+Pinterest Summer 2026 Trend Report (6 minute read) People are drawing on the visual codes of sport, from team colors and bold graphics to performance details.
+
+### Fetched Web Text
+Can We Take the Doom Out of Scrolling? (5 minute read) Researchers at Kellogg tested an alternative social media algorithm on 2,000 Bluesky users around the 2024 US election and found it reduced toxic and politically extreme content without moderating any specific posts. The algorithm worked by simply limiting the outsized influence of a small number of highly engaged accounts, making feeds more representative of the broader conversation on the platform. Users on engagement-based feeds saw 57.3% more political posts after the election compared to those on chronological feeds, and they significantly overestimated partisan animosity in their networks. Participants using the alternative algorithm reported enjoying the platform more, challenging the industry assumption that engagement-driven content is necessary to retain users.
+
+Americans Are About to Pay Even More at the Grocery Store (4 minute read) US grocery prices are rising again as food inflation runs above average. Costs are being pushed up by extreme weather, tariffs, a shrinking US cattle herd that sent beef to record highs, and supply disruptions that also lifted items like tomatoes by 33% in recent months. The outlook will worsen into 2027 as drought spreads across major crop regions, fertilizer prices are up 20% since the Iran war, and a likely El Niño threatens global harvests. With wages softening, savings falling, and household debt rising, grocery bills are set to keep outpacing incomes.
+
+Building an AI-Native Paid Ads System (5 minute read) A guide to combining media buying, creative testing, reporting, and competitive research into a single workflow inside Claude. The strategy centers on connecting live Meta ad data, automated competitor monitoring, and AI-generated creative so you can audit accounts, spot fatigue, and launch new tests without switching tools. The biggest advantage comes from systemizing context through brand-specific Claude skills, shared GitHub learnings, and scheduled research tasks so every campaign builds on past performance instead of starting from scratch. It also allows for faster creative iteration since teams can generate and refine new ad concepts in seconds, then tie those outputs directly to live campaign dashboards and performance data.
+
+Update TikTok video keywords after posting (1 minute read) A drop in TikTok views can happen when the algorithm lacks enough signals to categorize a video. TikTok now allows keywords to be added after posting, offering a cleaner way to guide distribution without forcing SEO into captions or visuals. Updating keywords helps the algorithm better understand content, and in some cases, has revived videos that previously had little reach.
+
+Be TLDR's first VP Marketing ($300k-$400k, Fully Remote) TLDR is hiring a VP of Marketing to scale growth, pipeline, and brand across 8M+ subscribers, 13 newsletters, and advertisers like AWS, Google Cloud, Microsoft, and Anthropic.  Apply here .
+
+Should You Run Marketing Like a Product Team (51 minute podcast) This podcast episode explains why marketing teams often slow down as they grow. It could be driven by context switching, scattered priorities, or constant incoming requests. It lays out a product-style operating system using 2-week sprints, a prioritized backlog, and lightweight intake rules to keep work focused and moving. It also covers ways to push back on random requests and use standups and reviews to improve visibility across the company.
+
+Ahrefs AI Search Benchmark Report (4 minute read) The Ahrefs AI Search Benchmark Report analyzes 100M+ data points across AI Overviews, AI Mode, and ChatGPT. It covers AI citations, visibility signals, user traffic behavior, and more. The research finds that YouTube mentions correlated most strongly with AI visibility, and Google sends 190x more traffic than ChatGPT.
+
+Yelp is the Top Source for AI Local Search (6 minute read) AI platforms overwhelmingly rely on Yelp when answering local business queries, citing it 3.4 times more than the next closest competitor across four major AI models, according to an analysis of 28 million responses in Q4 2025. Yelp captured 72.5% of all local discovery citations on Google AI Mode and held a 62.1% share on Perplexity. Nearly all citations stemmed from category-level queries like "best cleaning service near me" rather than brand searches.
+
+How Crocs Turned 'Ugly' Into Cultural Cool ft. CMO Terence Reilly (4 minute read) Crocs CMO Terence Reilly leaned into the brand's reputation as "ugly" footwear, reframing widespread ridicule as proof of awareness that could be converted into cultural relevance. He credits frontline employees for some of the brand's biggest moves, including the Post Malone partnership, which started when an intern flagged a photo of the artist wearing Crocs. Reilly pushes teams to take risks by publicly celebrating both wins and failures, arguing that most organizations talk about failing fast but structurally punish it. His track record includes a similar turnaround at Stanley, where a single TikTok-driven campaign generated $50 million in revenue and 100 million views.
+
+Mystery is the best marketing (7 minute read) Mystery is driving modern cultural breakout. The strongest campaigns leave gaps that audiences fill with theories, edits, and lore. Backrooms shows how unfinished narratives become shared worlds where the story expands through community participation. Breakthrough now comes from participation, not reach. People want to feel early, decode meaning, and share discoveries before they fully spread. The more brands hold back and trust audiences to connect the dots, the more culture forms around them.
+
+Google launches Real-Time Policy Reviews for faster ad approvals (1 minute read) The new feature gives advertisers instant policy feedback while building ads, replacing the traditional post-submission review queue that often delays campaign launches.
+
+10 ways to write a great headline (1 minute read) Great copy starts with a clear message, then uses simple literary devices to make it stick.
+
+Pinterest Summer 2026 Trend Report (6 minute read) People are drawing on the visual codes of sport, from team colors and bold graphics to performance details.
+
+### Source URL
+https://tldr.tech/marketing/2026-05-29

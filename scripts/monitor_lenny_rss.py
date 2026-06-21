@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 RSS_URL = "https://www.lennysnewsletter.com/feed"
-TRACKING_FILE = ROOT / "data" / "tracking" / "lenny_ingest.json"
+TRACKING_FILE = ROOT / "tracking" / "lenny_ingest.json"
 LOG_FILE = ROOT / "logs" / "lenny_rss.log"
 INGEST_SCRIPT = ROOT / "scripts" / "ingest_lenny.py"
 

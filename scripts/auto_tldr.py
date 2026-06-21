@@ -62,8 +62,8 @@ TLDR_TOPICS: dict[str, str] = {
     "hardware":  "Hardware",
 }
 
-TRACKING_FILE: Path = ROOT / "data" / "tracking" / "tldr_ingest.json"
-NEWS_DIR: Path = ROOT / "data" / "knowledge" / "news"
+TRACKING_FILE: Path = ROOT / "tracking" / "tldr_ingest.json"
+NEWS_DIR: Path = ROOT / "knowledge" / "news"
 LOG_FILE: Path = ROOT / "logs" / "tldr_ingest.log"
 
 ARCHIVE_URL_TEMPLATE = "https://tldr.tech/{slug}/archives"

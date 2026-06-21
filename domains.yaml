@@ -1,0 +1,76 @@
+# LifeOS Domain Classification Config
+# Maps keywords to experts and storage locations.
+domains:
+  ai-platform:
+    primary_mode: research-resource
+    storage_location: data/knowledge/ai-resources/
+    privacy: public
+    secondary_modes: [ai-builder]
+    keywords: [ai, agent, rag, openrouter, azure, gemini, llm, python, vector, embedding, mcp, deepseek, claude, model, openai]
+    
+  flow-temple:
+    primary_mode: flow-temple-operator
+    storage_location: data/business/flow-temple/
+    privacy: public
+    secondary_modes: [moxsensei-operator, content-planner]
+    keywords: [moxa, moxibustion, tcm, acupuncture, massage, sound healing, rednote, xiaohongshu]
+
+  career:
+    primary_mode: career-brand
+    storage_location: data/career/
+    privacy: public
+    keywords: [linkedin, cv, resume, job, portfolio, interview, business analyst]
+
+  creator-wisdom:
+    primary_mode: creator-wisdom
+    storage_location: data/knowledge/insights/
+    privacy: public
+    keywords: [youtube creator, channel, transcript, creator profile]
+
+  life-kompass:
+    primary_mode: life-kompass
+    storage_location: data/private/reflections/
+    privacy: private
+    keywords: [routine, reflection, decision, focus, weekly review, thought, emotion, family, relationship, money feelings, finance feelings, memory, memories, worry, feeling, anxiety, anxious]
+    sub_categories:
+      family:
+        path: data/private/family/
+        keywords: [family, parent, mom, dad, brother, sister, sibling]
+      relationships:
+        path: data/private/relationships/
+        keywords: [relationship, partner, friend, dating, spouse, marriage]
+      finance-feelings:
+        path: data/private/finance-feelings/
+        keywords: [money feelings, finance feelings, money anxiety, wealth feelings, money, finance, budget, spending, cost]
+      emotions:
+        path: data/private/emotions/
+        keywords: [emotion, anxious, anxiety, feeling, mood, depressed, happy, sad, fear, anger]
+      memories:
+        path: data/private/memories/
+        keywords: [memory, memories, remember, childhood, past]
+
+  body-practice:
+    primary_mode: body-practice
+    storage_location: data/private/body/
+    privacy: private
+    keywords: [gym, cut, cutting, fat loss, weight loss, calories, protein, workout, strength, calisthenics, overcoming gravity, crow pose, crane pose, handstand, ashtanga, mobility, wrists, recovery, yoga skill, body practice, training, planche, front lever, muscle-up, l-sit, deload, prehab, nutrition, deficit, body weight, pull-up, push-up, squat, deadlift]
+    sub_categories:
+      skills:
+        path: data/private/body/skills/
+        keywords: [skill, crow, crane, handstand, planche, front lever, muscle-up, l-sit, progression]
+      nutrition:
+        path: data/private/body/nutrition/
+        keywords: [nutrition, calories, protein, deficit, cut, cutting, fat loss, weight loss]
+      recovery:
+        path: data/private/body/recovery/
+        keywords: [recovery, deload, rest, prehab, injury, wrists, shoulder, sleep]
+      training-log:
+        path: data/private/body/training-log/
+        keywords: [gym, workout, training, strength]
+
+  tldr:
+    primary_mode: research-resource
+    storage_location: data/knowledge/news/
+    privacy: public
+    keywords: [tldr, newsletter, archives, tldr-]
+

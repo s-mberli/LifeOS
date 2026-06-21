@@ -37,7 +37,7 @@ def sync_outbox():
         for row in cursor.fetchall() if row[0]
     }
 
-    podcast_dir = ROOT / "data" / "knowledge" / "lenny-podcast"
+    podcast_dir = ROOT / "knowledge" / "lenny-podcast"
     if not podcast_dir.exists():
         print(f"Podcast directory {podcast_dir} does not exist. Skipping.")
         conn.close()

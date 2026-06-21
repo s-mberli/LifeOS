@@ -37,7 +37,7 @@ def append_to_daily_chat_log(
         date_str = now.strftime("%Y-%m-%d")
         time_str = now.strftime("%H:%M:%S")
 
-        log_dir = ROOT / "data" / "private" / "chat-logs"
+        log_dir = ROOT / "private" / "chat-logs"
         log_dir.mkdir(parents=True, exist_ok=True)
         log_file = log_dir / f"chat-{date_str}.md"
 
@@ -107,7 +107,7 @@ def save_message_as_insight(
         safe_title = re.sub(r"-+", "-", safe_title).strip("-")
         filename = f"chat-insight-{date_str}-{safe_title[:30]}.md"
 
-        insights_dir = ROOT / "data" / "knowledge" / "chat-insights"
+        insights_dir = ROOT / "knowledge" / "chat-insights"
         insights_dir.mkdir(parents=True, exist_ok=True)
 
         out_filepath = insights_dir / filename
