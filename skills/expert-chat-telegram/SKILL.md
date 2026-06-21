@@ -53,6 +53,20 @@ cd /root/markusos && .venv/bin/python scripts/expert_chat.py list
 
 When in expert mode, prepend responses with a subtle indicator like `🎭 **David Deida**` so the user knows which expert is active. Then respond in the expert's voice using their principles and playbook.
 
+### ⚠️ Message Length Limit
+
+Telegram truncates messages at ~4096 characters. **Never exceed ~3500 characters per response.** If the answer needs more space, split into numbered parts:
+
+```
+🎭 **Lenny** (1/2)
+[first part of answer]
+
+🎭 **Lenny** (2/2)
+[second part of answer]
+```
+
+Prefer concise, punchy responses. If a full playbook dump is needed, summarize the key points and offer to go deeper on specific items.
+
 ## State Management
 
 Read/write the state file on every message:
