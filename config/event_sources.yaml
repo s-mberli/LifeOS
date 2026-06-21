@@ -1,0 +1,121 @@
+# config/event_sources.yaml
+# ============================================
+# Event Tracker Configuration
+# ============================================
+# Define what to search for and where.
+# Add/remove sources and categories freely.
+
+location:
+  city: "Sydney"
+  region: "NSW"
+  country: "AU"
+  # Search radius in km (used by sources that support it)
+  radius_km: 30
+  # Specific areas to include
+  areas:
+    - "Epping"
+    - "Sydney"
+    - "Parramatta"
+    - "North Sydney"
+    - "Chatswood"
+    - "Hornsby"
+
+# How many days ahead to look
+days_ahead: 14
+
+# Categories to track (used as keywords per source)
+categories:
+  dance:
+    keywords:
+      - "dance"
+      - "salsa"
+      - "bachata"
+      - "tango"
+      - "swing"
+      - "ballet"
+      - "contemporary dance"
+      - "hip hop dance"
+      - "dance class"
+      - "dance workshop"
+      - "social dance"
+      - "latin dance"
+  yoga:
+    keywords:
+      - "yoga"
+      - "vinyasa"
+      - "hatha"
+      - "ashtanga"
+      - "yin yoga"
+      - "hot yoga"
+      - "yoga class"
+      - "yoga workshop"
+      - "meditation"
+      - "mindfulness"
+  wellness:
+    keywords:
+      - "wellness"
+      - "breathwork"
+      - "sound healing"
+      - "sound bath"
+      - "reiki"
+      - "tai chi"
+      - "qigong"
+      - "pilates"
+      - "stretching"
+      - "mobility"
+      - "workshop"
+      - "retreat"
+  music:
+    keywords:
+      - "live music"
+      - "concert"
+      - "gig"
+      - "jam session"
+      - "open mic"
+      - "DJ night"
+      - "electronic music"
+      - "band"
+
+# Sources to check
+sources:
+  eventbrite:
+    enabled: true
+    # Free API key from https://www.eventbrite.com/platform/api/
+    api_key: "${EVENTBRITE_API_KEY}"
+    # Categories map to Eventbrite category IDs
+    # 107 = Health & Wellness, 108 = Sports & Fitness, 103 = Music, 104 = Film & Media
+    category_ids:
+      - "107"
+      - "108"
+      - "103"
+
+  meetup:
+    enabled: true
+    # No API key needed — we scrape the public search page
+    # Meetup GraphQL API requires auth, so we use web scraping
+
+  humanitix:
+    enabled: true
+    # No API — scrape the public event listings
+    base_url: "https://humanitix.com/au"
+
+  facebook:
+    enabled: true
+    # Uses facebook-event-scraper (Node.js) via subprocess
+    # Install: npm install -g facebook-event-scraper
+    # Provide Facebook group/page URLs to monitor
+    pages:
+      # Add Facebook event page URLs here
+      # Example: "https://www.facebook.com/groups/sydneydance/"
+      []
+
+# Delivery
+delivery:
+  telegram:
+    enabled: true
+    # Cron schedule (when to run)
+    cron: "0 8 * * *"  # Daily at 8am
+    # Max events to show per category in digest
+    max_per_category: 5
+    # Only show events within this many days
+    max_days_ahead: 14
