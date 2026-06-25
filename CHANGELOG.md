@@ -1,5 +1,9 @@
 # Changelog
 
+## [2026-06-25]
+### Added
+- New feature implemented from Hermes proposal.
+
 ## [2026-06-20]
 ### Added
 - **Unified Memory Core (sqlite-vec + FTS5 RRF hybrid RAG):** Re-architected storage and retrieval layer for scale. Added dynamic loading of `sqlite-vec` extension and schema definitions for vector/chunk mapping (`vec_docs` and `doc_chunks` tables). Implemented hybrid search combining FTS5 keyword and sqlite-vec KNN queries with Reciprocal Rank Fusion (RRF). Added OpenRouter-based embedding generation (`nomic-embed-text-v1.5`) and LLM context briefing synthesis. Removed redundant threaded re-indexing in `triage_outbox.py`.
