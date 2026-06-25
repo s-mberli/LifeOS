@@ -2,7 +2,8 @@
 
 ## [2026-06-25]
 ### Added
-- New feature implemented from Hermes proposal.
+- **TicNote Manual Inbox Processing**: Implemented robust manual file drop workflow to process exported transcripts from `data/inbox/ticnote/`. The script `scripts/process_ticnote_inbox.py` extracts project structure, runs LLM synthesis/insights generation (or parses pre-generated JSON), archives raw transcripts to `data/knowledge/ticnote/<project>/raw/`, writes distilled insights, and triggers FTS index rebuild.
+- **API Integration Cleanup**: Removed unused API sync code (`src/integrations/ticnote/client.py`) and corresponding unit tests.
 
 ## [2026-06-20]
 ### Added
