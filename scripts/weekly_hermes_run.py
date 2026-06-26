@@ -152,9 +152,9 @@ def run_weekly_pipeline():
     if len(candidates_text) > 60000:
         candidates_text = candidates_text[:60000] + "\n\n[... truncated ...]"
 
-    selection_prompt = f"""You are Hermes, a senior tech intelligence analyst.
+    selection_prompt = """You are Hermes, a senior tech intelligence analyst.
 
-Below is a list of {len(articles)} articles from this week's tech newsletters.
+Below is a list of {len_articles} articles from this week's tech newsletters.
 
 Pick the 5-7 most important, high-signal stories that a senior software engineer and CTO would care about. 
 
@@ -169,7 +169,7 @@ Prioritize:
 Respond with ONLY a JSON array of the selected article numbers (1-indexed). Example: [3, 7, 12, 15, 22]
 
 Articles:
-{candidates_text}"""
+{candidates_text}""".format(len_articles=len(articles), candidates_text=candidates_text)  # nosec B608
 
     print("Phase 1: Asking LLM to select top stories...")
     selection_response = call_llm(
@@ -381,13 +381,52 @@ Here are the articles:
         row_ids = [r[0] for r in cursor.fetchall()]
         if row_ids:
             now_str = datetime.datetime.now(datetime.timezone.utc).astimezone().isoformat()
+            placeholders = ','.join('?' for _ in row_ids)
+            query = "UPDATE automation_outbox SET hermes_run_at = ? WHERE id IN ({})".format(placeholders)  # nosec B608
             cursor.execute(
-                f"UPDATE automation_outbox SET hermes_run_at = ? WHERE id IN ({','.join('?' for _ in row_ids)})",
+                query,
                 [now_str] + row_ids,
             )
             conn.commit()
             print(f"✓ Marked {len(row_ids)} outbox items as processed.")
         conn.close()
+
+    # 8. Phase 3: Push to TinaCMS (GitHub)
+    github_token = os.environ.get("WEBSITE_GITHUB_TOKEN")
+    github_repo = os.environ.get("WEBSITE_GITHUB_REPO")
+    if github_token and github_repo and "No dispatch generated" not in dispatch:
+        print("Phase 3: Deploying newsletter to GitHub for TinaCMS...")
+        try:
+            from github import Github
+            from github import Auth
+            
+            now_iso = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            
+            # Strip the placeholder header and use the user's header formatting
+            if "## 🔥 Top Stories This Week" in dispatch:
+                # Get everything after the header
+                parts = dispatch.split("## 🔥 Top Stories This Week", 1)
+                body_content = "# 🔥 Top Stories This Week" + parts[1]
+            else:
+                body_content = dispatch
+                
+            frontmatter = f"---\ntitle: LifeOS Weekly Dispatch — {today}\ndescription: ''\ntype: note\npubDate: {now_iso}\ntags:\n  - lifeos\n  - story\n  - architecture\n---\n\n"
+            final_markdown = frontmatter + body_content.strip()
+            
+            auth = Auth.Token(github_token)
+            gh = Github(auth=auth)
+            repo = gh.get_repo(github_repo)
+            file_path = f"src/content/notes/LifeOS-Weekly-Dispatch--{today}.md"
+            
+            repo.create_file(
+                path=file_path,
+                message=f"content: weekly dispatch for {today}",
+                content=final_markdown,
+                branch="main"
+            )
+            print(f"✓ Successfully published {file_path} to {github_repo}")
+        except Exception as e:
+            print(f"Failed to publish to GitHub: {e}")
 
     print("--- Pipeline Complete ---")
 
