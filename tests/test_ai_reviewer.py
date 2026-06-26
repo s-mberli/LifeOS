@@ -30,7 +30,7 @@ DIRTY_CODE = '''\
 import os
 import sys
 
-API_KEY = "sk-1234567890abcdef"  # hardcoded secret
+API_KEY = "mock-secret"  # hardcoded secret
 
 def fetch(url):
     result = os.system("curl " + url)  # shell injection

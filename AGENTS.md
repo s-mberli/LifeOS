@@ -96,3 +96,12 @@ When the user says **"implement this proposal"** (or references a file in `data/
 ### Step 7: Proposal Status Update
 - After merge, update the proposal file's `## Status` from `Proposed` to `✅ Implemented`.
 - If the proposal was rejected during review, update to `❌ Rejected` with a reason.
+
+---
+
+## 🔄 VPS Sync Review Protocol
+
+1. **Local Review First**: Since Syncthing automatically synchronizes files from the VPS, never assume they are safe or leak-free. Always run `git diff` to inspect synced changes.
+2. **Pre-Commit Checks**: Commit the synced files locally to trigger the `pre-commit` security hook (which checks for PII, secrets, and paths). Do not bypass these checks.
+3. **Documentation Updates**: Verify that any functional changes synced from the VPS are properly documented in `CHANGELOG.md` and `README.md`.
+
