@@ -182,7 +182,7 @@ def test_reddit_and_jina_ingestion_e2e(tmp_project: Path):
         import urllib.parse
         parsed = urllib.parse.urlparse(url)
         hostname = parsed.hostname or ""
-        if "reddit.com" in hostname or "redd.it" in hostname:
+        if hostname == "reddit.com" or hostname.endswith(".reddit.com") or hostname == "redd.it" or hostname.endswith(".redd.it"):
             resp.json.return_value = mock_reddit_response
         elif "r.jina.ai" in url:
             resp.headers = {"X-Title": "Jina Scraped Article"}

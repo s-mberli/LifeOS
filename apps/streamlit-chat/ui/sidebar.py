@@ -64,13 +64,15 @@ def _render_sidebar_body() -> None:
                 label_visibility="collapsed",
             )
 
-        # Check if the pasted text looks like a single-line YouTube URL
         is_yt_url = False
-        if pasted_text:
-            is_yt_url = (
-                ("youtube.com" in pasted_text or "youtu.be" in pasted_text)
-                and "\n" not in pasted_text
-            )
+        if pasted_text and pasted_text.strip().startswith(("http://", "https://")):
+            try:
+                import urllib.parse
+                parsed = urllib.parse.urlparse(pasted_text.strip())
+                if parsed.hostname and (parsed.hostname == "youtube.com" or parsed.hostname.endswith(".youtube.com") or parsed.hostname == "youtu.be" or parsed.hostname.endswith(".youtu.be")):
+                    is_yt_url = "\n" not in pasted_text
+            except Exception:
+                pass
 
         use_ai_bulk = st.checkbox("Run AI Summaries", value=True, key="use_ai_bulk")
         st.markdown(

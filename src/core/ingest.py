@@ -71,7 +71,7 @@ def _build_note_content(
     privacy_val = decision.get("privacy", "public")
     import urllib.parse
     parsed = urllib.parse.urlparse(source_url) if source_url else None
-    is_yt = parsed and parsed.hostname and ("youtube.com" in parsed.hostname or "youtu.be" in parsed.hostname)
+    is_yt = parsed and parsed.hostname and (parsed.hostname == "youtube.com" or parsed.hostname.endswith(".youtube.com") or parsed.hostname == "youtu.be" or parsed.hostname.endswith(".youtu.be"))
     source_type = "youtube_video" if (channel and is_yt) else ("article" if source_url else "text")
 
     fm: dict = {
@@ -219,7 +219,7 @@ def _extract_metadata(content: str, filepath: Path, log) -> dict:
         suggested_url = _clean_url(urls[0])
         import urllib.parse
         parsed = urllib.parse.urlparse(suggested_url)
-        if parsed.hostname and ("youtube.com" in parsed.hostname or "youtu.be" in parsed.hostname):
+        if parsed.hostname and (parsed.hostname == "youtube.com" or parsed.hostname.endswith(".youtube.com") or parsed.hostname == "youtu.be" or parsed.hostname.endswith(".youtu.be")):
             is_youtube = True
             log(f"Detected YouTube URL: {suggested_url}")
             meta = fetch_video_metadata(suggested_url)

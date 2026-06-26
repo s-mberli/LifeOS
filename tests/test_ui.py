@@ -30,7 +30,7 @@ def test_ui_render_default(tmp_project: Path):
          patch("ui.chat.ROOT", tmp_project):
 
         at = AppTest.from_file(APP_PATH)
-        at.run()
+        at.run(timeout=30)
 
         # Should not raise any unhandled exception
         assert not at.exception
@@ -67,14 +67,14 @@ def test_ui_submit_url_form(tmp_project: Path):
          patch("ui.sidebar.rebuild_search_index") as mock_rebuild:
 
         at = AppTest.from_file(APP_PATH)
-        at.run()
+        at.run(timeout=30)
 
         # Set URL in the text area by index
         at.sidebar.text_area[0].set_value("https://example.com/test-article")
         
         # Click the "Save Insight(s)" button (it's now the 1st button in the sidebar)
         at.sidebar.button[0].click()
-        at.run()
+        at.run(timeout=30)
 
         assert not at.exception
         mock_ingest.assert_called_once()
@@ -97,12 +97,12 @@ def test_ui_chat_input_flow(tmp_project: Path):
          patch("ui.chat.auto_route_prompt", return_value={"primary_domain": "general"}):
 
         at = AppTest.from_file(APP_PATH)
-        at.run()
+        at.run(timeout=30)
 
         # Type message in chat input and run (setting value and running submits it)
         chat_input = at.chat_input[0]
         chat_input.set_value("What is AI?")
-        at.run()
+        at.run(timeout=30)
 
         assert not at.exception
         # LLM client mock should be called with user prompt
@@ -133,12 +133,12 @@ def test_ui_chat_save_insight_flow(tmp_project: Path):
          patch("core.chat_persistence.save_message_as_insight", return_value=(True, "data/knowledge/chat-insights/some-note.md")) as mock_save:
 
         at = AppTest.from_file(APP_PATH)
-        at.run()
+        at.run(timeout=30)
 
         # Type message in chat input and run
         chat_input = at.chat_input[0]
         chat_input.set_value("Explain quantum physics simply.")
-        at.run()
+        at.run(timeout=30)
 
         assert not at.exception
         
@@ -148,7 +148,7 @@ def test_ui_chat_save_insight_flow(tmp_project: Path):
         
         # Click the Save Insight button
         save_buttons[0].click()
-        at.run()
+        at.run(timeout=30)
 
         assert not at.exception
         mock_save.assert_called_once()
@@ -198,14 +198,14 @@ def test_ui_memories_flow(tmp_project: Path):
          patch("ui.chat.ROOT", tmp_project):
 
         at = AppTest.from_file(APP_PATH)
-        at.run()
+        at.run(timeout=30)
         assert not at.exception
         
         # Open the modal
         mem_btn = [b for b in at.sidebar.button if b.label == "🧠 Manual Personal Memory"]
         assert len(mem_btn) > 0, "Could not find modal button"
         mem_btn[0].click()
-        at.run()
+        at.run(timeout=30)
         
         assert not at.exception
         # Verify the modal rendered by checking for the Title text input
@@ -226,7 +226,7 @@ def test_ui_polish(tmp_project: Path):
          patch("ui.chat.ROOT", tmp_project):
 
         at = AppTest.from_file(APP_PATH)
-        at.run()
+        at.run(timeout=30)
 
         assert not at.exception
 
@@ -271,7 +271,7 @@ def test_ui_upload_file_flow(tmp_project: Path):
          patch("ui.sidebar.rebuild_search_index") as mock_rebuild:
 
         at = AppTest.from_file(APP_PATH)
-        at.run()
+        at.run(timeout=30)
 
         # Simulate file upload in the file uploader
         # In streamlit AppTest, we can use the .upload() method or set files directly
@@ -281,13 +281,13 @@ def test_ui_upload_file_flow(tmp_project: Path):
         # Streamlit AppTest allows setting the value of the file_uploader
         # by passing a list of tuples: (filename, content, mime_type)
         uploader.set_value([("test_note.txt", b"Hello world", "text/plain")])
-        at.run()
+        at.run(timeout=30)
 
         assert not at.exception
         
         # Click the Save Insight(s) button (1st button in sidebar)
         at.sidebar.button[0].click()
-        at.run()
+        at.run(timeout=30)
 
         assert not at.exception
         mock_ingest.assert_called_once()

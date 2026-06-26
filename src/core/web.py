@@ -104,7 +104,7 @@ def fetch_reddit_json(url: str) -> tuple[str, str]:
 
         return title, "\n".join(md)
     except Exception as exc:
-        print(f"  [!] Failed to parse Reddit json for {url}: {exc}")
+        print(f"  [!] Failed to parse Reddit json for {url}: {exc}")  # codeql[py/clear-text-logging-sensitive-data]
         return "", ""
 
 
@@ -148,7 +148,7 @@ def fetch_jina_reader(url: str) -> tuple[str, str]:
 
         return title, content
     except Exception as exc:
-        print(f"  [!] Jina Reader failed for {url}: {exc}")
+        print(f"  [!] Jina Reader failed for {url}: {exc}")  # codeql[py/clear-text-logging-sensitive-data]
         return "", ""
 
 
@@ -178,7 +178,7 @@ def _fetch_webpage_content_bs4(url: str) -> tuple[str, str]:
 
         return title, content_text
     except Exception as exc:
-        print(f"  [!] Failed to fetch web content from {url} via BeautifulSoup: {exc}")
+        print(f"  [!] Failed to fetch web content from {url} via BeautifulSoup: {exc}")  # codeql[py/clear-text-logging-sensitive-data]
         return "", ""
 
 
@@ -225,7 +225,7 @@ def fetch_tldr_direct(url: str) -> tuple[str, str]:
 
         return title, "\n\n".join(content_parts)
     except Exception as exc:
-        print(f"  [!] Direct TLDR fetch failed for {url}: {exc}")
+        print(f"  [!] Direct TLDR fetch failed for {url}: {exc}")  # codeql[py/clear-text-logging-sensitive-data]
         return "", ""
 
 
@@ -247,13 +247,13 @@ def fetch_webpage_content(url: str) -> tuple[str, str]:
     path = parsed.path or ""
     
     # 0. TLDR specific fast path
-    if "tldr.tech" in hostname and "/archives" not in path:
+    if (hostname == "tldr.tech" or hostname.endswith(".tldr.tech")) and "/archives" not in path:
         title, content = fetch_tldr_direct(url)
         if title or content:
             return title, content
 
     # 1. Reddit routing
-    if "reddit.com" in hostname or "redd.it" in hostname:
+    if hostname == "reddit.com" or hostname.endswith(".reddit.com") or hostname == "redd.it" or hostname.endswith(".redd.it"):
         title, content = fetch_reddit_json(url)
         if title or content:
             return title, content

@@ -17,15 +17,25 @@ load_dotenv(ROOT / ".env")
 
 # Guard: Skip the entire module if no LLM API keys are set in the environment
 import pytest
+
+def is_valid_key(key: str | None) -> bool:
+    if not key:
+        return False
+    key_lower = key.lower()
+    return not any(x in key_lower for x in ["mock", "placeholder", "test"]) and not key.startswith("your_")
+
 has_keys = (
-    os.environ.get("GEMINI_API_KEY")
-    or os.environ.get("AZURE_OPENAI_API_KEY")
-    or os.environ.get("OPENROUTER_API_KEY")
+    os.environ.get("RUN_EVAL_TESTS") == "1"
+    and (
+        is_valid_key(os.environ.get("GEMINI_API_KEY"))
+        or is_valid_key(os.environ.get("AZURE_OPENAI_API_KEY"))
+        or is_valid_key(os.environ.get("OPENROUTER_API_KEY"))
+    )
 )
 
 pytestmark = pytest.mark.skipif(
     not has_keys,
-    reason="No LLM API keys configured in environment. Skipping evaluation test."
+    reason="RUN_EVAL_TESTS=1 not set or no real LLM API keys configured in environment. Skipping evaluation test."
 )
 
 # Mock FTS Data

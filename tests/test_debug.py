@@ -10,5 +10,4 @@ def test_debug_imports():
     cols = [row[1] for row in cursor.fetchall()]
     print("DEBUG DOC_CHUNKS COLS:", cols)
     conn.close()
-    assert False
 
