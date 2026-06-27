@@ -128,8 +128,9 @@ def test_weekly_hermes_run(tmp_project: Path):
     note_file.parent.mkdir(parents=True, exist_ok=True)
     note_file.write_text("Use pathlib instead of os.path across the codebase.", encoding="utf-8")
 
-    # Create a mock TLDR news file so collect_articles_from_notes finds it
-    news_dir = tmp_project / "data" / "knowledge" / "news"
+    # Create a mock TLDR news file so collect_articles_from_notes finds it.
+    # Uses the corrected path — knowledge/news/ (no data/ prefix).
+    news_dir = tmp_project / "knowledge" / "news"
     news_dir.mkdir(parents=True, exist_ok=True)
     tldr_file = news_dir / "tldr_test.md"
     tldr_file.write_text(
@@ -144,23 +145,27 @@ def test_weekly_hermes_run(tmp_project: Path):
     # Mock call_llm to simulate LLM responses for selection, proposals, and dispatch
     mock_llm = MagicMock()
     mock_llm.side_effect = [
-        "[1]", # Selection phase
-        '[{"filename": "proposal_test.md", "content": "# Test Proposal\\n\\nUse pathlib"}]', # Proposals phase
-        "# Weekly Dispatch Test\n\nSome summaries." # Dispatch phase
+        "[1]",  # Selection phase
+        '[{"filename": "proposal_test.md", "content": "# Test Proposal\\n\\nUse pathlib"}]',  # Proposals phase
+        "# Weekly Dispatch Test\n\nSome summaries."  # Dispatch phase
     ]
 
     mock_fetch = MagicMock(return_value=("Cool Title", "Full article content"))
 
     with patch("scripts.weekly_hermes_run.BASE_DIR", tmp_project), \
+         patch("scripts.weekly_hermes_run.NEWS_DIR", news_dir), \
+         patch("scripts.weekly_hermes_run.DIGEST_DIR", news_dir / "digest"), \
+         patch("scripts.weekly_hermes_run.find_latest_digest", return_value=None), \
          patch("scripts.weekly_hermes_run.DB_PATH", db_path), \
          patch("scripts.weekly_hermes_run.call_llm", mock_llm), \
          patch("scripts.weekly_hermes_run.fetch_webpage_content", mock_fetch), \
+         patch.dict(os.environ, {"INCLUDE_PROPOSALS": "true"}), \
          patch("scripts.triage_outbox.BASE_DIR", tmp_project), \
          patch("scripts.triage_outbox.DB_PATH", db_path):
-         
+
         run_weekly_pipeline()
 
-    # Verify LLM was called
+    # Verify LLM was called: selection + proposals + dispatch = 3
     assert mock_llm.call_count == 3
 
     # Verify that the proposal was saved
