@@ -54,7 +54,7 @@ def generate_speech(text: str, voice_id: str | None = None) -> bytes:
         },
     }
 
-    response = requests.post(url, json=data, headers=headers)
+    response = requests.post(url, json=data, headers=headers, timeout=10)
     response.raise_for_status()
     audio_bytes = response.content
 

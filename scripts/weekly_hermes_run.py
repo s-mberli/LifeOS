@@ -510,7 +510,7 @@ def _run_fallback_pipeline(today: str) -> tuple[str, list[dict]]:
         candidates_text = candidates_text[:60000] + "\n\n[... truncated ...]"
 
     selection_prompt = (
-        "You are Hermes, a senior tech intelligence analyst.\n\n"
+        "You are Hermes, a senior tech intelligence analyst.\n\n"  # nosec B608
         f"Below is a list of {len(articles)} articles from this week's tech newsletters.\n\n"
         "Pick the 5-7 most important, high-signal stories that a senior software "
         "engineer and CTO would care about.\n\n"
@@ -734,7 +734,7 @@ def run_weekly_pipeline() -> None:
             )
             placeholders = ",".join("?" for _ in row_ids)
             cursor.execute(
-                f"UPDATE automation_outbox SET hermes_run_at = ? WHERE id IN ({placeholders})",
+                f"UPDATE automation_outbox SET hermes_run_at = ? WHERE id IN ({placeholders})",  # nosec B608
                 [now_str] + row_ids,
             )
             conn.commit()

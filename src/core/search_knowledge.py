@@ -196,7 +196,7 @@ def hybrid_search(db_path: str, query: str = None, limit: int = 5, include_priva
             if like_clauses:
                 like_q = " OR ".join(like_clauses)
                 try:
-                    cursor.execute(f"SELECT path, title, content FROM search_index WHERE {like_q}", like_params)
+                    cursor.execute(f"SELECT path, title, content FROM search_index WHERE {like_q}", like_params)  # nosec B608
                     fts_rows = cursor.fetchall()
                 except sqlite3.OperationalError:
                     pass

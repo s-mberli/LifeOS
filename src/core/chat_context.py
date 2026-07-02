@@ -112,7 +112,7 @@ def execute_agent_search_loop(
             url = web_match.group(1).strip()
             import urllib.parse
             parsed_url = urllib.parse.urlparse(url)
-            blocked_hosts = ["localhost", "127.0.0.1", "0.0.0.0", "169.254.169.254"]
+            blocked_hosts = ["localhost", "127.0.0.1", "0.0.0.0", "169.254.169.254"]  # nosec B104
             
             if parsed_url.hostname in blocked_hosts or (parsed_url.hostname and parsed_url.hostname.startswith(("192.168.", "10.", "172."))):
                 web_result = f"fetch_web error: Access to {parsed_url.hostname} is blocked for security."
