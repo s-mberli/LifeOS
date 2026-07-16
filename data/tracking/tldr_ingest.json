@@ -1,0 +1,2077 @@
+{
+  "https://tldr.tech/tech/2026-06-03": {
+    "topic": "tech",
+    "date": "2026-06-03",
+    "ingested_at": "2026-06-04T21:20:56.457233+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-02": {
+    "topic": "tech",
+    "date": "2026-06-02",
+    "ingested_at": "2026-06-04T21:21:05.859136+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-01": {
+    "topic": "tech",
+    "date": "2026-06-01",
+    "ingested_at": "2026-06-04T21:21:12.016344+10:00"
+  },
+  "https://tldr.tech/tech/2026-05-29": {
+    "topic": "tech",
+    "date": "2026-05-29",
+    "ingested_at": "2026-06-04T21:21:27.063675+10:00"
+  },
+  "https://tldr.tech/tech/2026-05-28": {
+    "topic": "tech",
+    "date": "2026-05-28",
+    "ingested_at": "2026-06-04T21:21:35.050474+10:00"
+  },
+  "https://tldr.tech/tech/2026-05-27": {
+    "topic": "tech",
+    "date": "2026-05-27",
+    "ingested_at": "2026-06-04T21:21:42.331887+10:00"
+  },
+  "https://tldr.tech/tech/2026-05-26": {
+    "topic": "tech",
+    "date": "2026-05-26",
+    "ingested_at": "2026-06-04T21:21:48.911839+10:00"
+  },
+  "https://tldr.tech/tech/2026-05-25": {
+    "topic": "tech",
+    "date": "2026-05-25",
+    "ingested_at": "2026-06-04T21:21:55.855532+10:00"
+  },
+  "https://tldr.tech/tech/2026-05-22": {
+    "topic": "tech",
+    "date": "2026-05-22",
+    "ingested_at": "2026-06-04T21:25:25.378136+10:00"
+  },
+  "https://tldr.tech/tech/2026-05-21": {
+    "topic": "tech",
+    "date": "2026-05-21",
+    "ingested_at": "2026-06-04T21:26:22.680325+10:00"
+  },
+  "https://tldr.tech/tech/2026-05-20": {
+    "topic": "tech",
+    "date": "2026-05-20",
+    "ingested_at": "2026-06-04T21:27:15.023073+10:00"
+  },
+  "https://tldr.tech/tech/2026-05-19": {
+    "topic": "tech",
+    "date": "2026-05-19",
+    "ingested_at": "2026-06-04T21:28:11.451844+10:00"
+  },
+  "https://tldr.tech/tech/2026-05-18": {
+    "topic": "tech",
+    "date": "2026-05-18",
+    "ingested_at": "2026-06-04T21:29:07.173967+10:00"
+  },
+  "https://tldr.tech/tech/2026-05-15": {
+    "topic": "tech",
+    "date": "2026-05-15",
+    "ingested_at": "2026-06-04T21:30:06.668558+10:00"
+  },
+  "https://tldr.tech/tech/2026-05-14": {
+    "topic": "tech",
+    "date": "2026-05-14",
+    "ingested_at": "2026-06-04T21:30:55.929579+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-03": {
+    "topic": "ai",
+    "date": "2026-06-03",
+    "ingested_at": "2026-06-04T21:31:41.792008+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-02": {
+    "topic": "ai",
+    "date": "2026-06-02",
+    "ingested_at": "2026-06-04T21:32:30.440482+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-01": {
+    "topic": "ai",
+    "date": "2026-06-01",
+    "ingested_at": "2026-06-04T21:33:27.476157+10:00"
+  },
+  "https://tldr.tech/ai/2026-05-29": {
+    "topic": "ai",
+    "date": "2026-05-29",
+    "ingested_at": "2026-06-04T21:34:22.962899+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-04": {
+    "topic": "tech",
+    "date": "2026-06-04",
+    "ingested_at": "2026-06-05T08:31:46.828326+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-04": {
+    "topic": "ai",
+    "date": "2026-06-04",
+    "ingested_at": "2026-06-05T08:32:01.879697+10:00"
+  },
+  "https://tldr.tech/ai/2026-05-28": {
+    "topic": "ai",
+    "date": "2026-05-28",
+    "ingested_at": "2026-06-05T08:33:03.929718+10:00"
+  },
+  "https://tldr.tech/ai/2026-05-27": {
+    "topic": "ai",
+    "date": "2026-05-27",
+    "ingested_at": "2026-06-05T08:34:01.322042+10:00"
+  },
+  "https://tldr.tech/ai/2026-05-26": {
+    "topic": "ai",
+    "date": "2026-05-26",
+    "ingested_at": "2026-06-05T08:34:17.148268+10:00"
+  },
+  "https://tldr.tech/ai/2026-05-25": {
+    "topic": "ai",
+    "date": "2026-05-25",
+    "ingested_at": "2026-06-05T08:34:36.399820+10:00"
+  },
+  "https://tldr.tech/ai/2026-05-22": {
+    "topic": "ai",
+    "date": "2026-05-22",
+    "ingested_at": "2026-06-05T08:35:22.582197+10:00"
+  },
+  "https://tldr.tech/ai/2026-05-21": {
+    "topic": "ai",
+    "date": "2026-05-21",
+    "ingested_at": "2026-06-05T08:35:52.669560+10:00"
+  },
+  "https://tldr.tech/ai/2026-05-20": {
+    "topic": "ai",
+    "date": "2026-05-20",
+    "ingested_at": "2026-06-05T08:36:27.091201+10:00"
+  },
+  "https://tldr.tech/ai/2026-05-19": {
+    "topic": "ai",
+    "date": "2026-05-19",
+    "ingested_at": "2026-06-05T08:37:02.836089+10:00"
+  },
+  "https://tldr.tech/ai/2026-05-18": {
+    "topic": "ai",
+    "date": "2026-05-18",
+    "ingested_at": "2026-06-05T08:37:51.997903+10:00"
+  },
+  "https://tldr.tech/ai/2026-05-15": {
+    "topic": "ai",
+    "date": "2026-05-15",
+    "ingested_at": "2026-06-05T08:38:47.690592+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-04": {
+    "topic": "infosec",
+    "date": "2026-06-04",
+    "ingested_at": "2026-06-05T08:39:29.676863+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-03": {
+    "topic": "infosec",
+    "date": "2026-06-03",
+    "ingested_at": "2026-06-05T08:40:22.522335+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-02": {
+    "topic": "infosec",
+    "date": "2026-06-02",
+    "ingested_at": "2026-06-05T08:41:14.331419+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-01": {
+    "topic": "infosec",
+    "date": "2026-06-01",
+    "ingested_at": "2026-06-05T08:42:12.156145+10:00"
+  },
+  "https://tldr.tech/infosec/2026-05-29": {
+    "topic": "infosec",
+    "date": "2026-05-29",
+    "ingested_at": "2026-06-05T08:43:02.879433+10:00"
+  },
+  "https://tldr.tech/infosec/2026-05-28": {
+    "topic": "infosec",
+    "date": "2026-05-28",
+    "ingested_at": "2026-06-05T08:43:52.857565+10:00"
+  },
+  "https://tldr.tech/infosec/2026-05-27": {
+    "topic": "infosec",
+    "date": "2026-05-27",
+    "ingested_at": "2026-06-05T08:44:40.329297+10:00"
+  },
+  "https://tldr.tech/infosec/2026-05-26": {
+    "topic": "infosec",
+    "date": "2026-05-26",
+    "ingested_at": "2026-06-05T08:45:38.387875+10:00"
+  },
+  "https://tldr.tech/infosec/2026-05-25": {
+    "topic": "infosec",
+    "date": "2026-05-25",
+    "ingested_at": "2026-06-05T08:46:23.856276+10:00"
+  },
+  "https://tldr.tech/infosec/2026-05-22": {
+    "topic": "infosec",
+    "date": "2026-05-22",
+    "ingested_at": "2026-06-05T08:47:24.064326+10:00"
+  },
+  "https://tldr.tech/infosec/2026-05-21": {
+    "topic": "infosec",
+    "date": "2026-05-21",
+    "ingested_at": "2026-06-05T08:48:10.961907+10:00"
+  },
+  "https://tldr.tech/infosec/2026-05-20": {
+    "topic": "infosec",
+    "date": "2026-05-20",
+    "ingested_at": "2026-06-05T08:49:01.549436+10:00"
+  },
+  "https://tldr.tech/infosec/2026-05-19": {
+    "topic": "infosec",
+    "date": "2026-05-19",
+    "ingested_at": "2026-06-05T08:49:51.927550+10:00"
+  },
+  "https://tldr.tech/infosec/2026-05-18": {
+    "topic": "infosec",
+    "date": "2026-05-18",
+    "ingested_at": "2026-06-05T08:50:41.181304+10:00"
+  },
+  "https://tldr.tech/infosec/2026-05-15": {
+    "topic": "infosec",
+    "date": "2026-05-15",
+    "ingested_at": "2026-06-05T08:51:37.812263+10:00"
+  },
+  "https://tldr.tech/devops/2026-06-03": {
+    "topic": "devops",
+    "date": "2026-06-03",
+    "ingested_at": "2026-06-05T08:51:51.533577+10:00"
+  },
+  "https://tldr.tech/devops/2026-06-01": {
+    "topic": "devops",
+    "date": "2026-06-01",
+    "ingested_at": "2026-06-05T08:52:04.432177+10:00"
+  },
+  "https://tldr.tech/devops/2026-05-29": {
+    "topic": "devops",
+    "date": "2026-05-29",
+    "ingested_at": "2026-06-05T08:52:27.429196+10:00"
+  },
+  "https://tldr.tech/devops/2026-05-27": {
+    "topic": "devops",
+    "date": "2026-05-27",
+    "ingested_at": "2026-06-05T08:52:42.630486+10:00"
+  },
+  "https://tldr.tech/devops/2026-05-25": {
+    "topic": "devops",
+    "date": "2026-05-25",
+    "ingested_at": "2026-06-05T08:52:54.823302+10:00"
+  },
+  "https://tldr.tech/devops/2026-05-22": {
+    "topic": "devops",
+    "date": "2026-05-22",
+    "ingested_at": "2026-06-05T08:53:07.724062+10:00"
+  },
+  "https://tldr.tech/devops/2026-05-20": {
+    "topic": "devops",
+    "date": "2026-05-20",
+    "ingested_at": "2026-06-05T08:53:26.308114+10:00"
+  },
+  "https://tldr.tech/devops/2026-05-18": {
+    "topic": "devops",
+    "date": "2026-05-18",
+    "ingested_at": "2026-06-05T08:53:48.574693+10:00"
+  },
+  "https://tldr.tech/devops/2026-05-15": {
+    "topic": "devops",
+    "date": "2026-05-15",
+    "ingested_at": "2026-06-05T08:54:31.484420+10:00"
+  },
+  "https://tldr.tech/devops/2026-05-13": {
+    "topic": "devops",
+    "date": "2026-05-13",
+    "ingested_at": "2026-06-05T08:54:52.061200+10:00"
+  },
+  "https://tldr.tech/devops/2026-05-11": {
+    "topic": "devops",
+    "date": "2026-05-11",
+    "ingested_at": "2026-06-05T08:55:16.532906+10:00"
+  },
+  "https://tldr.tech/devops/2026-05-08": {
+    "topic": "devops",
+    "date": "2026-05-08",
+    "ingested_at": "2026-06-05T08:55:36.191055+10:00"
+  },
+  "https://tldr.tech/devops/2026-05-06": {
+    "topic": "devops",
+    "date": "2026-05-06",
+    "ingested_at": "2026-06-05T08:55:58.342693+10:00"
+  },
+  "https://tldr.tech/devops/2026-05-04": {
+    "topic": "devops",
+    "date": "2026-05-04",
+    "ingested_at": "2026-06-05T08:56:10.589354+10:00"
+  },
+  "https://tldr.tech/devops/2026-05-01": {
+    "topic": "devops",
+    "date": "2026-05-01",
+    "ingested_at": "2026-06-05T08:56:29.746546+10:00"
+  },
+  "https://tldr.tech/founders/2026-06-03": {
+    "topic": "founders",
+    "date": "2026-06-03",
+    "ingested_at": "2026-06-05T08:57:12.557560+10:00"
+  },
+  "https://tldr.tech/founders/2026-06-01": {
+    "topic": "founders",
+    "date": "2026-06-01",
+    "ingested_at": "2026-06-05T08:58:00.487921+10:00"
+  },
+  "https://tldr.tech/founders/2026-05-29": {
+    "topic": "founders",
+    "date": "2026-05-29",
+    "ingested_at": "2026-06-05T08:58:13.995697+10:00"
+  },
+  "https://tldr.tech/founders/2026-05-27": {
+    "topic": "founders",
+    "date": "2026-05-27",
+    "ingested_at": "2026-06-05T08:58:46.144683+10:00"
+  },
+  "https://tldr.tech/founders/2026-05-25": {
+    "topic": "founders",
+    "date": "2026-05-25",
+    "ingested_at": "2026-06-05T08:59:24.648589+10:00"
+  },
+  "https://tldr.tech/founders/2026-05-22": {
+    "topic": "founders",
+    "date": "2026-05-22",
+    "ingested_at": "2026-06-05T09:00:12.771921+10:00"
+  },
+  "https://tldr.tech/founders/2026-05-20": {
+    "topic": "founders",
+    "date": "2026-05-20",
+    "ingested_at": "2026-06-05T09:00:36.531829+10:00"
+  },
+  "https://tldr.tech/founders/2026-05-18": {
+    "topic": "founders",
+    "date": "2026-05-18",
+    "ingested_at": "2026-06-05T09:01:11.040025+10:00"
+  },
+  "https://tldr.tech/founders/2026-05-15": {
+    "topic": "founders",
+    "date": "2026-05-15",
+    "ingested_at": "2026-06-05T09:01:22.670207+10:00"
+  },
+  "https://tldr.tech/founders/2026-05-13": {
+    "topic": "founders",
+    "date": "2026-05-13",
+    "ingested_at": "2026-06-05T09:02:01.936821+10:00"
+  },
+  "https://tldr.tech/founders/2026-05-11": {
+    "topic": "founders",
+    "date": "2026-05-11",
+    "ingested_at": "2026-06-05T09:02:16.273416+10:00"
+  },
+  "https://tldr.tech/founders/2026-05-08": {
+    "topic": "founders",
+    "date": "2026-05-08",
+    "ingested_at": "2026-06-05T09:02:29.974782+10:00"
+  },
+  "https://tldr.tech/founders/2026-05-06": {
+    "topic": "founders",
+    "date": "2026-05-06",
+    "ingested_at": "2026-06-05T09:03:10.156486+10:00"
+  },
+  "https://tldr.tech/founders/2026-05-04": {
+    "topic": "founders",
+    "date": "2026-05-04",
+    "ingested_at": "2026-06-05T09:03:41.589270+10:00"
+  },
+  "https://tldr.tech/founders/2026-05-01": {
+    "topic": "founders",
+    "date": "2026-05-01",
+    "ingested_at": "2026-06-05T09:04:16.998028+10:00"
+  },
+  "https://tldr.tech/design/2026-06-04": {
+    "topic": "design",
+    "date": "2026-06-04",
+    "ingested_at": "2026-06-05T09:04:48.288114+10:00"
+  },
+  "https://tldr.tech/design/2026-06-03": {
+    "topic": "design",
+    "date": "2026-06-03",
+    "ingested_at": "2026-06-05T09:05:23.052500+10:00"
+  },
+  "https://tldr.tech/design/2026-06-02": {
+    "topic": "design",
+    "date": "2026-06-02",
+    "ingested_at": "2026-06-05T09:05:54.480402+10:00"
+  },
+  "https://tldr.tech/design/2026-06-01": {
+    "topic": "design",
+    "date": "2026-06-01",
+    "ingested_at": "2026-06-05T09:06:08.511110+10:00"
+  },
+  "https://tldr.tech/design/2026-05-29": {
+    "topic": "design",
+    "date": "2026-05-29",
+    "ingested_at": "2026-06-05T09:06:52.342510+10:00"
+  },
+  "https://tldr.tech/design/2026-05-28": {
+    "topic": "design",
+    "date": "2026-05-28",
+    "ingested_at": "2026-06-05T09:07:24.490753+10:00"
+  },
+  "https://tldr.tech/design/2026-05-27": {
+    "topic": "design",
+    "date": "2026-05-27",
+    "ingested_at": "2026-06-05T09:08:03.603047+10:00"
+  },
+  "https://tldr.tech/design/2026-05-26": {
+    "topic": "design",
+    "date": "2026-05-26",
+    "ingested_at": "2026-06-05T09:08:34.225307+10:00"
+  },
+  "https://tldr.tech/design/2026-05-25": {
+    "topic": "design",
+    "date": "2026-05-25",
+    "ingested_at": "2026-06-05T09:09:11.802098+10:00"
+  },
+  "https://tldr.tech/design/2026-05-22": {
+    "topic": "design",
+    "date": "2026-05-22",
+    "ingested_at": "2026-06-05T09:09:44.883411+10:00"
+  },
+  "https://tldr.tech/design/2026-05-21": {
+    "topic": "design",
+    "date": "2026-05-21",
+    "ingested_at": "2026-06-05T09:10:14.165246+10:00"
+  },
+  "https://tldr.tech/design/2026-05-20": {
+    "topic": "design",
+    "date": "2026-05-20",
+    "ingested_at": "2026-06-05T09:10:56.316164+10:00"
+  },
+  "https://tldr.tech/design/2026-05-19": {
+    "topic": "design",
+    "date": "2026-05-19",
+    "ingested_at": "2026-06-05T09:11:27.380486+10:00"
+  },
+  "https://tldr.tech/design/2026-05-18": {
+    "topic": "design",
+    "date": "2026-05-18",
+    "ingested_at": "2026-06-05T09:12:03.528325+10:00"
+  },
+  "https://tldr.tech/design/2026-05-15": {
+    "topic": "design",
+    "date": "2026-05-15",
+    "ingested_at": "2026-06-05T09:12:49.506918+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-04": {
+    "topic": "marketing",
+    "date": "2026-06-04",
+    "ingested_at": "2026-06-05T09:13:23.608049+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-03": {
+    "topic": "marketing",
+    "date": "2026-06-03",
+    "ingested_at": "2026-06-05T09:14:06.001005+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-02": {
+    "topic": "marketing",
+    "date": "2026-06-02",
+    "ingested_at": "2026-06-05T09:14:28.626419+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-01": {
+    "topic": "marketing",
+    "date": "2026-06-01",
+    "ingested_at": "2026-06-05T09:14:44.292895+10:00"
+  },
+  "https://tldr.tech/marketing/2026-05-29": {
+    "topic": "marketing",
+    "date": "2026-05-29",
+    "ingested_at": "2026-06-05T09:15:18.917021+10:00"
+  },
+  "https://tldr.tech/marketing/2026-05-28": {
+    "topic": "marketing",
+    "date": "2026-05-28",
+    "ingested_at": "2026-06-05T09:16:07.867643+10:00"
+  },
+  "https://tldr.tech/marketing/2026-05-27": {
+    "topic": "marketing",
+    "date": "2026-05-27",
+    "ingested_at": "2026-06-05T09:16:48.559618+10:00"
+  },
+  "https://tldr.tech/marketing/2026-05-26": {
+    "topic": "marketing",
+    "date": "2026-05-26",
+    "ingested_at": "2026-06-05T09:17:00.075347+10:00"
+  },
+  "https://tldr.tech/marketing/2026-05-25": {
+    "topic": "marketing",
+    "date": "2026-05-25",
+    "ingested_at": "2026-06-05T09:17:34.891977+10:00"
+  },
+  "https://tldr.tech/marketing/2026-05-22": {
+    "topic": "marketing",
+    "date": "2026-05-22",
+    "ingested_at": "2026-06-05T09:18:18.922707+10:00"
+  },
+  "https://tldr.tech/marketing/2026-05-21": {
+    "topic": "marketing",
+    "date": "2026-05-21",
+    "ingested_at": "2026-06-05T09:19:00.804460+10:00"
+  },
+  "https://tldr.tech/marketing/2026-05-20": {
+    "topic": "marketing",
+    "date": "2026-05-20",
+    "ingested_at": "2026-06-05T09:19:39.204524+10:00"
+  },
+  "https://tldr.tech/marketing/2026-05-19": {
+    "topic": "marketing",
+    "date": "2026-05-19",
+    "ingested_at": "2026-06-05T09:19:50.985969+10:00"
+  },
+  "https://tldr.tech/marketing/2026-05-18": {
+    "topic": "marketing",
+    "date": "2026-05-18",
+    "ingested_at": "2026-06-05T09:20:03.270424+10:00"
+  },
+  "https://tldr.tech/marketing/2026-05-15": {
+    "topic": "marketing",
+    "date": "2026-05-15",
+    "ingested_at": "2026-06-05T09:20:32.835351+10:00"
+  },
+  "https://tldr.tech/product/2026-06-02": {
+    "topic": "product",
+    "date": "2026-06-02",
+    "ingested_at": "2026-06-05T09:20:49.217177+10:00"
+  },
+  "https://tldr.tech/product/2026-05-29": {
+    "topic": "product",
+    "date": "2026-05-29",
+    "ingested_at": "2026-06-05T09:21:04.577965+10:00"
+  },
+  "https://tldr.tech/product/2026-05-26": {
+    "topic": "product",
+    "date": "2026-05-26",
+    "ingested_at": "2026-06-05T09:21:19.957291+10:00"
+  },
+  "https://tldr.tech/product/2026-05-22": {
+    "topic": "product",
+    "date": "2026-05-22",
+    "ingested_at": "2026-06-05T09:21:37.758050+10:00"
+  },
+  "https://tldr.tech/product/2026-05-19": {
+    "topic": "product",
+    "date": "2026-05-19",
+    "ingested_at": "2026-06-05T09:21:54.446708+10:00"
+  },
+  "https://tldr.tech/product/2026-05-15": {
+    "topic": "product",
+    "date": "2026-05-15",
+    "ingested_at": "2026-06-05T09:22:09.294997+10:00"
+  },
+  "https://tldr.tech/product/2026-05-12": {
+    "topic": "product",
+    "date": "2026-05-12",
+    "ingested_at": "2026-06-05T09:22:30.186897+10:00"
+  },
+  "https://tldr.tech/product/2026-05-08": {
+    "topic": "product",
+    "date": "2026-05-08",
+    "ingested_at": "2026-06-05T09:22:46.589985+10:00"
+  },
+  "https://tldr.tech/product/2026-05-05": {
+    "topic": "product",
+    "date": "2026-05-05",
+    "ingested_at": "2026-06-05T09:23:04.389401+10:00"
+  },
+  "https://tldr.tech/product/2026-05-01": {
+    "topic": "product",
+    "date": "2026-05-01",
+    "ingested_at": "2026-06-05T09:23:20.573623+10:00"
+  },
+  "https://tldr.tech/product/2026-04-28": {
+    "topic": "product",
+    "date": "2026-04-28",
+    "ingested_at": "2026-06-05T09:23:34.697185+10:00"
+  },
+  "https://tldr.tech/product/2026-04-24": {
+    "topic": "product",
+    "date": "2026-04-24",
+    "ingested_at": "2026-06-05T09:23:49.037040+10:00"
+  },
+  "https://tldr.tech/product/2026-04-21": {
+    "topic": "product",
+    "date": "2026-04-21",
+    "ingested_at": "2026-06-05T09:24:03.165442+10:00"
+  },
+  "https://tldr.tech/product/2026-04-17": {
+    "topic": "product",
+    "date": "2026-04-17",
+    "ingested_at": "2026-06-05T09:24:19.143611+10:00"
+  },
+  "https://tldr.tech/product/2026-04-14": {
+    "topic": "product",
+    "date": "2026-04-14",
+    "ingested_at": "2026-06-05T09:24:43.000357+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-04": {
+    "topic": "crypto",
+    "date": "2026-06-04",
+    "ingested_at": "2026-06-05T09:25:30.008843+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-03": {
+    "topic": "crypto",
+    "date": "2026-06-03",
+    "ingested_at": "2026-06-05T09:26:15.063467+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-02": {
+    "topic": "crypto",
+    "date": "2026-06-02",
+    "ingested_at": "2026-06-05T09:26:51.714349+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-01": {
+    "topic": "crypto",
+    "date": "2026-06-01",
+    "ingested_at": "2026-06-05T09:27:32.168336+10:00"
+  },
+  "https://tldr.tech/crypto/2026-05-29": {
+    "topic": "crypto",
+    "date": "2026-05-29",
+    "ingested_at": "2026-06-05T09:28:18.765478+10:00"
+  },
+  "https://tldr.tech/crypto/2026-05-28": {
+    "topic": "crypto",
+    "date": "2026-05-28",
+    "ingested_at": "2026-06-05T09:29:09.663568+10:00"
+  },
+  "https://tldr.tech/crypto/2026-05-27": {
+    "topic": "crypto",
+    "date": "2026-05-27",
+    "ingested_at": "2026-06-05T09:29:52.053338+10:00"
+  },
+  "https://tldr.tech/crypto/2026-05-26": {
+    "topic": "crypto",
+    "date": "2026-05-26",
+    "ingested_at": "2026-06-05T09:30:51.034656+10:00"
+  },
+  "https://tldr.tech/crypto/2026-05-25": {
+    "topic": "crypto",
+    "date": "2026-05-25",
+    "ingested_at": "2026-06-05T09:31:38.862645+10:00"
+  },
+  "https://tldr.tech/crypto/2026-05-22": {
+    "topic": "crypto",
+    "date": "2026-05-22",
+    "ingested_at": "2026-06-05T09:32:35.487258+10:00"
+  },
+  "https://tldr.tech/crypto/2026-05-21": {
+    "topic": "crypto",
+    "date": "2026-05-21",
+    "ingested_at": "2026-06-05T09:33:21.707191+10:00"
+  },
+  "https://tldr.tech/crypto/2026-05-20": {
+    "topic": "crypto",
+    "date": "2026-05-20",
+    "ingested_at": "2026-06-05T09:34:13.486602+10:00"
+  },
+  "https://tldr.tech/crypto/2026-05-19": {
+    "topic": "crypto",
+    "date": "2026-05-19",
+    "ingested_at": "2026-06-05T09:35:01.822662+10:00"
+  },
+  "https://tldr.tech/crypto/2026-05-18": {
+    "topic": "crypto",
+    "date": "2026-05-18",
+    "ingested_at": "2026-06-05T09:35:48.206604+10:00"
+  },
+  "https://tldr.tech/crypto/2026-05-15": {
+    "topic": "crypto",
+    "date": "2026-05-15",
+    "ingested_at": "2026-06-05T09:36:36.236327+10:00"
+  },
+  "https://tldr.tech/fintech/2026-06-04": {
+    "topic": "fintech",
+    "date": "2026-06-04",
+    "ingested_at": "2026-06-05T09:36:49.341521+10:00"
+  },
+  "https://tldr.tech/fintech/2026-06-01": {
+    "topic": "fintech",
+    "date": "2026-06-01",
+    "ingested_at": "2026-06-05T09:37:37.482110+10:00"
+  },
+  "https://tldr.tech/fintech/2026-05-28": {
+    "topic": "fintech",
+    "date": "2026-05-28",
+    "ingested_at": "2026-06-05T09:37:57.750324+10:00"
+  },
+  "https://tldr.tech/fintech/2026-05-25": {
+    "topic": "fintech",
+    "date": "2026-05-25",
+    "ingested_at": "2026-06-05T09:38:29.491759+10:00"
+  },
+  "https://tldr.tech/fintech/2026-05-21": {
+    "topic": "fintech",
+    "date": "2026-05-21",
+    "ingested_at": "2026-06-05T09:39:17.733068+10:00"
+  },
+  "https://tldr.tech/fintech/2026-05-18": {
+    "topic": "fintech",
+    "date": "2026-05-18",
+    "ingested_at": "2026-06-05T09:40:04.008233+10:00"
+  },
+  "https://tldr.tech/fintech/2026-05-14": {
+    "topic": "fintech",
+    "date": "2026-05-14",
+    "ingested_at": "2026-06-05T09:40:50.711943+10:00"
+  },
+  "https://tldr.tech/fintech/2026-05-11": {
+    "topic": "fintech",
+    "date": "2026-05-11",
+    "ingested_at": "2026-06-05T09:41:38.528840+10:00"
+  },
+  "https://tldr.tech/fintech/2026-05-07": {
+    "topic": "fintech",
+    "date": "2026-05-07",
+    "ingested_at": "2026-06-05T09:42:26.970804+10:00"
+  },
+  "https://tldr.tech/fintech/2026-05-04": {
+    "topic": "fintech",
+    "date": "2026-05-04",
+    "ingested_at": "2026-06-05T09:43:08.031524+10:00"
+  },
+  "https://tldr.tech/fintech/2026-04-30": {
+    "topic": "fintech",
+    "date": "2026-04-30",
+    "ingested_at": "2026-06-05T09:43:54.619133+10:00"
+  },
+  "https://tldr.tech/fintech/2026-04-27": {
+    "topic": "fintech",
+    "date": "2026-04-27",
+    "ingested_at": "2026-06-05T09:44:51.965353+10:00"
+  },
+  "https://tldr.tech/fintech/2026-04-23": {
+    "topic": "fintech",
+    "date": "2026-04-23",
+    "ingested_at": "2026-06-05T09:45:33.846815+10:00"
+  },
+  "https://tldr.tech/fintech/2026-04-20": {
+    "topic": "fintech",
+    "date": "2026-04-20",
+    "ingested_at": "2026-06-05T09:46:24.332076+10:00"
+  },
+  "https://tldr.tech/fintech/2026-04-16": {
+    "topic": "fintech",
+    "date": "2026-04-16",
+    "ingested_at": "2026-06-05T09:47:02.317496+10:00"
+  },
+  "https://tldr.tech/it/2026-06-04": {
+    "topic": "it",
+    "date": "2026-06-04",
+    "ingested_at": "2026-06-05T09:47:18.298199+10:00"
+  },
+  "https://tldr.tech/it/2026-06-03": {
+    "topic": "it",
+    "date": "2026-06-03",
+    "ingested_at": "2026-06-05T09:47:32.226330+10:00"
+  },
+  "https://tldr.tech/it/2026-06-02": {
+    "topic": "it",
+    "date": "2026-06-02",
+    "ingested_at": "2026-06-05T09:47:46.877817+10:00"
+  },
+  "https://tldr.tech/it/2026-06-01": {
+    "topic": "it",
+    "date": "2026-06-01",
+    "ingested_at": "2026-06-05T09:48:03.356922+10:00"
+  },
+  "https://tldr.tech/it/2026-05-29": {
+    "topic": "it",
+    "date": "2026-05-29",
+    "ingested_at": "2026-06-05T09:48:31.041397+10:00"
+  },
+  "https://tldr.tech/it/2026-05-28": {
+    "topic": "it",
+    "date": "2026-05-28",
+    "ingested_at": "2026-06-05T09:49:08.081536+10:00"
+  },
+  "https://tldr.tech/it/2026-05-27": {
+    "topic": "it",
+    "date": "2026-05-27",
+    "ingested_at": "2026-06-05T09:49:23.441899+10:00"
+  },
+  "https://tldr.tech/it/2026-05-26": {
+    "topic": "it",
+    "date": "2026-05-26",
+    "ingested_at": "2026-06-05T09:49:39.099963+10:00"
+  },
+  "https://tldr.tech/it/2026-05-25": {
+    "topic": "it",
+    "date": "2026-05-25",
+    "ingested_at": "2026-06-05T09:49:56.820885+10:00"
+  },
+  "https://tldr.tech/it/2026-05-22": {
+    "topic": "it",
+    "date": "2026-05-22",
+    "ingested_at": "2026-06-05T09:50:17.915341+10:00"
+  },
+  "https://tldr.tech/it/2026-05-21": {
+    "topic": "it",
+    "date": "2026-05-21",
+    "ingested_at": "2026-06-05T09:50:36.658460+10:00"
+  },
+  "https://tldr.tech/it/2026-05-20": {
+    "topic": "it",
+    "date": "2026-05-20",
+    "ingested_at": "2026-06-05T09:50:55.185788+10:00"
+  },
+  "https://tldr.tech/it/2026-05-19": {
+    "topic": "it",
+    "date": "2026-05-19",
+    "ingested_at": "2026-06-05T09:51:12.698971+10:00"
+  },
+  "https://tldr.tech/it/2026-05-18": {
+    "topic": "it",
+    "date": "2026-05-18",
+    "ingested_at": "2026-06-05T09:51:28.062425+10:00"
+  },
+  "https://tldr.tech/it/2026-05-15": {
+    "topic": "it",
+    "date": "2026-05-15",
+    "ingested_at": "2026-06-05T09:51:43.102142+10:00"
+  },
+  "https://tldr.tech/data/2026-06-04": {
+    "topic": "data",
+    "date": "2026-06-04",
+    "ingested_at": "2026-06-05T09:52:00.316816+10:00"
+  },
+  "https://tldr.tech/data/2026-06-01": {
+    "topic": "data",
+    "date": "2026-06-01",
+    "ingested_at": "2026-06-05T09:52:55.732970+10:00"
+  },
+  "https://tldr.tech/data/2026-05-28": {
+    "topic": "data",
+    "date": "2026-05-28",
+    "ingested_at": "2026-06-05T09:53:40.465012+10:00"
+  },
+  "https://tldr.tech/data/2026-05-25": {
+    "topic": "data",
+    "date": "2026-05-25",
+    "ingested_at": "2026-06-05T09:53:57.470388+10:00"
+  },
+  "https://tldr.tech/data/2026-05-21": {
+    "topic": "data",
+    "date": "2026-05-21",
+    "ingested_at": "2026-06-05T09:54:31.873954+10:00"
+  },
+  "https://tldr.tech/data/2026-05-18": {
+    "topic": "data",
+    "date": "2026-05-18",
+    "ingested_at": "2026-06-05T09:55:07.200018+10:00"
+  },
+  "https://tldr.tech/data/2026-05-14": {
+    "topic": "data",
+    "date": "2026-05-14",
+    "ingested_at": "2026-06-05T09:56:12.430364+10:00"
+  },
+  "https://tldr.tech/data/2026-05-11": {
+    "topic": "data",
+    "date": "2026-05-11",
+    "ingested_at": "2026-06-05T09:56:31.478520+10:00"
+  },
+  "https://tldr.tech/data/2026-05-07": {
+    "topic": "data",
+    "date": "2026-05-07",
+    "ingested_at": "2026-06-05T09:57:08.757510+10:00"
+  },
+  "https://tldr.tech/data/2026-05-04": {
+    "topic": "data",
+    "date": "2026-05-04",
+    "ingested_at": "2026-06-05T09:57:56.056830+10:00"
+  },
+  "https://tldr.tech/data/2026-04-30": {
+    "topic": "data",
+    "date": "2026-04-30",
+    "ingested_at": "2026-06-05T09:58:34.153949+10:00"
+  },
+  "https://tldr.tech/data/2026-04-27": {
+    "topic": "data",
+    "date": "2026-04-27",
+    "ingested_at": "2026-06-05T09:58:48.590208+10:00"
+  },
+  "https://tldr.tech/data/2026-04-23": {
+    "topic": "data",
+    "date": "2026-04-23",
+    "ingested_at": "2026-06-05T09:59:21.669705+10:00"
+  },
+  "https://tldr.tech/data/2026-04-20": {
+    "topic": "data",
+    "date": "2026-04-20",
+    "ingested_at": "2026-06-05T10:00:43.499629+10:00"
+  },
+  "https://tldr.tech/data/2026-04-16": {
+    "topic": "data",
+    "date": "2026-04-16",
+    "ingested_at": "2026-06-05T10:01:30.898700+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-05": {
+    "topic": "tech",
+    "date": "2026-06-05",
+    "ingested_at": "2026-06-07T12:39:36.573097+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-05": {
+    "topic": "ai",
+    "date": "2026-06-05",
+    "ingested_at": "2026-06-07T12:41:16.153568+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-05": {
+    "topic": "infosec",
+    "date": "2026-06-05",
+    "ingested_at": "2026-06-07T12:43:49.533446+10:00"
+  },
+  "https://tldr.tech/devops/2026-06-05": {
+    "topic": "devops",
+    "date": "2026-06-05",
+    "ingested_at": "2026-06-07T12:45:19.859303+10:00"
+  },
+  "https://tldr.tech/founders/2026-06-05": {
+    "topic": "founders",
+    "date": "2026-06-05",
+    "ingested_at": "2026-06-07T12:47:31.656167+10:00"
+  },
+  "https://tldr.tech/design/2026-06-05": {
+    "topic": "design",
+    "date": "2026-06-05",
+    "ingested_at": "2026-06-07T12:49:18.743428+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-05": {
+    "topic": "marketing",
+    "date": "2026-06-05",
+    "ingested_at": "2026-06-07T12:51:19.557682+10:00"
+  },
+  "https://tldr.tech/product/2026-06-05": {
+    "topic": "product",
+    "date": "2026-06-05",
+    "ingested_at": "2026-06-07T12:52:26.857754+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-05": {
+    "topic": "crypto",
+    "date": "2026-06-05",
+    "ingested_at": "2026-06-07T12:54:07.620426+10:00"
+  },
+  "https://tldr.tech/it/2026-06-05": {
+    "topic": "it",
+    "date": "2026-06-05",
+    "ingested_at": "2026-06-07T12:56:01.154360+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-09": {
+    "topic": "tech",
+    "date": "2026-06-09",
+    "ingested_at": "2026-06-10T10:02:16.261158+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-08": {
+    "topic": "tech",
+    "date": "2026-06-08",
+    "ingested_at": "2026-06-10T10:04:42.853994+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-09": {
+    "topic": "ai",
+    "date": "2026-06-09",
+    "ingested_at": "2026-06-10T10:07:16.993264+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-08": {
+    "topic": "ai",
+    "date": "2026-06-08",
+    "ingested_at": "2026-06-10T10:09:28.874318+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-09": {
+    "topic": "infosec",
+    "date": "2026-06-09",
+    "ingested_at": "2026-06-10T10:12:08.220376+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-08": {
+    "topic": "infosec",
+    "date": "2026-06-08",
+    "ingested_at": "2026-06-10T10:15:12.651287+10:00"
+  },
+  "https://tldr.tech/devops/2026-06-08": {
+    "topic": "devops",
+    "date": "2026-06-08",
+    "ingested_at": "2026-06-10T10:17:13.692463+10:00"
+  },
+  "https://tldr.tech/founders/2026-06-08": {
+    "topic": "founders",
+    "date": "2026-06-08",
+    "ingested_at": "2026-06-10T10:18:52.505758+10:00"
+  },
+  "https://tldr.tech/design/2026-06-09": {
+    "topic": "design",
+    "date": "2026-06-09",
+    "ingested_at": "2026-06-10T10:20:38.179548+10:00"
+  },
+  "https://tldr.tech/design/2026-06-08": {
+    "topic": "design",
+    "date": "2026-06-08",
+    "ingested_at": "2026-06-10T10:22:31.970558+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-09": {
+    "topic": "marketing",
+    "date": "2026-06-09",
+    "ingested_at": "2026-06-10T10:24:34.486879+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-08": {
+    "topic": "marketing",
+    "date": "2026-06-08",
+    "ingested_at": "2026-06-10T10:26:44.635629+10:00"
+  },
+  "https://tldr.tech/product/2026-06-09": {
+    "topic": "product",
+    "date": "2026-06-09",
+    "ingested_at": "2026-06-10T10:28:21.677651+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-09": {
+    "topic": "crypto",
+    "date": "2026-06-09",
+    "ingested_at": "2026-06-10T12:20:27.285978+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-08": {
+    "topic": "crypto",
+    "date": "2026-06-08",
+    "ingested_at": "2026-06-10T14:22:40.299777+10:00"
+  },
+  "https://tldr.tech/fintech/2026-06-08": {
+    "topic": "fintech",
+    "date": "2026-06-08",
+    "ingested_at": "2026-06-10T15:45:56.387522+10:00"
+  },
+  "https://tldr.tech/it/2026-06-09": {
+    "topic": "it",
+    "date": "2026-06-09",
+    "ingested_at": "2026-06-10T21:08:26.827601+10:00"
+  },
+  "https://tldr.tech/it/2026-06-08": {
+    "topic": "it",
+    "date": "2026-06-08",
+    "ingested_at": "2026-06-12T08:15:04.228717+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-11": {
+    "topic": "tech",
+    "date": "2026-06-11",
+    "ingested_at": "2026-06-12T08:19:55.362494+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-10": {
+    "topic": "tech",
+    "date": "2026-06-10",
+    "ingested_at": "2026-06-12T08:21:31.254503+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-11": {
+    "topic": "ai",
+    "date": "2026-06-11",
+    "ingested_at": "2026-06-12T08:22:51.989989+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-10": {
+    "topic": "ai",
+    "date": "2026-06-10",
+    "ingested_at": "2026-06-12T08:25:24.264507+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-11": {
+    "topic": "infosec",
+    "date": "2026-06-11",
+    "ingested_at": "2026-06-12T08:27:56.680695+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-10": {
+    "topic": "infosec",
+    "date": "2026-06-10",
+    "ingested_at": "2026-06-12T08:30:33.829586+10:00"
+  },
+  "https://tldr.tech/devops/2026-06-10": {
+    "topic": "devops",
+    "date": "2026-06-10",
+    "ingested_at": "2026-06-12T08:33:07.139300+10:00"
+  },
+  "https://tldr.tech/founders/2026-06-10": {
+    "topic": "founders",
+    "date": "2026-06-10",
+    "ingested_at": "2026-06-12T08:35:20.588468+10:00"
+  },
+  "https://tldr.tech/design/2026-06-11": {
+    "topic": "design",
+    "date": "2026-06-11",
+    "ingested_at": "2026-06-12T08:37:18.078138+10:00"
+  },
+  "https://tldr.tech/design/2026-06-10": {
+    "topic": "design",
+    "date": "2026-06-10",
+    "ingested_at": "2026-06-12T08:39:14.102045+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-11": {
+    "topic": "marketing",
+    "date": "2026-06-11",
+    "ingested_at": "2026-06-12T08:41:27.083338+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-10": {
+    "topic": "marketing",
+    "date": "2026-06-10",
+    "ingested_at": "2026-06-12T08:43:08.915008+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-11": {
+    "topic": "crypto",
+    "date": "2026-06-11",
+    "ingested_at": "2026-06-12T08:45:21.791941+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-10": {
+    "topic": "crypto",
+    "date": "2026-06-10",
+    "ingested_at": "2026-06-12T08:48:00.554435+10:00"
+  },
+  "https://tldr.tech/fintech/2026-06-11": {
+    "topic": "fintech",
+    "date": "2026-06-11",
+    "ingested_at": "2026-06-12T08:50:10.199610+10:00"
+  },
+  "https://tldr.tech/it/2026-06-11": {
+    "topic": "it",
+    "date": "2026-06-11",
+    "ingested_at": "2026-06-12T08:52:05.578938+10:00"
+  },
+  "https://tldr.tech/it/2026-06-10": {
+    "topic": "it",
+    "date": "2026-06-10",
+    "ingested_at": "2026-06-12T08:53:39.151811+10:00"
+  },
+  "https://tldr.tech/data/2026-06-11": {
+    "topic": "data",
+    "date": "2026-06-11",
+    "ingested_at": "2026-06-12T08:55:16.669830+10:00"
+  },
+  "https://tldr.tech/data/2026-06-08": {
+    "topic": "data",
+    "date": "2026-06-08",
+    "ingested_at": "2026-06-12T08:57:12.266726+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-12": {
+    "topic": "tech",
+    "date": "2026-06-12",
+    "ingested_at": "2026-06-13T10:02:07.934685+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-12": {
+    "topic": "ai",
+    "date": "2026-06-12",
+    "ingested_at": "2026-06-13T10:04:08.568515+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-12": {
+    "topic": "infosec",
+    "date": "2026-06-12",
+    "ingested_at": "2026-06-13T10:06:47.973685+10:00"
+  },
+  "https://tldr.tech/devops/2026-06-12": {
+    "topic": "devops",
+    "date": "2026-06-12",
+    "ingested_at": "2026-06-13T10:08:47.176909+10:00"
+  },
+  "https://tldr.tech/founders/2026-06-12": {
+    "topic": "founders",
+    "date": "2026-06-12",
+    "ingested_at": "2026-06-13T10:11:31.584132+10:00"
+  },
+  "https://tldr.tech/design/2026-06-12": {
+    "topic": "design",
+    "date": "2026-06-12",
+    "ingested_at": "2026-06-13T10:13:34.826429+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-12": {
+    "topic": "marketing",
+    "date": "2026-06-12",
+    "ingested_at": "2026-06-13T10:15:25.476294+10:00"
+  },
+  "https://tldr.tech/product/2026-06-12": {
+    "topic": "product",
+    "date": "2026-06-12",
+    "ingested_at": "2026-06-13T10:16:46.482443+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-12": {
+    "topic": "crypto",
+    "date": "2026-06-12",
+    "ingested_at": "2026-06-13T10:18:48.006263+10:00"
+  },
+  "https://tldr.tech/it/2026-06-12": {
+    "topic": "it",
+    "date": "2026-06-12",
+    "ingested_at": "2026-06-13T10:20:41.690482+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-17": {
+    "topic": "tech",
+    "date": "2026-06-17",
+    "ingested_at": "2026-06-18T10:00:15.287181+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-16": {
+    "topic": "tech",
+    "date": "2026-06-16",
+    "ingested_at": "2026-06-18T10:00:26.248695+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-15": {
+    "topic": "tech",
+    "date": "2026-06-15",
+    "ingested_at": "2026-06-18T10:00:40.465863+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-17": {
+    "topic": "ai",
+    "date": "2026-06-17",
+    "ingested_at": "2026-06-18T10:00:52.723039+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-16": {
+    "topic": "ai",
+    "date": "2026-06-16",
+    "ingested_at": "2026-06-18T10:01:04.665306+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-15": {
+    "topic": "ai",
+    "date": "2026-06-15",
+    "ingested_at": "2026-06-19T00:49:08.638575+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-19": {
+    "topic": "tech",
+    "date": "2026-06-19",
+    "ingested_at": "2026-06-20T10:00:14.036463+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-18": {
+    "topic": "tech",
+    "date": "2026-06-18",
+    "ingested_at": "2026-06-20T10:00:24.513405+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-19": {
+    "topic": "ai",
+    "date": "2026-06-19",
+    "ingested_at": "2026-06-20T10:00:35.778735+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-18": {
+    "topic": "ai",
+    "date": "2026-06-18",
+    "ingested_at": "2026-06-20T10:00:47.550090+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-19": {
+    "topic": "infosec",
+    "date": "2026-06-19",
+    "ingested_at": "2026-06-20T10:01:01.181314+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-18": {
+    "topic": "infosec",
+    "date": "2026-06-18",
+    "ingested_at": "2026-06-20T10:01:14.175070+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-17": {
+    "topic": "infosec",
+    "date": "2026-06-17",
+    "ingested_at": "2026-06-20T10:01:27.182070+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-16": {
+    "topic": "infosec",
+    "date": "2026-06-16",
+    "ingested_at": "2026-06-20T10:01:39.671732+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-15": {
+    "topic": "infosec",
+    "date": "2026-06-15",
+    "ingested_at": "2026-06-20T10:01:52.373608+10:00"
+  },
+  "https://tldr.tech/devops/2026-06-19": {
+    "topic": "devops",
+    "date": "2026-06-19",
+    "ingested_at": "2026-06-20T10:02:03.434262+10:00"
+  },
+  "https://tldr.tech/devops/2026-06-17": {
+    "topic": "devops",
+    "date": "2026-06-17",
+    "ingested_at": "2026-06-20T10:02:14.938319+10:00"
+  },
+  "https://tldr.tech/devops/2026-06-15": {
+    "topic": "devops",
+    "date": "2026-06-15",
+    "ingested_at": "2026-06-20T10:02:26.060000+10:00"
+  },
+  "https://tldr.tech/founders/2026-06-19": {
+    "topic": "founders",
+    "date": "2026-06-19",
+    "ingested_at": "2026-06-20T10:02:35.072418+10:00"
+  },
+  "https://tldr.tech/founders/2026-06-17": {
+    "topic": "founders",
+    "date": "2026-06-17",
+    "ingested_at": "2026-06-20T10:02:46.540743+10:00"
+  },
+  "https://tldr.tech/founders/2026-06-15": {
+    "topic": "founders",
+    "date": "2026-06-15",
+    "ingested_at": "2026-06-20T10:02:57.600893+10:00"
+  },
+  "https://tldr.tech/design/2026-06-19": {
+    "topic": "design",
+    "date": "2026-06-19",
+    "ingested_at": "2026-06-20T10:03:08.397547+10:00"
+  },
+  "https://tldr.tech/design/2026-06-18": {
+    "topic": "design",
+    "date": "2026-06-18",
+    "ingested_at": "2026-06-20T10:03:19.207199+10:00"
+  },
+  "https://tldr.tech/design/2026-06-17": {
+    "topic": "design",
+    "date": "2026-06-17",
+    "ingested_at": "2026-06-20T10:03:28.836054+10:00"
+  },
+  "https://tldr.tech/design/2026-06-16": {
+    "topic": "design",
+    "date": "2026-06-16",
+    "ingested_at": "2026-06-20T10:03:40.094932+10:00"
+  },
+  "https://tldr.tech/design/2026-06-15": {
+    "topic": "design",
+    "date": "2026-06-15",
+    "ingested_at": "2026-06-20T10:03:50.030185+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-19": {
+    "topic": "marketing",
+    "date": "2026-06-19",
+    "ingested_at": "2026-06-20T10:03:59.556149+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-18": {
+    "topic": "marketing",
+    "date": "2026-06-18",
+    "ingested_at": "2026-06-20T10:04:08.669743+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-17": {
+    "topic": "marketing",
+    "date": "2026-06-17",
+    "ingested_at": "2026-06-20T10:04:19.930367+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-16": {
+    "topic": "marketing",
+    "date": "2026-06-16",
+    "ingested_at": "2026-06-20T10:04:29.353609+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-15": {
+    "topic": "marketing",
+    "date": "2026-06-15",
+    "ingested_at": "2026-06-20T10:04:39.387161+10:00"
+  },
+  "https://tldr.tech/product/2026-06-19": {
+    "topic": "product",
+    "date": "2026-06-19",
+    "ingested_at": "2026-06-20T10:04:43.576102+10:00"
+  },
+  "https://tldr.tech/product/2026-06-16": {
+    "topic": "product",
+    "date": "2026-06-16",
+    "ingested_at": "2026-06-20T10:04:47.272941+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-19": {
+    "topic": "crypto",
+    "date": "2026-06-19",
+    "ingested_at": "2026-06-20T10:04:58.334286+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-18": {
+    "topic": "crypto",
+    "date": "2026-06-18",
+    "ingested_at": "2026-06-20T10:05:09.594790+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-17": {
+    "topic": "crypto",
+    "date": "2026-06-17",
+    "ingested_at": "2026-06-20T10:05:21.373077+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-16": {
+    "topic": "crypto",
+    "date": "2026-06-16",
+    "ingested_at": "2026-06-20T10:05:31.920840+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-15": {
+    "topic": "crypto",
+    "date": "2026-06-15",
+    "ingested_at": "2026-06-20T10:05:43.182495+10:00"
+  },
+  "https://tldr.tech/fintech/2026-06-18": {
+    "topic": "fintech",
+    "date": "2026-06-18",
+    "ingested_at": "2026-06-20T10:05:52.912489+10:00"
+  },
+  "https://tldr.tech/fintech/2026-06-15": {
+    "topic": "fintech",
+    "date": "2026-06-15",
+    "ingested_at": "2026-06-20T10:06:02.329221+10:00"
+  },
+  "https://tldr.tech/it/2026-06-19": {
+    "topic": "it",
+    "date": "2026-06-19",
+    "ingested_at": "2026-06-20T10:06:12.266568+10:00"
+  },
+  "https://tldr.tech/it/2026-06-18": {
+    "topic": "it",
+    "date": "2026-06-18",
+    "ingested_at": "2026-06-20T10:06:19.431552+10:00"
+  },
+  "https://tldr.tech/it/2026-06-17": {
+    "topic": "it",
+    "date": "2026-06-17",
+    "ingested_at": "2026-06-20T10:06:28.645797+10:00"
+  },
+  "https://tldr.tech/it/2026-06-16": {
+    "topic": "it",
+    "date": "2026-06-16",
+    "ingested_at": "2026-06-20T10:06:37.862965+10:00"
+  },
+  "https://tldr.tech/it/2026-06-15": {
+    "topic": "it",
+    "date": "2026-06-15",
+    "ingested_at": "2026-06-20T10:06:46.469709+10:00"
+  },
+  "https://tldr.tech/data/2026-06-18": {
+    "topic": "data",
+    "date": "2026-06-18",
+    "ingested_at": "2026-06-20T10:06:55.886644+10:00"
+  },
+  "https://tldr.tech/data/2026-06-15": {
+    "topic": "data",
+    "date": "2026-06-15",
+    "ingested_at": "2026-06-20T10:07:05.246241+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-22": {
+    "topic": "tech",
+    "date": "2026-06-22",
+    "ingested_at": "2026-06-23T10:00:26.537349+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-22": {
+    "topic": "ai",
+    "date": "2026-06-22",
+    "ingested_at": "2026-06-23T10:00:44.193086+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-22": {
+    "topic": "infosec",
+    "date": "2026-06-22",
+    "ingested_at": "2026-06-23T10:01:03.255874+10:00"
+  },
+  "https://tldr.tech/devops/2026-06-22": {
+    "topic": "devops",
+    "date": "2026-06-22",
+    "ingested_at": "2026-06-23T10:01:19.841779+10:00"
+  },
+  "https://tldr.tech/founders/2026-06-22": {
+    "topic": "founders",
+    "date": "2026-06-22",
+    "ingested_at": "2026-06-23T10:01:34.029385+10:00"
+  },
+  "https://tldr.tech/design/2026-06-22": {
+    "topic": "design",
+    "date": "2026-06-22",
+    "ingested_at": "2026-06-23T10:01:50.343418+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-22": {
+    "topic": "marketing",
+    "date": "2026-06-22",
+    "ingested_at": "2026-06-23T10:02:04.644681+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-22": {
+    "topic": "crypto",
+    "date": "2026-06-22",
+    "ingested_at": "2026-06-23T10:02:18.296293+10:00"
+  },
+  "https://tldr.tech/fintech/2026-06-22": {
+    "topic": "fintech",
+    "date": "2026-06-22",
+    "ingested_at": "2026-06-23T10:02:29.660794+10:00"
+  },
+  "https://tldr.tech/it/2026-06-22": {
+    "topic": "it",
+    "date": "2026-06-22",
+    "ingested_at": "2026-06-23T10:02:40.418919+10:00"
+  },
+  "https://tldr.tech/data/2026-06-22": {
+    "topic": "data",
+    "date": "2026-06-22",
+    "ingested_at": "2026-06-23T10:02:50.690367+10:00"
+  },
+  "https://tldr.tech/tech/2026-07-03": {
+    "topic": "tech",
+    "date": "2026-07-03",
+    "ingested_at": "2026-07-06T10:01:13.694586+10:00"
+  },
+  "https://tldr.tech/tech/2026-07-02": {
+    "topic": "tech",
+    "date": "2026-07-02",
+    "ingested_at": "2026-07-06T10:01:56.827299+10:00"
+  },
+  "https://tldr.tech/tech/2026-07-01": {
+    "topic": "tech",
+    "date": "2026-07-01",
+    "ingested_at": "2026-07-06T10:03:48.860945+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-30": {
+    "topic": "tech",
+    "date": "2026-06-30",
+    "ingested_at": "2026-07-06T10:04:59.781006+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-29": {
+    "topic": "tech",
+    "date": "2026-06-29",
+    "ingested_at": "2026-07-06T10:06:06.264882+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-26": {
+    "topic": "tech",
+    "date": "2026-06-26",
+    "ingested_at": "2026-07-06T10:07:23.232195+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-25": {
+    "topic": "tech",
+    "date": "2026-06-25",
+    "ingested_at": "2026-07-06T10:09:59.832479+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-24": {
+    "topic": "tech",
+    "date": "2026-06-24",
+    "ingested_at": "2026-07-06T10:13:06.133484+10:00"
+  },
+  "https://tldr.tech/tech/2026-06-23": {
+    "topic": "tech",
+    "date": "2026-06-23",
+    "ingested_at": "2026-07-06T10:14:51.865227+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-23": {
+    "topic": "ai",
+    "date": "2026-06-23",
+    "ingested_at": "2026-07-06T10:15:42.123181+10:00"
+  },
+  "https://tldr.tech/infosec/2026-07-03": {
+    "topic": "infosec",
+    "date": "2026-07-03",
+    "ingested_at": "2026-07-06T10:16:37.991932+10:00"
+  },
+  "https://tldr.tech/infosec/2026-07-02": {
+    "topic": "infosec",
+    "date": "2026-07-02",
+    "ingested_at": "2026-07-06T10:17:27.695152+10:00"
+  },
+  "https://tldr.tech/infosec/2026-07-01": {
+    "topic": "infosec",
+    "date": "2026-07-01",
+    "ingested_at": "2026-07-06T10:18:18.538264+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-30": {
+    "topic": "infosec",
+    "date": "2026-06-30",
+    "ingested_at": "2026-07-06T10:19:41.331003+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-29": {
+    "topic": "infosec",
+    "date": "2026-06-29",
+    "ingested_at": "2026-07-06T10:20:56.363569+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-26": {
+    "topic": "infosec",
+    "date": "2026-06-26",
+    "ingested_at": "2026-07-06T10:21:57.934277+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-25": {
+    "topic": "infosec",
+    "date": "2026-06-25",
+    "ingested_at": "2026-07-06T10:23:08.231614+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-24": {
+    "topic": "infosec",
+    "date": "2026-06-24",
+    "ingested_at": "2026-07-06T10:24:01.661378+10:00"
+  },
+  "https://tldr.tech/infosec/2026-06-23": {
+    "topic": "infosec",
+    "date": "2026-06-23",
+    "ingested_at": "2026-07-06T10:24:51.420825+10:00"
+  },
+  "https://tldr.tech/devops/2026-06-26": {
+    "topic": "devops",
+    "date": "2026-06-26",
+    "ingested_at": "2026-07-06T10:25:36.707795+10:00"
+  },
+  "https://tldr.tech/devops/2026-06-24": {
+    "topic": "devops",
+    "date": "2026-06-24",
+    "ingested_at": "2026-07-06T10:26:26.278158+10:00"
+  },
+  "https://tldr.tech/founders/2026-07-03": {
+    "topic": "founders",
+    "date": "2026-07-03",
+    "ingested_at": "2026-07-06T10:27:08.544332+10:00"
+  },
+  "https://tldr.tech/founders/2026-07-01": {
+    "topic": "founders",
+    "date": "2026-07-01",
+    "ingested_at": "2026-07-06T10:27:52.797628+10:00"
+  },
+  "https://tldr.tech/founders/2026-06-29": {
+    "topic": "founders",
+    "date": "2026-06-29",
+    "ingested_at": "2026-07-06T10:28:32.174086+10:00"
+  },
+  "https://tldr.tech/founders/2026-06-26": {
+    "topic": "founders",
+    "date": "2026-06-26",
+    "ingested_at": "2026-07-06T10:29:13.018898+10:00"
+  },
+  "https://tldr.tech/founders/2026-06-24": {
+    "topic": "founders",
+    "date": "2026-06-24",
+    "ingested_at": "2026-07-06T10:30:10.104221+10:00"
+  },
+  "https://tldr.tech/design/2026-06-26": {
+    "topic": "design",
+    "date": "2026-06-26",
+    "ingested_at": "2026-07-06T10:31:06.651356+10:00"
+  },
+  "https://tldr.tech/design/2026-06-25": {
+    "topic": "design",
+    "date": "2026-06-25",
+    "ingested_at": "2026-07-06T10:32:02.216160+10:00"
+  },
+  "https://tldr.tech/design/2026-06-24": {
+    "topic": "design",
+    "date": "2026-06-24",
+    "ingested_at": "2026-07-06T10:32:43.939288+10:00"
+  },
+  "https://tldr.tech/design/2026-06-23": {
+    "topic": "design",
+    "date": "2026-06-23",
+    "ingested_at": "2026-07-06T10:33:51.636387+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-23": {
+    "topic": "marketing",
+    "date": "2026-06-23",
+    "ingested_at": "2026-07-06T10:34:45.173894+10:00"
+  },
+  "https://tldr.tech/product/2026-06-26": {
+    "topic": "product",
+    "date": "2026-06-26",
+    "ingested_at": "2026-07-06T10:35:08.317219+10:00"
+  },
+  "https://tldr.tech/product/2026-06-23": {
+    "topic": "product",
+    "date": "2026-06-23",
+    "ingested_at": "2026-07-06T10:35:43.747567+10:00"
+  },
+  "https://tldr.tech/crypto/2026-07-03": {
+    "topic": "crypto",
+    "date": "2026-07-03",
+    "ingested_at": "2026-07-06T10:36:36.597671+10:00"
+  },
+  "https://tldr.tech/crypto/2026-07-02": {
+    "topic": "crypto",
+    "date": "2026-07-02",
+    "ingested_at": "2026-07-06T10:37:27.271612+10:00"
+  },
+  "https://tldr.tech/crypto/2026-07-01": {
+    "topic": "crypto",
+    "date": "2026-07-01",
+    "ingested_at": "2026-07-06T10:38:10.915185+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-30": {
+    "topic": "crypto",
+    "date": "2026-06-30",
+    "ingested_at": "2026-07-06T10:38:58.594153+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-29": {
+    "topic": "crypto",
+    "date": "2026-06-29",
+    "ingested_at": "2026-07-06T10:39:42.201736+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-26": {
+    "topic": "crypto",
+    "date": "2026-06-26",
+    "ingested_at": "2026-07-06T10:40:32.605539+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-25": {
+    "topic": "crypto",
+    "date": "2026-06-25",
+    "ingested_at": "2026-07-06T10:41:14.574160+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-24": {
+    "topic": "crypto",
+    "date": "2026-06-24",
+    "ingested_at": "2026-07-06T10:42:33.105823+10:00"
+  },
+  "https://tldr.tech/crypto/2026-06-23": {
+    "topic": "crypto",
+    "date": "2026-06-23",
+    "ingested_at": "2026-07-06T10:43:24.220611+10:00"
+  },
+  "https://tldr.tech/fintech/2026-07-02": {
+    "topic": "fintech",
+    "date": "2026-07-02",
+    "ingested_at": "2026-07-06T10:43:59.874077+10:00"
+  },
+  "https://tldr.tech/fintech/2026-06-29": {
+    "topic": "fintech",
+    "date": "2026-06-29",
+    "ingested_at": "2026-07-06T10:44:38.031941+10:00"
+  },
+  "https://tldr.tech/fintech/2026-06-25": {
+    "topic": "fintech",
+    "date": "2026-06-25",
+    "ingested_at": "2026-07-06T10:45:11.915776+10:00"
+  },
+  "https://tldr.tech/it/2026-07-03": {
+    "topic": "it",
+    "date": "2026-07-03",
+    "ingested_at": "2026-07-06T10:45:45.123132+10:00"
+  },
+  "https://tldr.tech/it/2026-07-02": {
+    "topic": "it",
+    "date": "2026-07-02",
+    "ingested_at": "2026-07-06T10:46:19.494846+10:00"
+  },
+  "https://tldr.tech/it/2026-07-01": {
+    "topic": "it",
+    "date": "2026-07-01",
+    "ingested_at": "2026-07-06T10:46:54.156879+10:00"
+  },
+  "https://tldr.tech/it/2026-06-30": {
+    "topic": "it",
+    "date": "2026-06-30",
+    "ingested_at": "2026-07-06T10:47:32.234101+10:00"
+  },
+  "https://tldr.tech/it/2026-06-29": {
+    "topic": "it",
+    "date": "2026-06-29",
+    "ingested_at": "2026-07-06T10:48:05.589133+10:00"
+  },
+  "https://tldr.tech/it/2026-06-26": {
+    "topic": "it",
+    "date": "2026-06-26",
+    "ingested_at": "2026-07-06T10:48:41.852040+10:00"
+  },
+  "https://tldr.tech/it/2026-06-25": {
+    "topic": "it",
+    "date": "2026-06-25",
+    "ingested_at": "2026-07-06T10:49:25.135496+10:00"
+  },
+  "https://tldr.tech/it/2026-06-24": {
+    "topic": "it",
+    "date": "2026-06-24",
+    "ingested_at": "2026-07-06T10:49:52.097418+10:00"
+  },
+  "https://tldr.tech/it/2026-06-23": {
+    "topic": "it",
+    "date": "2026-06-23",
+    "ingested_at": "2026-07-06T10:50:14.624019+10:00"
+  },
+  "https://tldr.tech/data/2026-07-02": {
+    "topic": "data",
+    "date": "2026-07-02",
+    "ingested_at": "2026-07-06T10:50:40.828257+10:00"
+  },
+  "https://tldr.tech/data/2026-06-29": {
+    "topic": "data",
+    "date": "2026-06-29",
+    "ingested_at": "2026-07-06T10:51:20.886959+10:00"
+  },
+  "https://tldr.tech/data/2026-06-25": {
+    "topic": "data",
+    "date": "2026-06-25",
+    "ingested_at": "2026-07-06T10:51:57.220266+10:00"
+  },
+  "https://tldr.tech/tech/2026-07-06": {
+    "topic": "tech",
+    "date": "2026-07-06",
+    "ingested_at": "2026-07-07T10:00:43.670381+10:00"
+  },
+  "https://tldr.tech/ai/2026-07-06": {
+    "topic": "ai",
+    "date": "2026-07-06",
+    "ingested_at": "2026-07-07T10:01:23.221487+10:00"
+  },
+  "https://tldr.tech/ai/2026-07-03": {
+    "topic": "ai",
+    "date": "2026-07-03",
+    "ingested_at": "2026-07-07T10:01:50.970556+10:00"
+  },
+  "https://tldr.tech/ai/2026-07-02": {
+    "topic": "ai",
+    "date": "2026-07-02",
+    "ingested_at": "2026-07-07T10:02:26.691669+10:00"
+  },
+  "https://tldr.tech/ai/2026-07-01": {
+    "topic": "ai",
+    "date": "2026-07-01",
+    "ingested_at": "2026-07-07T10:03:04.490875+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-30": {
+    "topic": "ai",
+    "date": "2026-06-30",
+    "ingested_at": "2026-07-07T10:04:08.381681+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-29": {
+    "topic": "ai",
+    "date": "2026-06-29",
+    "ingested_at": "2026-07-07T10:04:58.434376+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-26": {
+    "topic": "ai",
+    "date": "2026-06-26",
+    "ingested_at": "2026-07-07T10:05:40.084898+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-25": {
+    "topic": "ai",
+    "date": "2026-06-25",
+    "ingested_at": "2026-07-07T10:06:26.774782+10:00"
+  },
+  "https://tldr.tech/ai/2026-06-24": {
+    "topic": "ai",
+    "date": "2026-06-24",
+    "ingested_at": "2026-07-07T10:07:09.796570+10:00"
+  },
+  "https://tldr.tech/infosec/2026-07-06": {
+    "topic": "infosec",
+    "date": "2026-07-06",
+    "ingested_at": "2026-07-07T10:07:57.111544+10:00"
+  },
+  "https://tldr.tech/founders/2026-07-06": {
+    "topic": "founders",
+    "date": "2026-07-06",
+    "ingested_at": "2026-07-07T10:08:35.465086+10:00"
+  },
+  "https://tldr.tech/crypto/2026-07-06": {
+    "topic": "crypto",
+    "date": "2026-07-06",
+    "ingested_at": "2026-07-07T10:09:26.293098+10:00"
+  },
+  "https://tldr.tech/fintech/2026-07-06": {
+    "topic": "fintech",
+    "date": "2026-07-06",
+    "ingested_at": "2026-07-07T10:10:18.501941+10:00"
+  },
+  "https://tldr.tech/it/2026-07-06": {
+    "topic": "it",
+    "date": "2026-07-06",
+    "ingested_at": "2026-07-07T10:10:50.864992+10:00"
+  },
+  "https://tldr.tech/data/2026-07-06": {
+    "topic": "data",
+    "date": "2026-07-06",
+    "ingested_at": "2026-07-07T10:11:25.752512+10:00"
+  },
+  "https://tldr.tech/tech/2026-07-07": {
+    "topic": "tech",
+    "date": "2026-07-07",
+    "ingested_at": "2026-07-08T10:01:06.859958+10:00"
+  },
+  "https://tldr.tech/ai/2026-07-07": {
+    "topic": "ai",
+    "date": "2026-07-07",
+    "ingested_at": "2026-07-08T10:01:37.353932+10:00"
+  },
+  "https://tldr.tech/infosec/2026-07-07": {
+    "topic": "infosec",
+    "date": "2026-07-07",
+    "ingested_at": "2026-07-08T10:02:12.205763+10:00"
+  },
+  "https://tldr.tech/crypto/2026-07-07": {
+    "topic": "crypto",
+    "date": "2026-07-07",
+    "ingested_at": "2026-07-08T10:02:48.856006+10:00"
+  },
+  "https://tldr.tech/it/2026-07-07": {
+    "topic": "it",
+    "date": "2026-07-07",
+    "ingested_at": "2026-07-08T10:03:10.059813+10:00"
+  },
+  "https://tldr.tech/tech/2026-07-08": {
+    "topic": "tech",
+    "date": "2026-07-08",
+    "ingested_at": "2026-07-09T10:42:07.004660+10:00"
+  },
+  "https://tldr.tech/ai/2026-07-08": {
+    "topic": "ai",
+    "date": "2026-07-08",
+    "ingested_at": "2026-07-09T10:58:17.342324+10:00"
+  },
+  "https://tldr.tech/infosec/2026-07-08": {
+    "topic": "infosec",
+    "date": "2026-07-08",
+    "ingested_at": "2026-07-09T10:58:57.557576+10:00"
+  },
+  "https://tldr.tech/founders/2026-07-08": {
+    "topic": "founders",
+    "date": "2026-07-08",
+    "ingested_at": "2026-07-09T11:12:24.847125+10:00"
+  },
+  "https://tldr.tech/crypto/2026-07-08": {
+    "topic": "crypto",
+    "date": "2026-07-08",
+    "ingested_at": "2026-07-09T11:13:25.059164+10:00"
+  },
+  "https://tldr.tech/tech/2026-07-09": {
+    "topic": "tech",
+    "date": "2026-07-09",
+    "ingested_at": "2026-07-11T10:34:46.488108+10:00"
+  },
+  "https://tldr.tech/ai/2026-07-09": {
+    "topic": "ai",
+    "date": "2026-07-09",
+    "ingested_at": "2026-07-11T10:53:22.193481+10:00"
+  },
+  "https://tldr.tech/infosec/2026-07-09": {
+    "topic": "infosec",
+    "date": "2026-07-09",
+    "ingested_at": "2026-07-11T11:10:30.700120+10:00"
+  },
+  "https://tldr.tech/devops/2026-07-08": {
+    "topic": "devops",
+    "date": "2026-07-08",
+    "ingested_at": "2026-07-11T11:41:15.383350+10:00"
+  },
+  "https://tldr.tech/devops/2026-07-06": {
+    "topic": "devops",
+    "date": "2026-07-06",
+    "ingested_at": "2026-07-11T11:41:57.671135+10:00"
+  },
+  "https://tldr.tech/devops/2026-07-03": {
+    "topic": "devops",
+    "date": "2026-07-03",
+    "ingested_at": "2026-07-11T11:57:25.600882+10:00"
+  },
+  "https://tldr.tech/devops/2026-07-01": {
+    "topic": "devops",
+    "date": "2026-07-01",
+    "ingested_at": "2026-07-11T12:13:10.227642+10:00"
+  },
+  "https://tldr.tech/devops/2026-06-29": {
+    "topic": "devops",
+    "date": "2026-06-29",
+    "ingested_at": "2026-07-11T12:44:44.935959+10:00"
+  },
+  "https://tldr.tech/design/2026-07-09": {
+    "topic": "design",
+    "date": "2026-07-09",
+    "ingested_at": "2026-07-11T12:45:03.464233+10:00"
+  },
+  "https://tldr.tech/design/2026-07-07": {
+    "topic": "design",
+    "date": "2026-07-07",
+    "ingested_at": "2026-07-11T13:03:12.109358+10:00"
+  },
+  "https://tldr.tech/design/2026-07-06": {
+    "topic": "design",
+    "date": "2026-07-06",
+    "ingested_at": "2026-07-11T13:19:07.947780+10:00"
+  },
+  "https://tldr.tech/design/2026-07-03": {
+    "topic": "design",
+    "date": "2026-07-03",
+    "ingested_at": "2026-07-11T13:19:33.917781+10:00"
+  },
+  "https://tldr.tech/design/2026-07-02": {
+    "topic": "design",
+    "date": "2026-07-02",
+    "ingested_at": "2026-07-11T13:19:52.178556+10:00"
+  },
+  "https://tldr.tech/design/2026-07-01": {
+    "topic": "design",
+    "date": "2026-07-01",
+    "ingested_at": "2026-07-11T13:50:11.914519+10:00"
+  },
+  "https://tldr.tech/design/2026-06-30": {
+    "topic": "design",
+    "date": "2026-06-30",
+    "ingested_at": "2026-07-11T13:50:31.700707+10:00"
+  },
+  "https://tldr.tech/design/2026-06-29": {
+    "topic": "design",
+    "date": "2026-06-29",
+    "ingested_at": "2026-07-11T14:08:22.928643+10:00"
+  },
+  "https://tldr.tech/marketing/2026-07-09": {
+    "topic": "marketing",
+    "date": "2026-07-09",
+    "ingested_at": "2026-07-11T14:08:46.075181+10:00"
+  },
+  "https://tldr.tech/marketing/2026-07-08": {
+    "topic": "marketing",
+    "date": "2026-07-08",
+    "ingested_at": "2026-07-11T14:09:08.804992+10:00"
+  },
+  "https://tldr.tech/marketing/2026-07-07": {
+    "topic": "marketing",
+    "date": "2026-07-07",
+    "ingested_at": "2026-07-11T14:09:25.391489+10:00"
+  },
+  "https://tldr.tech/marketing/2026-07-06": {
+    "topic": "marketing",
+    "date": "2026-07-06",
+    "ingested_at": "2026-07-11T14:09:42.006675+10:00"
+  },
+  "https://tldr.tech/marketing/2026-07-03": {
+    "topic": "marketing",
+    "date": "2026-07-03",
+    "ingested_at": "2026-07-11T14:09:57.979040+10:00"
+  },
+  "https://tldr.tech/marketing/2026-07-02": {
+    "topic": "marketing",
+    "date": "2026-07-02",
+    "ingested_at": "2026-07-11T14:10:15.984163+10:00"
+  },
+  "https://tldr.tech/marketing/2026-07-01": {
+    "topic": "marketing",
+    "date": "2026-07-01",
+    "ingested_at": "2026-07-11T14:10:31.539235+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-30": {
+    "topic": "marketing",
+    "date": "2026-06-30",
+    "ingested_at": "2026-07-11T14:10:47.428803+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-29": {
+    "topic": "marketing",
+    "date": "2026-06-29",
+    "ingested_at": "2026-07-11T14:11:03.427476+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-26": {
+    "topic": "marketing",
+    "date": "2026-06-26",
+    "ingested_at": "2026-07-11T14:11:21.593003+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-25": {
+    "topic": "marketing",
+    "date": "2026-06-25",
+    "ingested_at": "2026-07-11T14:11:38.238944+10:00"
+  },
+  "https://tldr.tech/marketing/2026-06-24": {
+    "topic": "marketing",
+    "date": "2026-06-24",
+    "ingested_at": "2026-07-11T14:11:56.384603+10:00"
+  },
+  "https://tldr.tech/product/2026-07-07": {
+    "topic": "product",
+    "date": "2026-07-07",
+    "ingested_at": "2026-07-11T14:28:29.417344+10:00"
+  },
+  "https://tldr.tech/product/2026-07-03": {
+    "topic": "product",
+    "date": "2026-07-03",
+    "ingested_at": "2026-07-11T14:28:54.284059+10:00"
+  },
+  "https://tldr.tech/product/2026-06-30": {
+    "topic": "product",
+    "date": "2026-06-30",
+    "ingested_at": "2026-07-11T14:29:08.863118+10:00"
+  },
+  "https://tldr.tech/crypto/2026-07-09": {
+    "topic": "crypto",
+    "date": "2026-07-09",
+    "ingested_at": "2026-07-11T14:29:25.671038+10:00"
+  },
+  "https://tldr.tech/fintech/2026-07-09": {
+    "topic": "fintech",
+    "date": "2026-07-09",
+    "ingested_at": "2026-07-11T14:29:43.998752+10:00"
+  },
+  "https://tldr.tech/it/2026-07-09": {
+    "topic": "it",
+    "date": "2026-07-09",
+    "ingested_at": "2026-07-11T14:30:01.120476+10:00"
+  },
+  "https://tldr.tech/data/2026-07-09": {
+    "topic": "data",
+    "date": "2026-07-09",
+    "ingested_at": "2026-07-11T14:30:17.870147+10:00"
+  },
+  "https://tldr.tech/design/2026-07-08": {
+    "topic": "design",
+    "date": "2026-07-08",
+    "ingested_at": "2026-07-12T10:01:06.250813+10:00"
+  }
+}

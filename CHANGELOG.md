@@ -7,6 +7,7 @@
 
 ### Added
 - **Ponytail Skill:** Added the `ponytail` skill to enforce YAGNI, minimalist code generation, and standard library preference across agents.
+- **Hermes Digest-First Pipeline & GitHub Export:** Refactored `weekly_hermes_run.py` to use a robust digest-first pipeline, performing a single LLM call to write the dispatch. Also added an idempotent `push_to_github` function leveraging `PyGithub` to automatically export the generated dispatch to a TinaCMS repository.
 
 ## [2026-06-21]
 ### Added

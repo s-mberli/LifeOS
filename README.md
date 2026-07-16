@@ -182,7 +182,7 @@ LifeOS doesn't just store knowledge — it **acts on it**. The system features a
 | **1** | `src/core/ingest.py` | On every note save, pushes metadata to the `automation_outbox` table in SQLite. |
 | **2** | `scripts/triage_outbox.py` | Lightweight keyword scanner (AI, Architecture, Python, SQLite, etc.). **No LLM calls** — runs in milliseconds. |
 | **3** | `scripts/weekly_hermes_run.sh` | Cron-triggered weekly. Aggregates all actionable notes since the last run. |
-| **4** | Hermes Agent | Receives the aggregated context, reviews the codebase via MCP tools, implements improvements, runs `pytest`, and opens a **GitHub Pull Request** for human approval. |
+| **4** | Hermes Agent | Receives the aggregated context, reviews the codebase via MCP tools, implements improvements, runs `pytest`, opens a **GitHub Pull Request** for human approval, and publishes a synthesized weekly dispatch to your TinaCMS website repo. |
 
 > **Why this design?** Calling an LLM on every single ingested note would be expensive and noisy. The outbox + keyword triage pattern keeps costs near-zero during normal operation, and batches the expensive Hermes review into a single weekly run.
 
