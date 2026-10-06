@@ -35,6 +35,6 @@ def test_jina_reader_title_extraction_with_prefix():
     mock_response.text = "Title: Varick Agents on X: \"How to Transform a Company With AI\" / X\n\nURL Source: https://x.com/varickagents/status/2059397823674958265\n\nMarkdown Content:\nSome content"
     mock_response.status_code = 200
 
-    with patch("requests.get", return_value=mock_response):
+    with patch("src.core.web._public_get", return_value=mock_response):
         title, content = fetch_jina_reader("https://x.com/varickagents/status/2059397823674958265")
         assert title == "Varick Agents on X: \"How to Transform a Company With AI\" / X"

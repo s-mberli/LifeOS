@@ -202,7 +202,7 @@ def test_reddit_and_jina_ingestion_e2e(tmp_project: Path):
     }
 
     # Patches to redirect files and DBs to the temporary project folder
-    with patch("requests.get", side_effect=mock_requests_get), \
+    with patch("core.web._public_get", side_effect=mock_requests_get), \
          patch("src.core.classify_input.classify", return_value=mock_decision), \
          patch("src.core.llm_client.call_llm", return_value="Summary of Python or Jina post"), \
          patch("src.core.build_fts_index.BASE_DIR", tmp_project), \

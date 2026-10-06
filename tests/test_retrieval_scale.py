@@ -16,37 +16,27 @@ from src.core.build_fts_index import chunk_markdown, extract_wikilinks, index_fi
 from src.core.search_knowledge import hybrid_search, synthesize_briefing
 
 
+@pytest.fixture
+def embedding_api_key(monkeypatch):
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+
+
 
 # --- OUTBOX PIPELINE HELPER ---
 def process_outbox_pipeline(db_path: str):
     import scripts.triage_outbox
     orig_db_path = scripts.triage_outbox.DB_PATH
     orig_base_dir = scripts.triage_outbox.BASE_DIR
-    scripts.triage_outbox.DB_PATH = Path(db_path)
-    scripts.triage_outbox.BASE_DIR = Path(db_path).parent.parent
-    
-    # 1. Run Triage notes
-    scripts.triage_outbox.triage_notes()
-    scripts.triage_outbox.DB_PATH = orig_db_path
-    scripts.triage_outbox.BASE_DIR = orig_base_dir
-    
-    # 2. Index actionable items
-    conn = get_db_connection(db_path)
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, note_path, is_actionable FROM automation_outbox WHERE processed_at IS NOT NULL")
-    rows = cursor.fetchall()
-    
     base_dir = Path(db_path).parent.parent
-    for row_id, note_path, is_actionable in rows:
-        if is_actionable:
-            full_path = base_dir / note_path
-            if full_path.exists():
-                try:
-                    index_file(db_path, str(full_path))
-                except Exception:
-                    pass
-    conn.commit()
-    conn.close()
+    scripts.triage_outbox.DB_PATH = Path(db_path)
+    scripts.triage_outbox.BASE_DIR = base_dir
+
+    try:
+        with patch("src.core.build_fts_index.BASE_DIR", base_dir):
+            scripts.triage_outbox.triage_notes()
+    finally:
+        scripts.triage_outbox.DB_PATH = orig_db_path
+        scripts.triage_outbox.BASE_DIR = orig_base_dir
 
 
 # ==========================================
@@ -113,7 +103,7 @@ def test_db_init_empty_state(tmp_project):
 
 # --- Feature 2: Embeddings API ---
 
-def test_embeddings_api_success():
+def test_embeddings_api_success(embedding_api_key):
     with patch("requests.post") as mock_post:
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -125,7 +115,7 @@ def test_embeddings_api_success():
         assert len(emb) == 768
         assert emb[0] == 0.5
 
-def test_embeddings_api_batch():
+def test_embeddings_api_batch(embedding_api_key):
     with patch("requests.post") as mock_post:
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -141,7 +131,7 @@ def test_embeddings_api_batch():
         assert embs[0][0] == 0.1
         assert embs[1][0] == 0.2
 
-def test_embeddings_api_dimensions():
+def test_embeddings_api_dimensions(embedding_api_key):
     with patch("requests.post") as mock_post:
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -155,7 +145,7 @@ def test_embeddings_api_empty_input():
     res = get_embeddings([])
     assert res == []
 
-def test_embeddings_api_special_characters():
+def test_embeddings_api_special_characters(embedding_api_key):
     with patch("requests.post") as mock_post:
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -652,6 +642,7 @@ def test_db_init_missing_sqlite_vec_binary(tmp_project):
         cursor.execute("SELECT count(*) FROM doc_chunks")
         conn.close()
 
+@pytest.mark.skipif(os.name == "nt", reason="Windows chmod does not enforce POSIX directory permissions")
 def test_db_init_read_only_filesystem(tmp_project):
     ro_dir = tmp_project / "read_only_dir"
     ro_dir.mkdir()
@@ -706,7 +697,7 @@ def test_db_schema_upgrade(tmp_project):
 
 # --- Feature 2: Embeddings API ---
 
-def test_embeddings_api_too_long_text():
+def test_embeddings_api_too_long_text(embedding_api_key):
     long_text = "A" * 20000
     with patch("requests.post") as mock_post:
         mock_response = MagicMock()
@@ -721,14 +712,14 @@ def test_embeddings_api_too_long_text():
         sent_text = payload["input"][0]
         assert len(sent_text) <= 8000
 
-def test_embeddings_api_timeout():
+def test_embeddings_api_timeout(embedding_api_key):
     import requests
     with patch("requests.post") as mock_post:
         mock_post.side_effect = requests.exceptions.Timeout("Request Timeout")
         with pytest.raises((TimeoutError, Exception)):
             get_embeddings("timeout test")
 
-def test_embeddings_api_rate_limit_429():
+def test_embeddings_api_rate_limit_429(embedding_api_key):
     with patch("requests.post") as mock_post:
         mock_response = MagicMock()
         mock_response.status_code = 429
@@ -742,7 +733,7 @@ def test_embeddings_api_invalid_api_key():
         with pytest.raises(ValueError):
             get_embeddings("api key test")
 
-def test_embeddings_api_huge_batch():
+def test_embeddings_api_huge_batch(embedding_api_key):
     texts = ["hello"] * 1200
     with patch("requests.post") as mock_post:
         mock_response_1 = MagicMock()
@@ -1281,12 +1272,13 @@ def test_combination_indexing_and_search(tmp_project):
     db_path = str(tmp_project / "indexes" / "combo_idx_search.db")
     filepath = tmp_project / "data" / "knowledge" / "search_doc.md"
     filepath.write_text("# Search Target\nFind me if you can.", encoding="utf-8")
-    
-    index_file(db_path, str(filepath))
+
+    with patch("src.core.build_fts_index.BASE_DIR", tmp_project):
+        index_file(db_path, str(filepath))
     
     results = hybrid_search(db_path, "Find")
     assert len(results) == 1
-    assert results[0]["path"] == str(filepath)
+    assert results[0]["path"] == str(Path("data/knowledge/search_doc.md"))
 
 def test_combination_search_and_rrf(tmp_project):
     db_path = str(tmp_project / "indexes" / "combo_search_rrf.db")
@@ -1381,7 +1373,7 @@ def test_combination_outbox_and_synthesis(tmp_project):
         mock_call_llm.return_value = "Briefing summary for outbox synthesis"
         briefing = synthesize_briefing(results, "AI integration")
         assert "Briefing summary for outbox synthesis" in briefing
-        assert "data/knowledge/outbox_synth.md" in briefing
+        assert str(Path("data/knowledge/outbox_synth.md")) in briefing
 
 
 # ==========================================

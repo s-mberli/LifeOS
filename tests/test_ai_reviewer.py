@@ -4,6 +4,7 @@ tests/test_ai_reviewer.py — Unit tests for scripts/ai_code_reviewer.py
 from __future__ import annotations
 
 import sqlite3
+import signal
 import sys
 from pathlib import Path
 from unittest import mock
@@ -165,6 +166,18 @@ class TestReviewAndFixFile:
             result = reviewer.review_and_fix_file(f, "Human", db_path=db)
 
         assert result is False
+
+    @pytest.mark.skipif(not hasattr(signal, "SIGALRM"), reason="SIGALRM is unavailable")
+    def test_llm_error_cancels_alarm_and_restores_handler(self, tmp_path):
+        f = tmp_path / "code.py"
+        f.write_text(CLEAN_CODE)
+        old_handler = signal.getsignal(signal.SIGALRM)
+
+        with mock.patch("src.core.llm_client.call_llm", side_effect=RuntimeError("offline")):
+            assert reviewer.review_and_fix_file(f, db_path=_make_db(tmp_path)) is True
+
+        assert signal.alarm(0) == 0
+        assert signal.getsignal(signal.SIGALRM) == old_handler
 
     def test_returns_false_missing_file(self, tmp_path):
         db = _make_db(tmp_path)

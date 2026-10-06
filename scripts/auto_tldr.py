@@ -16,10 +16,9 @@ from __future__ import annotations
 import datetime
 import json
 import logging
+import os
 import re
-import shutil
 import sys
-import tempfile
 import time
 from pathlib import Path
 
@@ -43,12 +42,13 @@ except ImportError:
 # Configuration
 # ---------------------------------------------------------------------------
 
-BACKFILL_LIMIT: int = 15  # Max issues to process per topic per run
+BACKFILL_LIMIT: int = int(os.environ.get("TLDR_BACKFILL_LIMIT", "15"))
+ONLY_TOPICS = set(filter(None, os.environ.get("TLDR_ONLY_TOPICS", "").split(",")))
 
 TLDR_TOPICS: dict[str, str] = {
     "tech":      "Tech",
     "ai":        "AI",
-    "webdev":    "Web Dev",
+    "dev":       "Web Dev",
     "infosec":   "InfoSec",
     "devops":    "DevOps",
     "founders":  "Founders",
@@ -63,7 +63,7 @@ TLDR_TOPICS: dict[str, str] = {
 }
 
 TRACKING_FILE: Path = ROOT / "tracking" / "tldr_ingest.json"
-NEWS_DIR: Path = ROOT / "knowledge" / "news"
+NEWS_DIR: Path = ROOT / "data" / "knowledge" / "news"
 LOG_FILE: Path = ROOT / "logs" / "tldr_ingest.log"
 
 ARCHIVE_URL_TEMPLATE = "https://tldr.tech/{slug}/archives"
@@ -255,17 +255,13 @@ def ingest_newsletter(
     date: str,
     logger: logging.Logger,
 ) -> bool:
-    """Fetch a single newsletter issue and run it through the pipeline.
+    """Fetch a single newsletter issue into the searchable news collection.
 
-    1. Fetch clean markdown via Jina Reader (``src.core.web``).
-    2. Save raw markdown to ``data/knowledge/news/``.
-    3. Create a temp copy and feed it to ``process_one_file(use_ai=True)``.
+    1. Fetch and parse the TLDR issue page.
+    2. Save linked article summaries under ``data/knowledge/news/``.
 
     Returns ``True`` on success.
     """
-    from src.core.web import fetch_webpage_content  # noqa: E402
-    from src.core.ingest import process_one_file  # noqa: E402
-
     # 1. Fetch content -------------------------------------------------------
     logger.info("  Fetching content: %s", url)
     try:
@@ -306,39 +302,19 @@ def ingest_newsletter(
     md_lines.append(clean_text)
 
     raw_md = "\n".join(md_lines)
+    if not extracted_articles:
+        logger.error("  No linked articles in %s", url)
+        return False
     raw_path.write_text(raw_md, encoding="utf-8")
     logger.info("  Raw markdown saved: %s", raw_path.relative_to(ROOT))
-
-    # 3. Temp copy → process_one_file ----------------------------------------
-    #    process_one_file() moves the source file to processed/raw/,
-    #    so we hand it a disposable temp copy (same pattern as
-    #    process_directory in ingest.py).
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmp_file = Path(tmpdir) / raw_filename
-        # Put the URL on the first line so _extract_metadata detects it.
-        tmp_file.write_text(f"{url}\n\n{raw_md}", encoding="utf-8")
-
-        logger.info("  Running ingestion pipeline (use_ai=True)…")
-        try:
-            result = process_one_file(str(tmp_file), use_ai=True, rebuild_index_after=False)
-
-            if result.get("success"):
-                out = result.get("out_filepath", "?")
-                logger.info("  ✓ Ingested → %s", out)
-                return True
-
-            logger.error("  ✗ Ingestion failed: %s", result.get("error"))
-            return False
-        except Exception as exc:
-            logger.error("  ✗ Ingestion exception: %s", exc)
-            return False
+    return True
 
 
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
-def main() -> None:
+def main() -> int:
     logger = setup_logging()
     logger.info("=" * 60)
     logger.info("TLDR Newsletter Ingestion — Starting")
@@ -353,6 +329,8 @@ def main() -> None:
     stats = {"processed": 0, "skipped": 0, "failed": 0, "errors": 0}
 
     for slug, label in TLDR_TOPICS.items():
+        if ONLY_TOPICS and slug not in ONLY_TOPICS:
+            continue
         logger.info("")
         logger.info("--- [%s] (%s) ---", label, slug)
 
@@ -396,17 +374,6 @@ def main() -> None:
             # Politeness delay
             time.sleep(FETCH_DELAY)
 
-    # Rebuild FTS index once at the end of batch
-    if stats["processed"] > 0:
-        logger.info("")
-        logger.info("Rebuilding search index...")
-        try:
-            from src.core.build_fts_index import build_index
-            idx_res = build_index()
-            logger.info("✓ Search index rebuilt: %s", idx_res)
-        except Exception as exc:
-            logger.error("Failed to rebuild search index: %s", exc)
-
     logger.info("")
     logger.info("=" * 60)
     logger.info(
@@ -417,7 +384,8 @@ def main() -> None:
         stats["errors"],
     )
     logger.info("=" * 60)
+    return 1 if stats["failed"] or stats["errors"] else 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

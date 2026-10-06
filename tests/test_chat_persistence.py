@@ -72,6 +72,7 @@ def test_save_message_as_insight(tmp_project: Path):
         assert out_path_str != ""
         out_path = Path(out_path_str)
         assert out_path.exists()
+        assert out_path.parent == tmp_project / "data" / "knowledge" / "chat-insights"
 
         # Verify frontmatter and body
         fm, body = read_fm(out_path)
@@ -91,6 +92,7 @@ def test_save_message_as_insight(tmp_project: Path):
         ref_fm, ref_body = read_fm(ref_files[0])
         assert ref_fm["type"] == "expert_source_reference"
         assert ref_fm["expert_slug"] == expert_slug
+        assert ref_fm["source_path"] == str(out_path.relative_to(tmp_project))
 
 
 def test_save_message_as_insight_empty_history(tmp_project: Path):

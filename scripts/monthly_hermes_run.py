@@ -4,18 +4,21 @@ Monthly Hermes Runner for LifeOS
 Generates a Monthly Dispatch blog post and optionally Architecture Proposals.
 
 Digest-first approach (primary):
-  1. Read weekly digests from knowledge/news/digest/
+  1. Read weekly digests from data/knowledge/news/digest/
   2. Single LLM call to write dispatch from digest content
-  3. Save locally + push to GitHub (idempotent)
+  3. Save a local draft and its digest provenance
 
 Fallback (no digest available):
   1. Collect raw TLDR articles (30 days)
   2. LLM selects top 7-10
   3. Fetch full text of selected articles
   4. LLM writes dispatch
-  5. Save locally + push to GitHub
+  5. Save locally as a draft
 """
 
+import argparse
+import hashlib
+import json
 import sys
 import os
 import re
@@ -57,11 +60,13 @@ from src.core.agent_harness import execute_with_repair
 # Constants
 # ---------------------------------------------------------------------------
 
-NEWS_DIR: Path = BASE_DIR / "knowledge" / "news"
+NEWS_DIR: Path = BASE_DIR / "data" / "knowledge" / "news"
 DIGEST_DIR: Path = NEWS_DIR / "digest"
 FETCH_CAP_CHARS: int = 4000       # per-article fetch cap in fallback path
 DISPATCH_MAX_TOKENS: int = 7000   # generous budget for full dispatch
 DISPATCH_TEMPERATURE: float = 0.4
+MAX_PUBLISH_DIGEST_AGE_DAYS: int = 7
+DRAFT_DIR: Path = BASE_DIR / "data" / "inbox" / "content_drafts"
 
 
 # ---------------------------------------------------------------------------
@@ -193,12 +198,92 @@ def strip_artifacts(dispatch: str) -> str:
 # GitHub push (idempotent)
 # ---------------------------------------------------------------------------
 
-def push_to_github(dispatch: str, today: str) -> bool:
-    """Push the dispatch to the website repo on GitHub.
+def _is_fresh_digest(digest_path: Path | None, today: str) -> bool:
+    """Allow publishing only from a dated weekly digest at most seven days old."""
+    if digest_path is None or not digest_path.is_file():
+        return False
+    match = re.fullmatch(r"tldr-weekly-(\d{4}-\d{2}-\d{2})-w\d{4}W\d{2}\.md", digest_path.name)
+    if match is None:
+        return False
+    try:
+        digest_date = datetime.date.fromisoformat(match.group(1))
+        run_date = datetime.date.fromisoformat(today)
+    except ValueError:
+        return False
+    age = (run_date - digest_date).days
+    return 0 <= age <= MAX_PUBLISH_DIGEST_AGE_DAYS
+
+
+def _draft_path(path: str | Path) -> Path | None:
+    """Resolve an existing monthly draft directly inside the drafts directory."""
+    candidate = Path(path)
+    if not candidate.is_absolute() and len(candidate.parts) == 1:
+        candidate = DRAFT_DIR / candidate
+    try:
+        candidate = candidate.resolve(strict=True)
+        if candidate.parent != DRAFT_DIR.resolve(strict=True) or not candidate.is_file():
+            return None
+    except (OSError, RuntimeError, ValueError):
+        return None
+    if not re.fullmatch(r"monthly_dispatch_\d{4}-\d{2}-\d{2}\.md", candidate.name):
+        return None
+    return candidate
+
+
+def _digest_for_draft(draft: Path, today: str) -> Path | None:
+    """Verify the recorded source digest still exists, matches, and is fresh."""
+    try:
+        source = json.loads(draft.with_suffix(".source.json").read_text(encoding="utf-8"))
+        digest_name = source["digest"]
+        expected_hash = source["sha256"]
+        if not isinstance(digest_name, str) or not isinstance(expected_hash, str):
+            return None
+        digest = (BASE_DIR / digest_name).resolve(strict=True)
+        if digest.parent != DIGEST_DIR.resolve(strict=True):
+            return None
+        if not _is_fresh_digest(digest, today):
+            return None
+        if hashlib.sha256(digest.read_bytes()).hexdigest() != expected_hash:
+            return None
+    except (OSError, RuntimeError, ValueError, KeyError, TypeError):
+        return None
+    return digest
+
+
+def publish_existing_draft(path: str | Path) -> bool:
+    """Publish reviewed draft text without generating content or consuming outbox."""
+    draft = _draft_path(path)
+    if draft is None:
+        print("Draft must be an existing monthly dispatch in the drafts directory.")
+        return False
+    today = datetime.date.today().isoformat()
+    draft_date = draft.stem.removeprefix("monthly_dispatch_")
+    digest = _digest_for_draft(draft, today)
+    if digest is None:
+        print("Draft source digest is missing, changed, or no longer fresh.")
+        return False
+    return push_to_github(
+        draft.read_text(encoding="utf-8"), draft_date,
+        publish=True, digest_path=digest, publication_date=today,
+    )
+
+
+def push_to_github(
+    dispatch: str, today: str, *, publish: bool = False, digest_path: Path | None = None,
+    publication_date: str | None = None,
+) -> bool:
+    """Publish only after explicit opt-in with an existing fresh digest.
 
     Checks for existing file first to make the operation idempotent
     (``create_file`` would throw 422 on a second run).
     """
+    if not publish:
+        print("Draft only. Use --publish-draft PATH to publish a reviewed draft.")
+        return False
+    if not _is_fresh_digest(digest_path, publication_date or today):
+        print("No fresh dated weekly digest. Skipping website publishing.")
+        return False
+
     github_token = os.environ.get("WEBSITE_GITHUB_TOKEN")
     github_repo = os.environ.get("WEBSITE_GITHUB_REPO")
     if not github_token or not github_repo:
@@ -619,9 +704,35 @@ def _run_fallback_pipeline(today: str) -> tuple[str, list[dict]]:
 # Main Pipeline
 # ---------------------------------------------------------------------------
 
+def _proposal_output_path(proposal_dir: Path, filename: object) -> Path | None:
+    """Return a draft path only for a plain filename inside the proposals dir."""
+    if (
+        not isinstance(filename, str)
+        or not filename
+        or filename in {".", ".."}
+        or any(char in filename for char in "/\\:")
+    ):
+        return None
+
+    if not filename.endswith(".md"):
+        filename += ".md"
+    candidate = proposal_dir / filename
+    try:
+        if not candidate.resolve().is_relative_to(proposal_dir.resolve()):
+            return None
+    except (OSError, RuntimeError):
+        return None
+    return candidate
+
+
 @execute_with_repair(mode="background")
 def run_weekly_pipeline() -> None:
     today = datetime.datetime.now().strftime("%Y-%m-%d")
+    out_file = DRAFT_DIR / f"monthly_dispatch_{today}.md"
+    source_file = out_file.with_suffix(".source.json")
+    if any(path.exists() or path.is_symlink() for path in (out_file, source_file)):
+        print(f"Existing draft or source record for {today}; skipping rerun.")
+        return
     print("--- Starting Weekly Hermes Pipeline ---")
 
     # 1. Run outbox triage
@@ -630,6 +741,7 @@ def run_weekly_pipeline() -> None:
 
     # 2. Try digest-first approach; fall back to raw articles if no digest
     digest_path = find_latest_digest()
+    digest_sha256: str | None = None
     proposals_list: list[dict] = []
 
     if digest_path:
@@ -639,6 +751,7 @@ def run_weekly_pipeline() -> None:
             digest_display = digest_path
         print(f"Found weekly digest: {digest_display}")
         digest_content = digest_path.read_text(encoding="utf-8")
+        digest_sha256 = hashlib.sha256(digest_path.read_bytes()).hexdigest()
 
         # Collect article URLs for cross-referencing in the dispatch
         articles = collect_articles_from_notes(days=7)
@@ -695,10 +808,16 @@ def run_weekly_pipeline() -> None:
         )
 
     # 4. Save dispatch locally
-    out_dir = BASE_DIR / "data" / "inbox" / "content_drafts"
+    out_dir = DRAFT_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_file = out_dir / f"monthly_dispatch_{today}.md"
-    out_file.write_text(dispatch, encoding="utf-8")  # codeql[py/clear-text-storage-sensitive-data]
+    with out_file.open("x", encoding="utf-8") as output:
+        output.write(dispatch)  # codeql[py/clear-text-storage-sensitive-data]
+    source = {
+        "digest": digest_path.relative_to(BASE_DIR).as_posix() if digest_path else None,
+        "sha256": digest_sha256,
+    }
+    with source_file.open("x", encoding="utf-8") as output:
+        output.write(json.dumps(source, indent=2) + "\n")
     print(f"✓ Monthly dispatch saved: {out_file.relative_to(BASE_DIR)}")
 
     # 5. Save proposals (if any were generated)
@@ -707,9 +826,10 @@ def run_weekly_pipeline() -> None:
         prop_dir.mkdir(parents=True, exist_ok=True)
         for prop in proposals_list:
             filename = prop.get("filename", f"proposal_{today}.md")
-            if not filename.endswith(".md"):
-                filename += ".md"
-            prop_file = prop_dir / filename
+            prop_file = _proposal_output_path(prop_dir, filename)
+            if prop_file is None:
+                print("WARNING: Skipping proposal with unsafe filename.")
+                continue
             prop_file.write_text(
                 prop.get("content", ""), encoding="utf-8",
             )  # codeql[py/clear-text-storage-sensitive-data]
@@ -741,11 +861,21 @@ def run_weekly_pipeline() -> None:
             print(f"✓ Marked {len(row_ids)} outbox items as processed.")
         conn.close()
 
-    # 7. Push to GitHub (idempotent — handles both create and update)
-    push_to_github(dispatch, today)
-
     print("--- Pipeline Complete ---")
 
 
-if __name__ == "__main__":
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Generate a monthly dispatch draft.")
+    parser.add_argument(
+        "--publish-draft", metavar="PATH",
+        help="Publish an existing reviewed draft with its unchanged fresh source digest.",
+    )
+    args = parser.parse_args(argv)
+    if args.publish_draft is not None:
+        return 0 if publish_existing_draft(args.publish_draft) else 1
     run_weekly_pipeline()
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

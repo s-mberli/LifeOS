@@ -1,17 +1,24 @@
-import os
 import sys
 import time
 import logging
+import os
+import re
+import sqlite3
 from pathlib import Path
 from mcp.server.fastmcp import FastMCP
-from pydantic import Field
 
 # Ensure we can import from src
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-from src.core.search_knowledge import fts_search
+MCP_ROOT = os.environ.get("LIFEOS_MCP_ROOT")
+if MCP_ROOT:
+    # This mode runs from a small, approved copy of the vault. It must not
+    # import the general search module, which points at the live vault index.
+    BASE_DIR = Path(MCP_ROOT).resolve()
+else:
+    from src.core.search_knowledge import fts_search
 
 # --- Security: Audit Logging (OWASP LLM06/07) ---
 log_path = BASE_DIR / "data" / "private" / "mcp_audit.log"
@@ -28,6 +35,43 @@ logger = logging.getLogger("mcp_server")
 RATE_LIMIT_REQUESTS = 60
 RATE_LIMIT_WINDOW_SEC = 60
 request_timestamps = []
+ALLOWED_COLLECTIONS = {("data", "knowledge"), ("data", "experts")}
+SEARCH_PREFIXES = (
+    ("data/knowledge/david-deida/", "data/experts/expert--david-deida/")
+    if MCP_ROOT else ("data/knowledge/", "data/experts/")
+)
+MAX_FILE_BYTES = 64 * 1024
+MAX_SEARCH_RESULTS = 10
+MAX_SEARCH_TEXT = 16 * 1024
+
+
+def allowed_vault_file(path: str) -> Path | None:
+    """Resolve a citable vault path without following links or leaving curated collections."""
+    if not path or "\x00" in path:
+        return None
+    relative = Path(path)
+    if relative.is_absolute() or any(part in (".", "..") for part in path.replace("\\", "/").split("/")):
+        return None
+    parts = relative.parts
+    if len(parts) < 3 or parts[:2] not in ALLOWED_COLLECTIONS:
+        return None
+    if MCP_ROOT and not any(path.replace("\\", "/").startswith(prefix)
+                            for prefix in SEARCH_PREFIXES):
+        return None
+    if any(part.casefold() == "raw" or part.startswith(".") for part in parts[2:]):
+        return None
+    if relative.suffix.lower() not in {".md", ".txt"}:
+        return None
+
+    root = BASE_DIR.resolve()
+    candidate = root.joinpath(*parts)
+    if any(root.joinpath(*parts[:index]).is_symlink() for index in range(1, len(parts) + 1)):
+        return None
+    try:
+        candidate.resolve().relative_to(root)
+    except ValueError:
+        return None
+    return candidate
 
 def check_rate_limit() -> bool:
     global request_timestamps
@@ -42,6 +86,38 @@ def check_rate_limit() -> bool:
 # Create the FastMCP server
 mcp = FastMCP("MarkusOS")
 
+
+def isolated_fts_search(query: str, limit: int) -> list[tuple]:
+    """Search only the index in the approved MCP root, opened read-only."""
+    db_path = BASE_DIR / "indexes" / "lifeos.db"
+    if ((BASE_DIR / "indexes").is_symlink() or db_path.is_symlink()
+            or not db_path.is_file()):
+        return []
+    tokens = re.findall(r"[\w]+", query.lower())
+    if not tokens:
+        return []
+    # Quoted tokens prevent FTS operators in user input from changing scope.
+    match_query = " OR ".join('"' + token.replace('"', '') + '"' for token in tokens[:20])
+    connection = sqlite3.connect(f"file:{db_path.as_posix()}?mode=ro", uri=True)
+    try:
+        rows = connection.execute(
+            "SELECT title, path, snippet(search_index, 2, '**', '**', '...', 40), "
+            "bm25(search_index) FROM search_index WHERE search_index MATCH ? "
+            "AND (path LIKE ? OR path LIKE ?) ORDER BY bm25(search_index) LIMIT ?",
+            (match_query, *(prefix + "%" for prefix in SEARCH_PREFIXES), limit),
+        ).fetchall()
+        return rows
+    finally:
+        connection.close()
+
+
+def source_url_for(path: Path) -> str:
+    """Get the citable URL from an approved note without following a link."""
+    with path.open("rb") as source:
+        header = source.read(8192).decode("utf-8", errors="replace")
+    match = re.search(r"(?im)^(?:source_url|Source URL):\s*['\"]?(https://[^\s'\"]+)", header)
+    return match.group(1) if match else ""
+
 @mcp.tool()
 def search_vault(query: str, limit: int = 5) -> str:
     """
@@ -53,21 +129,37 @@ def search_vault(query: str, limit: int = 5) -> str:
         return "Error: Rate limit exceeded. Try again later."
         
     # Security: Input Validation (OWASP LLM04/01)
-    if len(query) > 500:
+    if not isinstance(query, str) or len(query) > 500:
         logger.warning("search_vault input validation failed: query too long")
         return "Error: Query length exceeds maximum allowed length of 500 characters."
+    if type(limit) is not int or not 1 <= limit <= MAX_SEARCH_RESULTS:
+        return f"Error: Limit must be between 1 and {MAX_SEARCH_RESULTS}."
 
     logger.info(f"search_vault called with query='{query}', limit={limit}")
     
     try:
-        # Security: Force include_private=False to prevent external agents from reading private data
-        results = fts_search(query, limit, include_private=False)
-        if not results:
-            return f"No results found for: '{query}'"
+        # Filter collections before the FTS ranking limit, then verify each
+        # returned file again before exposing its indexed text.
+        results = (isolated_fts_search(query, 50) if MCP_ROOT else
+                   fts_search(query, 50, include_private=False, allowed_prefixes=SEARCH_PREFIXES))
         
         formatted = []
-        for idx, (title, path, snippet, score) in enumerate(results, 1):
-            formatted.append(f"Result {idx}:\nTitle: {title}\nPath: {path}\nScore: {score:.4f}\nSnippet: {snippet.strip()}\n")
+        for title, path, snippet, score in results:
+            full_path = allowed_vault_file(path) if isinstance(path, str) and len(path) <= 1000 else None
+            if (full_path is None or not full_path.is_file()
+                    or full_path.stat().st_size > MAX_FILE_BYTES):
+                continue
+            source_url = source_url_for(full_path)
+            entry = (f"Result {len(formatted) + 1}:\nTitle: {str(title)[:300]}\n"
+                     f"Path: {path}\nSource URL: {source_url}\nScore: {score:.4f}\n"
+                     f"Snippet: {str(snippet).strip()[:2000]}\n")
+            if sum(map(len, formatted)) + len(entry) > MAX_SEARCH_TEXT:
+                break
+            formatted.append(entry)
+            if len(formatted) >= limit:
+                break
+        if not formatted:
+            return f"No results found for: '{query}'"
         
         return "\n" + "-"*40 + "\n" + "\n".join(formatted)
     except Exception as e:
@@ -85,42 +177,25 @@ def read_vault_file(path: str) -> str:
         return "Error: Rate limit exceeded. Try again later."
 
     # Security: Input Validation (OWASP LLM04)
-    if len(path) > 1000:
+    if not isinstance(path, str) or len(path) > 1000:
         logger.warning("read_vault_file input validation failed: path too long")
         return "Error: Path length exceeds maximum allowed length of 1000 characters."
 
     logger.info(f"read_vault_file called for path='{path}'")
     
     try:
-        try:
-            # Resolve path to prevent directory traversal
-            full_path = (BASE_DIR / path).resolve()
-            rel_path = full_path.relative_to(BASE_DIR)
-        except ValueError:
-            return "Error: Security violation. Path must be within the MarkusOS directory."
-        except Exception as e:
-            logger.error(f"read_vault_file resolution error: {e}")
-            return "Error: Internal server error resolving path."
-
-        # Strict access control list
-        path_parts = rel_path.parts
-        if not path_parts or path_parts[0] != "data":
-            return "Error: Security violation. External agents may only access the 'data/' directory."
-            
-        if len(path_parts) > 1 and path_parts[1] == "private":
-            return "Error: Security violation. Access to private data is strictly forbidden."
-
-        if ".env" in full_path.name or ".git" in str(full_path):
-            return "Error: Security violation. System files are protected."
+        full_path = allowed_vault_file(path)
+        if full_path is None:
+            return "Error: Security violation. Path is outside the readable vault collections."
 
         if not full_path.is_file():
             return f"Error: File not found at {path}"
         
-        # Simple check to avoid reading huge binary files
-        if full_path.suffix.lower() in [".db", ".sqlite", ".png", ".jpg", ".jpeg", ".mp4", ".mp3", ".wav", ".zip"]:
-            return f"Error: Cannot read binary file type {full_path.suffix}"
-
-        return full_path.read_text(encoding="utf-8")
+        with full_path.open("rb") as vault_file:
+            content = vault_file.read(MAX_FILE_BYTES + 1)
+        if len(content) > MAX_FILE_BYTES:
+            return f"Error: File exceeds the {MAX_FILE_BYTES}-byte read limit."
+        return content.decode("utf-8")
     except Exception as e:
         # Security: Error Sanitization (OWASP LLM06)
         logger.error(f"read_vault_file read error: {e}")

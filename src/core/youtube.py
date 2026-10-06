@@ -21,7 +21,7 @@ from pathlib import Path
 
 _VIDEO_ID_RE = re.compile(
     r"(?:youtube\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)"
-    r"([^\"&?/ ]{11})"
+    r"([A-Za-z0-9_-]{11})"
 )
 
 

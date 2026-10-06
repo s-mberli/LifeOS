@@ -156,26 +156,34 @@ def review_and_fix_file(
         return True
 
     import signal
+    import threading
 
     def _timeout_handler(signum, frame):
         raise TimeoutError("LLM call exceeded timeout")
 
+    # SIGALRM is unavailable on Windows and signal handlers require the main thread.
+    can_alarm = hasattr(signal, "SIGALRM") and threading.current_thread() is threading.main_thread()
+    previous_handler = None
     try:
-        signal.signal(signal.SIGALRM, _timeout_handler)
-        signal.alarm(REVIEW_TIMEOUT_SECS)
+        if can_alarm:
+            previous_handler = signal.signal(signal.SIGALRM, _timeout_handler)
+            signal.alarm(REVIEW_TIMEOUT_SECS)
         response = call_llm(
             prompt=prompt,
             system_prompt=REVIEW_SYSTEM_PROMPT,
             max_tokens=REVIEW_MAX_TOKENS,
             temperature=0.2,
         )
-        signal.alarm(0)  # cancel alarm
     except TimeoutError:
         print(f"  ⏰ {rel} — LLM timed out after {REVIEW_TIMEOUT_SECS}s, skipping")
         return True  # don't block commit on timeout
     except Exception as exc:
         print(f"  ❌ LLM call failed: {exc}")
         return True  # don't block commit on LLM errors
+    finally:
+        if can_alarm and previous_handler is not None:
+            signal.alarm(0)
+            signal.signal(signal.SIGALRM, previous_handler)
 
     if not response:
         print("  ❌ LLM returned empty response.")

@@ -8,6 +8,125 @@ optional; graceful degradation occurs when they are not installed.
 
 from __future__ import annotations
 
+import ipaddress
+import socket
+from contextlib import contextmanager
+from contextvars import ContextVar
+from urllib.parse import urljoin, urlsplit
+
+_clipper_ingestion = ContextVar("clipper_ingestion", default=False)
+_MAX_RESPONSE_BYTES = 2_000_000
+
+
+@contextmanager
+def clipper_ingestion():
+    """Keep browser execution out of the API's untrusted URL path."""
+    token = _clipper_ingestion.set(True)
+    try:
+        yield
+    finally:
+        _clipper_ingestion.reset(token)
+
+
+def validate_public_url(url: str, *, resolve: bool = False) -> str:
+    """Reject non-web, local, and non-public destinations before fetching."""
+    if not isinstance(url, str) or url != url.strip() or "\\" in url or any(ord(c) < 33 for c in url):
+        raise ValueError("Invalid URL format.")
+    try:
+        parsed = urlsplit(url)
+        host = parsed.hostname
+        port = parsed.port
+    except ValueError as exc:
+        raise ValueError("Invalid URL format.") from exc
+    if parsed.scheme.lower() not in {"http", "https"} or not host or parsed.username or parsed.password:
+        raise ValueError("Invalid URL format.")
+    if port is not None and not 1 <= port <= 65535:
+        raise ValueError("Invalid URL format.")
+    host = host.rstrip(".").lower()
+    try:
+        addresses = [ipaddress.ip_address(host)]
+    except ValueError:
+        if not host or "." not in host or host.endswith((".localhost", ".local", ".internal")):
+            raise ValueError("Private URL target.")
+        if not all(part and part.replace("-", "").isalnum() for part in host.split(".")):
+            raise ValueError("Invalid URL format.")
+        addresses = []
+    if resolve and not addresses:
+        addresses = _resolve_addresses(host, port or (443 if parsed.scheme.lower() == "https" else 80))
+    if any(not address.is_global for address in addresses):
+        raise ValueError("Private URL target.")
+    return url
+
+
+def _resolve_addresses(host: str, port: int) -> list[ipaddress.IPv4Address | ipaddress.IPv6Address]:
+    try:
+        addresses = [ipaddress.ip_address(item[4][0]) for item in socket.getaddrinfo(host, port)]
+    except (OSError, ValueError) as exc:
+        raise ValueError("URL host could not be resolved.") from exc
+    if not addresses:
+        raise ValueError("URL host could not be resolved.")
+    if any(not address.is_global for address in addresses):
+        raise ValueError("Private URL target.")
+    return addresses
+
+
+def _public_get(url: str, *, headers: dict | None = None, timeout: int = 15):
+    """Fetch through a validated, pinned public IP with bounded response bytes."""
+    import requests
+    import urllib3
+
+    for _ in range(6):
+        validate_public_url(url)
+        parsed = urlsplit(url)
+        host = parsed.hostname.rstrip(".").lower()
+        port = parsed.port or (443 if parsed.scheme.lower() == "https" else 80)
+        try:
+            address = ipaddress.ip_address(host)
+        except ValueError:
+            address = _resolve_addresses(host, port)[0]
+        else:
+            if not address.is_global:
+                raise ValueError("Private URL target.")
+
+        pool_class = urllib3.HTTPSConnectionPool if parsed.scheme.lower() == "https" else urllib3.HTTPConnectionPool
+        pool_options = {"assert_hostname": host, "server_hostname": host} if parsed.scheme.lower() == "https" else {}
+        pool = pool_class(str(address), port=port, **pool_options)
+        request_headers = dict(headers or {})
+        request_headers["Host"] = parsed.netloc
+        target = parsed.path or "/"
+        if parsed.query:
+            target += "?" + parsed.query
+        try:
+            raw = pool.request(
+                "GET", target, headers=request_headers, timeout=urllib3.Timeout(total=timeout),
+                redirect=False, retries=False, preload_content=False,
+            )
+            try:
+                response = requests.Response()
+                response.status_code = raw.status
+                response.headers.update(raw.headers)
+                response.url = url
+                if raw.status in {301, 302, 303, 307, 308} and raw.headers.get("Location"):
+                    response._content = b""
+                else:
+                    if int(raw.headers.get("Content-Length", 0)) > _MAX_RESPONSE_BYTES:
+                        raise ValueError("Web response exceeds size limit.")
+                    body = raw.read(_MAX_RESPONSE_BYTES + 1, decode_content=True)
+                    if len(body) > _MAX_RESPONSE_BYTES:
+                        raise ValueError("Web response exceeds size limit.")
+                    response._content = body
+            finally:
+                raw.release_conn()
+        finally:
+            pool.close()
+        if response.status_code not in {301, 302, 303, 307, 308}:
+            return response
+        location = response.headers.get("Location")
+        if not location:
+            return response
+        url = urljoin(url, location)
+    raise ValueError("Too many URL redirects.")
+
 
 # ---------------------------------------------------------------------------
 # Public API
@@ -39,7 +158,7 @@ def fetch_reddit_json(url: str) -> tuple[str, str]:
                 "Chrome/120.0.0.0 Safari/537.36"
             )
         }
-        response = requests.get(json_url, headers=headers, timeout=15)
+        response = _public_get(json_url, headers=headers, timeout=15)
         response.raise_for_status()
         
         data = response.json()
@@ -131,7 +250,8 @@ def fetch_jina_reader(url: str) -> tuple[str, str]:
             )
         }
         jina_url = f"https://r.jina.ai/{url}"
-        response = requests.get(jina_url, headers=headers, timeout=20)
+        validate_public_url(url, resolve=True)
+        response = _public_get(jina_url, headers=headers, timeout=20)
         response.raise_for_status()
         
         title = response.headers.get("X-Title", "").strip()
@@ -192,6 +312,22 @@ def _fetch_webpage_content_bs4(url: str) -> tuple[str, str]:
         return "", ""
 
 
+def _fetch_public_text(url: str) -> tuple[str, str]:
+    """Read clipper pages without executing scripts or loading subresources."""
+    try:
+        from bs4 import BeautifulSoup
+
+        response = _public_get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+        title = soup.title.get_text(strip=True) if soup.title else ""
+        for element in soup.select("script, style, nav, footer, header, aside"):
+            element.decompose()
+        return title, soup.get_text(" ", strip=True)
+    except Exception:
+        return "", ""
+
+
 def fetch_tldr_direct(url: str) -> tuple[str, str]:
     """Fetch TLDR newsletter content directly via BeautifulSoup (extremely fast)."""
     try:
@@ -208,7 +344,7 @@ def fetch_tldr_direct(url: str) -> tuple[str, str]:
                 "Chrome/120.0.0.0 Safari/537.36"
             )
         }
-        response = requests.get(url, headers=headers, timeout=10)
+        response = _public_get(url, headers=headers, timeout=10)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
 
@@ -249,6 +385,7 @@ def fetch_webpage_content(url: str) -> tuple[str, str]:
         A tuple of ``(title, content_text)``. Both strings may be empty if
         the request fails.
     """
+    validate_public_url(url, resolve=True)
     lower_url = url.lower()
     
     import urllib.parse
@@ -269,7 +406,7 @@ def fetch_webpage_content(url: str) -> tuple[str, str]:
             return title, content
 
     # 2. Try direct fetch first (faster on VPS, works for most sites)
-    title, content = _fetch_webpage_content_bs4(url)
+    title, content = _fetch_public_text(url) if _clipper_ingestion.get() else _fetch_webpage_content_bs4(url)
     if title or content:
         return title, content
 
@@ -303,7 +440,7 @@ def fetch_webpage_metadata(url: str) -> dict:
 
     try:
         headers = {"User-Agent": "Mozilla/5.0"}
-        response = requests.get(url, headers=headers, timeout=5)
+        response = _public_get(url, headers=headers, timeout=5)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
 

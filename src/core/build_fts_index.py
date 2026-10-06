@@ -1,5 +1,6 @@
 import os
 import re
+import sqlite3
 from pathlib import Path
 from src.core.db import get_db_connection, init_db
 from src.core.llm_client import get_embeddings
@@ -54,6 +55,7 @@ def build_index():
     
     indexed_count = 0
     skipped_count = 0
+    error_count = 0
     
     for directory in DIRECTORIES_TO_INDEX:
         if not directory.exists():
@@ -85,6 +87,7 @@ def build_index():
             except Exception as e:
                 print(f"Error indexing {filepath}: {e}")
                 skipped_count += 1
+                error_count += 1
                 
     conn.commit()
     conn.close()
@@ -97,6 +100,8 @@ def build_index():
         if d.exists():
             print(f"  - {d.relative_to(BASE_DIR)}")
     print(f"Database saved to: {DB_PATH}")
+    if error_count:
+        raise RuntimeError(f"Index failed for {error_count} file(s)")
     return {"indexed": indexed_count, "skipped": skipped_count, "error": None}
 
 def chunk_markdown(text: str, chunk_size: int = 1000, overlap: int | None = None) -> list[str]:
@@ -201,18 +206,21 @@ def index_file(db_path, filepath=None):
         chunks = chunk_markdown(content, chunk_size=1000, overlap=200)
         
         # Fetch embeddings outside transaction to avoid database lock contention
+        fts_only = os.environ.get("LIFEOS_FTS_ONLY") == "1"
         embeddings = []
-        for chunk in chunks:
-            try:
-                emb = get_embeddings(chunk)
-            except Exception:
-                emb = [0.0] * 768
-            embeddings.append(emb)
+        if not fts_only:
+            for chunk in chunks:
+                try:
+                    emb = get_embeddings(chunk)
+                except Exception:
+                    emb = [0.0] * 768
+                embeddings.append(emb)
             
         # Write to DB with retry logic
         for attempt in range(5):
             try:
-                cursor.execute("DELETE FROM vec_docs WHERE chunk_id IN (SELECT id FROM doc_chunks WHERE path = ?)", (relative_path,))
+                if not fts_only:
+                    cursor.execute("DELETE FROM vec_docs WHERE chunk_id IN (SELECT id FROM doc_chunks WHERE path = ?)", (relative_path,))
                 cursor.execute("DELETE FROM doc_chunks WHERE path = ?", (relative_path,))
                 cursor.execute("DELETE FROM search_index WHERE path = ?", (relative_path,))
                 
@@ -225,11 +233,12 @@ def index_file(db_path, filepath=None):
                     )
                     chunk_id = cursor.lastrowid
                     
-                    emb_data = struct.pack(f"{len(embeddings[idx])}f", *embeddings[idx])
-                    cursor.execute(
-                        "INSERT INTO vec_docs (chunk_id, embedding) VALUES (?, ?)",
-                        (chunk_id, emb_data)
-                    )
+                    if not fts_only:
+                        emb_data = struct.pack(f"{len(embeddings[idx])}f", *embeddings[idx])
+                        cursor.execute(
+                            "INSERT INTO vec_docs (chunk_id, embedding) VALUES (?, ?)",
+                            (chunk_id, emb_data)
+                        )
                     
                     cursor.execute(
                         "INSERT INTO search_index (path, title, content) VALUES (?, ?, ?)",

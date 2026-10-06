@@ -37,8 +37,9 @@ This document outlines the product direction and upcoming features for the **Lif
 ---
 
 ## 🔮 Phase 4 — Hybrid Retrieval & Offline LLMs
-> *100% offline, fully autonomous.*
+> *Broader retrieval and an optional offline inference path.*
 
 * [x] **Hybrid Search**: Combine keyword-based SQLite FTS5 search with dense vector embeddings (using `sqlite-vec`) for semantic retrieval combined via Reciprocal Rank Fusion (RRF).
 * [ ] **Local LLM Execution**: Native support for running lightweight models locally (via Ollama or Llama.cpp) to enable 100% offline usage.
-* [x] **Self-Improvement Candidates**: Enable the system to propose architecture, configuration, or playbook updates to itself based on new insights (requiring manual human approval). *[Delivered via the weekly Autonomous Hermes review and PR loop]*
+* [x] **Reviewable Improvement Candidates**: The LifeOS runner can draft architecture proposals from triaged notes for a person to assess.
+* [ ] **Proposal-to-PR Workflow**: Implement, test, review, and open a pull request from an approved proposal. This is a future capability, not part of the current runner.

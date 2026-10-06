@@ -16,33 +16,33 @@
 </p>
 
 <p align="center">
-  <a href="#-getting-started">Getting Started</a> · <a href="#-architecture">Architecture</a> · <a href="#-autonomous-hermes-loop">Hermes Agent</a> · <a href="ROADMAP.md">Roadmap</a> · <a href="AGENTS.md">Agent Rules</a>
+  <a href="#-getting-started">Getting Started</a> · <a href="#-architecture">Architecture</a> · <a href="#-dispatch-drafts">Dispatch Drafts</a> · <a href="ROADMAP.md">Roadmap</a> · <a href="docs/CLOUD-HANDOFF.md">Handoff</a>
 </p>
 
 ---
 
 ## What is LifeOS?
 
-> **A personal knowledge-to-action platform.** Ingest notes, web pages, and YouTube transcripts → synthesize AI expert personas grounded in your data → then let an autonomous agent apply those insights back into the codebase as GitHub PRs.
+> **A personal knowledge and expert chat system.** Ingest notes, web pages, and YouTube transcripts; organize them into searchable Markdown; synthesize expert profiles; and ask source-grounded questions.
 
-Most AI tools stop at retrieval. **LifeOS closes the loop**: new knowledge becomes hypotheses, hypotheses become code changes, code changes become tested pull requests — all without manual intervention.
+The ingestion outbox can also inform dispatch drafts and architecture proposals for human review. The checked-in runner does not implement code changes or open GitHub pull requests. See the [cloud continuation guide](docs/CLOUD-HANDOFF.md) for verified status and gaps.
 
 ### ⚡ Key Capabilities
 
 | Capability | Description |
 |:-----------|:------------|
 | **Expert Synthesis** | Groups content by creator/domain and auto-generates `playbook.md`, `principles.md`, and `profile.md` for each expert persona. |
-| **Multi-Turn Chat with Citations** | Chat with your synthesized experts. Every claim is backed by a specific Markdown note reference. |
+| **Multi-Turn Chat with Citations** | Chat with your synthesized experts and inspect citations to the underlying Markdown notes. |
 | **YouTube & Web Ingestion** | Drop a URL → LifeOS downloads the transcript or scrapes the page, summarizes it, and indexes it locally. |
-| **Hybrid RAG & Vector Search** | Combines SQLite FTS5 keyword search and `sqlite-vec` semantic search via Reciprocal Rank Fusion (RRF) for 10k+ scale. |
-| **Autonomous Self-Improvement** | The [Hermes Agent](#-autonomous-hermes-loop) triages new notes for architecture/coding insights, reviews the codebase weekly, and opens GitHub PRs. |
+| **Hybrid RAG & Vector Search** | Combines SQLite FTS5 keyword search and `sqlite-vec` semantic search via Reciprocal Rank Fusion (RRF). |
+| **Reviewable Dispatch Drafts** | The [monthly runner](#-dispatch-drafts) triages notes and writes a local dispatch draft; a separate command can publish a previously reviewed draft when its source digest passes validation. |
 | **Browser Clipper** | 1-click Firefox extension to capture any URL directly into your knowledge vault. |
 | **Manual Personal Memory** | User-managed memory system to inject persistent context, preferences, and LLM expert exports directly into the system prompt. |
-| **MCP Server** | Exposes `search_vault` and `get_note` tools via the [Model Context Protocol](https://modelcontextprotocol.io), so any MCP-compatible agent can query your knowledge base. |
+| **MCP Server** | Exposes `search_vault` and `read_vault_file` through the [Model Context Protocol](https://modelcontextprotocol.io) when configured. |
 | **Multi-Provider LLM** | Cascading fallback across Azure OpenAI → Gemini → OpenRouter. Swap models without code changes. |
-| **AI Code Review Pipeline** | Five-Axis automated code review with AI-powered vulnerability detection, provenance ledger, and mandatory review thresholds. |
+| **AI Code Review Tool** | A script can review supplied files and record provenance. Automatic enforcement across all contributions is not established. |
 #### 💬 Multi-Turn Chat with Citations
-Chat with your synthesized experts or your general knowledge base. Every claim is grounded in your actual notes with inline citations.
+Chat with your synthesized experts or your general knowledge base, then check important answers against their cited notes.
 <p align="center"><img src="docs/assets/chat-example.png" alt="Multi-Turn Chat" width="100%"></p>
 
 #### 📚 Knowledge Vault & AI Summaries
@@ -57,29 +57,13 @@ LifeOS groups your insights by creator/domain and auto-generates deep, interacti
 Paste a YouTube Channel URL to instantly download recent transcripts, summarize them, and build an Expert profile in one click.
 <p align="center"><img src="docs/assets/youtube-ingestion.png" alt="YouTube Bulk Ingestion" width="80%"></p>
 
-#### 🛡️ AI Code Review & Security Pipeline
+#### 🛡️ AI Code Review Tool
 
-As AI-authored code becomes the majority of contributions, LifeOS treats code provenance as a first-class concern. Every file committed to the vault is tagged with its authorship source (human vs. AI agent) and routed through an enhanced security scanning stage.
+`scripts/ai_code_reviewer.py` is an optional review tool for files you name. It records review data in SQLite. Its presence does not establish an automatic review or merge gate.
 
 **How it works:**
 
-1. **Authorship Tagging** — Every code contribution is labeled with its source (`Human`, `Hermes`, `Prototyper`, or custom agent name).
-2. **Five-Axis Review** — `scripts/ai_code_reviewer.py` performs automated review across Correctness, Readability, Architecture, Security, and Performance. Auto-fixes are applied automatically; manual fixes are flagged.
-3. **Provenance Ledger** — All review results are stored in the `ai_code_provenance` SQLite table, so any production issue can be traced back to the specific agent/model/version that authored the code.
-4. **Adaptive Review Gates** — The higher the AI authorship ratio, the more rigorous the human/AI-judge review threshold before merge.
-
-```mermaid
-flowchart LR
-    A[Code Contribution] --> B{Authorship Tag}
-    B -->|Human| C[Standard Review]
-    B -->|AI Agent| D[Enhanced Five-Axis Review]
-    D --> E[Auto-Fix Issues]
-    E --> F[Provenance Ledger\nai_code_provenance table]
-    F --> G{Review Threshold\nProportional to AI Ratio}
-    G -->|Pass| H[Merge to Main]
-    G -->|Fail| I[Flag for Manual Review]
-    I --> A
-```
+The script reviews supplied paths across correctness, readability, architecture, security, and performance. Treat its output as review input and verify suggested changes and test results before merging.
 
 **Usage:**
 ```bash
@@ -89,15 +73,13 @@ flowchart LR
 # Review multiple files
 .venv/bin/python scripts/ai_code_reviewer.py Prototyper src/a.py src/b.py
 
-# Emergency bypass
-SKIP_AI_REVIEW=1 git commit ...
 ```
 
-The pipeline is integrated into the Hermes Proposal Implementation Workflow (Step 4) and runs automatically on all modified `.py` files during feature development. See `AGENTS.md` for the full workflow.
+See [`AGENTS.md`](AGENTS.md) for the current contributor workflow.
 
 ### 🔒 Privacy Model
 
-LifeOS keeps **all data on your machine** — notes, indexes, expert profiles, and search stay in local SQLite and Markdown files. However, LLM inference (summarization, chat, expert synthesis) is processed via cloud APIs (Google Gemini, Azure OpenAI, or OpenRouter). Your data is sent to these providers for processing but is **never stored or trained on** by them. A future milestone ([Phase 4](ROADMAP.md)) adds full offline LLM support via Ollama.
+Notes, indexes, and profiles are stored in local Markdown and SQLite files. Summarization, chat, and synthesis can send selected content to configured cloud LLM providers; review each provider's current data terms separately. Full offline inference is a future [roadmap](ROADMAP.md) item. Keep private data out of Git and inspect changes before staging.
 
 ---
 
@@ -135,67 +117,40 @@ flowchart TB
         LLM --> Response["Response with Citations"]
     end
 
-    subgraph Hermes["🤖 Hermes Autonomous Loop"]
-        Outbox --> |Weekly Cron| Triage["Keyword Triage"]
-        Triage --> |Actionable Notes| Agent["Hermes Agent"]
-        Agent --> |Review + Implement| PR["GitHub Pull Request"]
+    subgraph Drafts["📝 Dispatch Drafts"]
+        Outbox --> |On runner invocation| Triage["Keyword Triage"]
+        Triage --> |Selected context| LLM2["LLM synthesis"]
+        LLM2 --> Draft["Local reviewable draft"]
     end
 
     style Ingestion fill:#1a1b26,stroke:#3553ff,color:#c0caf5
     style Storage fill:#1a1b26,stroke:#3553ff,color:#c0caf5
     style Experts fill:#1a1b26,stroke:#3553ff,color:#c0caf5
     style Chat fill:#1a1b26,stroke:#3553ff,color:#c0caf5
-    style Hermes fill:#1a1b26,stroke:#7aa2f7,color:#c0caf5
+    style Drafts fill:#1a1b26,stroke:#7aa2f7,color:#c0caf5
 ```
 
 ### System Design Principles
 
-1. **Separation of Layers** — System code (`src/`, `apps/`, `config/`) is strictly separated from user data (`data/`). The application reads the User Layer to construct context but **never overwrites** human-written files without explicit approval.
+1. **Separation of Layers** — System code lives in `src/`, `apps/`, and `config/`; current application data belongs under `data/`. Some legacy top-level data remains to be inventoried and migrated.
 
-2. **Expert Routing** — Queries are routed to the most relevant expert based on declarative mapping (`config/domain_map.yaml`) and frontmatter tags. Ask a design question → it goes to your design expert automatically.
+2. **Expert Routing** — Domain mapping (`config/domain_map.yaml`) and frontmatter tags inform expert selection; check a cited answer against its source note.
 
 3. **No Framework Lock-in** — Pure Python pipeline. No LangChain, no LlamaIndex. You own every prompt and every line of orchestration logic.
 
 ---
 
-## 🤖 Autonomous Hermes Loop
+## 📝 Dispatch Drafts
 
-LifeOS doesn't just store knowledge — it **acts on it**. The system features a decoupled, event-driven self-improvement pipeline:
+Ingestion can queue note metadata in SQLite. `scripts/triage_outbox.py` scores queued notes, and `scripts/monthly_hermes_run.py` uses configured LLM access to write a local dispatch draft and optional proposal files. The default run saves the draft under `data/inbox/content_drafts/`; it does not publish. This runner uses a Hermes-themed prompt through LifeOS's LLM client, not the separately installed Hermes coding agent.
 
-```
-┌─────────────┐    ┌──────────────┐    ┌──────────────┐    ┌─────────────┐
-│  Note        │    │  Outbox      │    │  Triage      │    │  Hermes     │
-│  Ingested    │───▶│  Queue       │───▶│  Worker      │───▶│  Agent      │
-│              │    │  (SQLite)    │    │  (Keywords)  │    │  (oneshot)  │
-└─────────────┘    └──────────────┘    └──────────────┘    └──────┬──────┘
-                                                                  │
-                                                    ┌─────────────▼──────────┐
-                                                    │  • Reviews codebase    │
-                                                    │  • Implements changes  │
-                                                    │  • Runs pytest         │
-                                                    │  • Opens GitHub PR     │
-                                                    └────────────────────────┘
-```
-
-| Step | Component | What it does |
-|:-----|:----------|:-------------|
-| **1** | `src/core/ingest.py` | On every note save, pushes metadata to the `automation_outbox` table in SQLite. |
-| **2** | `scripts/triage_outbox.py` | Lightweight keyword scanner (AI, Architecture, Python, SQLite, etc.). **No LLM calls** — runs in milliseconds. |
-| **3** | `scripts/weekly_hermes_run.sh` | Cron-triggered weekly. Aggregates all actionable notes since the last run. |
-| **4** | Hermes Agent | Receives the aggregated context, reviews the codebase via MCP tools, implements improvements, runs `pytest`, opens a **GitHub Pull Request** for human approval, and publishes a synthesized weekly dispatch to your TinaCMS website repo. |
-
-> **Why this design?** Calling an LLM on every single ingested note would be expensive and noisy. The outbox + keyword triage pattern keeps costs near-zero during normal operation, and batches the expensive Hermes review into a single weekly run.
+Publishing is a separate `--publish-draft PATH` invocation for an existing, reviewed draft. It checks the recorded source digest, its hash, and its age before the website publishing path can run. A draft made from fallback article collection has no eligible digest and cannot use this path. There is no checked-in process that implements code changes, runs tests, and opens a GitHub pull request from a proposal. Any deployed runner is a separate system; see the [cloud continuation guide](docs/CLOUD-HANDOFF.md) before assuming this checkout is deployed.
 
 ---
 
-## 🛡️ Agentic AI Security (OWASP 1.1)
+## 🛡️ Access Boundaries
 
-LifeOS is designed with defense-in-depth against autonomous AI threats, specifically adhering to the **OWASP Agentic AI Threats and Mitigations 1.1** standard:
-
-- **Memory Poisoning (LLM04):** LifeOS uses a strictly *manual* persistent memory injection system (`user_memory` table). Agents cannot autonomously overwrite your core preferences or system prompts, completely mitigating autonomous memory contamination.
-- **Tool Misuse & Privilege Escalation (LLM02):** The Model Context Protocol (MCP) server runs in a highly restricted sandbox. It explicitly blocks path traversal and hard-denies access to `.env` and `data/private/`. External agents are granted **read-only** access by default.
-- **Cascading Failures & Repudiation:** Every MCP tool invocation, including arguments and hidden Python exceptions, is securely logged to a private `mcp_audit.log`, ensuring full traceability of autonomous actions.
-- **Denial of Service (LLM04):** The local MCP server enforces strict rate limiting (max 60 req/min) and truncates excessively long string inputs to prevent malicious agents from causing CPU exhaustion or Out-of-Memory crashes.
+The MCP tools accept only Markdown or text under `data/knowledge/` and `data/experts/`; private, inbox, raw, hidden, and symlinked paths are excluded. File reads and search responses are capped, with query rate and length checks. The browser clipper validates public HTTP(S) destinations and redirects before fetching bounded text. These safeguards are in the current local checkout and still require integration verification before exposing the MCP server to other agents. See the [cloud continuation guide](docs/CLOUD-HANDOFF.md) for test status and remaining limits.
 
 ---
 
@@ -215,14 +170,13 @@ lifeos/
 │       ├── web.py             #   BeautifulSoup / Jina page scraping
 │       ├── experts.py         #   Expert profile synthesis
 │       ├── llm_client.py      #   Multi-provider LLM wrapper
-│       ├── mcp_server.py      #   MCP server (search_vault, get_note)
+│       ├── mcp_server.py      #   MCP server (search_vault, read_vault_file)
 │       └── build_fts_index.py #   SQLite FTS5 index builder
 ├── scripts/
 │   ├── triage_outbox.py       # Keyword-based note triage (no LLM)
-│   ├── weekly_hermes_run.py   # Weekly Hermes orchestrator
-│   └── weekly_hermes_run.sh   # Cron entrypoint
+│   └── monthly_hermes_run.py  # Dispatch draft and reviewed publish command
 ├── config/                    # Domain maps, model definitions
-├── data/                      # Your knowledge base (git-ignored)
+├── data/                      # User data (private note paths ignored by Git)
 │   ├── knowledge/             #   Ingested notes (Markdown)
 │   ├── experts/               #   Synthesized expert profiles
 │   └── private/               #   Personal backlog & sensitive data
@@ -244,8 +198,8 @@ lifeos/
 | **UI** | Streamlit | Multi-turn chat interface with expert routing |
 | **API** | FastAPI + Uvicorn | Sidecar server for browser clipper ingestion |
 | **LLM** | Azure OpenAI / Gemini / OpenRouter | Multi-provider with cascading fallback |
-| **Agent** | Hermes Agent (MCP) | Autonomous codebase reviewer with PR creation |
-| **Protocol** | Model Context Protocol (MCP) | Tool interface for external agents |
+| **Automation** | LifeOS runner | Local dispatch drafts and reviewed publication command |
+| **Protocol** | Model Context Protocol (MCP) | Read-only vault tools for external agents, when configured |
 | **Ingestion** | yt-dlp, BeautifulSoup, Jina | YouTube transcripts, web scraping |
 | **Testing** | pytest | Unit + integration test suite |
 
@@ -274,7 +228,7 @@ cp .env.example .env
 # Edit .env with your API keys
 ```
 
-See [`.env.example`](.env.example) for all available configuration options including multi-provider LLM setup and GitHub token for the Hermes workflow.
+See [`.env.example`](.env.example) for provider and optional integration settings. Keep the file local and review the destination and content before enabling website publication.
 
 ### 3. Run the Chat UI
 
@@ -292,11 +246,9 @@ Start the FastAPI sidecar to capture URLs from Firefox:
 
 Then load the extension from `apps/firefox-clipper/` — see [its README](apps/firefox-clipper/README.md) for setup.
 
-### 5. (Optional) Enable Hermes Autonomous Loop
+### 5. (Optional) Generate a Dispatch Draft
 
-1. Install the [Hermes Agent](https://github.com/hermes-agent/hermes)
-2. Add your `GITHUB_TOKEN` to `.env`
-3. The weekly cron job runs automatically every Sunday at midnight
+Run `python scripts/monthly_hermes_run.py` after configuring a provider and source notes. Review the draft under `data/inbox/content_drafts/`. Publishing requires a separate `--publish-draft PATH` command and a matching recent source digest; see [Dispatch Drafts](#-dispatch-drafts). Scheduling and the separately installed Hermes agent require independent setup.
 
 ---
 
@@ -307,7 +259,7 @@ source .venv/bin/activate
 pytest
 ```
 
-All core logic includes unit tests. External network and LLM calls are mocked. See [`AGENTS.md`](AGENTS.md) for contribution rules.
+The test suite contains unit and integration coverage; some tests depend on platform or local configuration. See the [cloud continuation guide](docs/CLOUD-HANDOFF.md) for the latest verified results and [`AGENTS.md`](AGENTS.md) for contribution rules.
 
 ---
 

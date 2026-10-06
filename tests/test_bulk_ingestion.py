@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock
 import pytest
 
-from src.core.ingest import process_directory
+from src.core.ingest import process_directory, process_one_file
 
 
 def test_process_directory(tmp_project: Path):
@@ -117,4 +117,38 @@ def test_process_directory_mixed_extensions(tmp_project: Path):
         assert len(res["processed"]) == 1
         assert len(res["failed"]) == 0
         assert res["processed"][0]["original_path"] == str(file_txt)
+
+
+def test_youtube_transcript_uses_canonical_knowledge_dir(tmp_project: Path):
+    source = tmp_project / "data" / "inbox" / "raw" / "video.txt"
+    source.write_text("https://www.youtube.com/watch?v=example", encoding="utf-8")
+    decision = {
+        "primary_domain": "general",
+        "primary_mode": "router",
+        "secondary_modes": [],
+        "storage_location": "data/knowledge/general/",
+        "suggested_tags": [],
+        "one_next_action": "Review manually.",
+        "privacy": "public",
+    }
+    metadata = {
+        "title": "Example video",
+        "source_url": "https://www.youtube.com/watch?v=example",
+        "is_youtube": True,
+        "transcript": "Example transcript",
+        "channel": "Example Channel",
+        "fetched_web_text": "",
+    }
+
+    with patch("src.core.ingest.ROOT", tmp_project), \
+         patch("src.core.ingest._extract_metadata", return_value=metadata), \
+         patch("src.core.ingest._get_routing_decision", return_value=decision), \
+         patch("src.core.ingest._run_cheap_triage", return_value=None), \
+         patch("core.youtube.save_transcript") as save_transcript, \
+         patch("src.core.build_fts_index.build_index"):
+        save_transcript.return_value = tmp_project / "data" / "knowledge" / "ai-resources" / "raw" / "video_transcript.md"
+        result = process_one_file(str(source), use_ai=False)
+
+    assert result["success"] is True
+    assert save_transcript.call_args.args[2] == tmp_project / "data" / "knowledge" / "ai-resources" / "raw"
 

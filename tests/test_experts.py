@@ -147,6 +147,11 @@ class TestGetExistingExperts:
         assert "display_name" in result[0]
         assert "path" in result[0]
 
+    def test_top_level_legacy_experts_are_not_discovered(self, tmp_project: Path):
+        legacy_dir = tmp_project / "experts" / "expert--legacy"
+        legacy_dir.mkdir(parents=True)
+        assert self._fn(tmp_project) == []
+
 
 @pytest.mark.skipif(
     not _CORE_EXPERTS_AVAILABLE,
@@ -242,5 +247,27 @@ class TestScanUnattachedInsights:
         paths = [r["path"] for r in results]
         assert str(inbox_file) in paths
         assert str(knowledge_file) in paths
+
+
+def test_suggest_experts_uses_canonical_data_directory(tmp_project: Path):
+    from src.core.experts import _suggest_experts_for_domain
+
+    slug = "expert--sample-author"
+    (tmp_project / "data" / "experts" / slug).mkdir()
+    (tmp_project / "experts" / "expert--legacy").mkdir(parents=True)
+
+    assert _suggest_experts_for_domain("general", [], "Sample Author", tmp_project) == [slug]
+    assert _suggest_experts_for_domain("general", [], "Legacy", tmp_project) == []
+
+
+def test_assign_insight_rejects_expert_path_traversal(tmp_project: Path, sample_insight: Path):
+    from unittest.mock import patch
+    from src.core.experts import assign_insight_to_expert
+
+    with patch("src.core.experts.ROOT", tmp_project):
+        result = assign_insight_to_expert(sample_insight, "../escaped")
+
+    assert result["success"] is False
+    assert not (tmp_project / "data" / "escaped").exists()
 
 

@@ -20,9 +20,13 @@ try:
     # Load LifeOS .env (overrides)
     load_dotenv(ROOT / ".env", override=True)
     # Load Hermes .env as fallback (doesn't override existing)
-    hermes_env = Path("/root/.hermes/.env")
-    if hermes_env.exists():
-        load_dotenv(hermes_env, override=False)
+    try:
+        hermes_env = Path.home() / ".hermes" / ".env"
+        if hermes_env.exists():
+            load_dotenv(hermes_env, override=False)
+    except OSError:
+        # Hermes is optional; inaccessible config must not block LifeOS imports.
+        pass
 except ImportError:
     pass
 

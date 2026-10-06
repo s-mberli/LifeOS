@@ -36,7 +36,10 @@ def fts_search(
     allowed_paths: Optional[set] = None,
     require_insight_note: bool = False,
     include_private: bool = False,
+    allowed_prefixes: Optional[tuple[str, ...]] = None,
 ) -> list[tuple]:
+    if allowed_prefixes is not None and not allowed_prefixes:
+        return []
     if not DB_PATH.exists():
         return []
 
@@ -45,17 +48,29 @@ def fts_search(
         conn = get_db_connection(DB_PATH)
         cursor = conn.cursor()
 
+        # Restrict curated collections in SQL before the FTS top-50 ranking
+        # limit. The index may contain either POSIX or Windows-style paths.
+        prefix_patterns = tuple(
+            prefix.replace("/", separator) + "%"
+            for prefix in (allowed_prefixes or ())
+            for separator in ("/", "\\")
+        )
+        path_clause = (
+            " AND (" + " OR ".join("path LIKE ?" for _ in prefix_patterns) + ")"
+            if prefix_patterns else ""
+        )
+
         def run_fts_query(q_str: str) -> list[tuple]:
             cursor.execute(
-                """
+                f"""
                 SELECT path, title, snippet(search_index, 2, '**', '**', '...', 64),
                        bm25(search_index)
                 FROM search_index
-                WHERE content MATCH ?
+                WHERE content MATCH ?{path_clause}
                 ORDER BY bm25(search_index)
                 LIMIT 50
                 """,
-                (q_str,),
+                (q_str, *prefix_patterns),
             )
             return cursor.fetchall()
 

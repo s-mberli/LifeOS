@@ -14,6 +14,16 @@
 # Private/sensitive data
 data/private/
 src/data/
+# Current and legacy flattened data paths used by ingestion and chat code
+/private/
+/inbox/
+/knowledge/
+/experts/
+/business/
+/career/
+/tracking/
+/tts_cache/
+/expert_chat_state.json
 
 # Logs & generated outputs (too large for git)
 logs/
@@ -51,6 +61,7 @@ Thumbs.db
 
 # Syncthing files
 .stfolder/
+.stfolder
 .stignore
 **/.stignore
 **/.stfolder/
@@ -66,8 +77,8 @@ scratch/
 .agents/
 
 # SQLite indexes (rebuilt at startup)
-indexes/*.db
-src/indexes/*.db
+/indexes/
+/src/indexes/
 
 # Raw transcripts (can be very large)
 **/raw/
@@ -88,6 +99,21 @@ config/profile.yml
 config/models.yml
 config/privacy.yml
 config/domains.yaml
+# Local personal automation configuration
+config/pregnancy_daily_content.json
+
+# Local operational handoffs and private deployment research
+/HANDOFF.md
+/docs/hermes-agent-research.md
+/docs/research/hermes-sydney-scheduling.md
+/docs/research/telegram-delivery-repair.md
+
+# Personal delivery automation stays with the private runtime
+/scripts/pregnancy_daily.py
+/scripts/pregnancy_delivery_watchdog.py
+/tests/test_pregnancy_daily.py
+/tests/test_pregnancy_delivery_watchdog.py
+/tests/test_hermes_sydney_scheduler.py
 
 # Exclude all markdown notes and transcripts
 data/knowledge/**/*.md

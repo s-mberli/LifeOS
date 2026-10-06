@@ -92,7 +92,7 @@ def triage_notes():
         if is_actionable == 1:
             try:
                 from src.core.build_fts_index import index_file
-                index_file(DB_PATH, full_path)
+                index_file(full_path, conn)
                 print(f"Indexed note successfully: {note_path}")
             except Exception as e:
                 print(f"Error indexing note {note_path}: {e}")

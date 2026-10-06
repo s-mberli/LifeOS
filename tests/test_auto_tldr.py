@@ -1,4 +1,6 @@
-import pytest
+from unittest.mock import Mock
+
+from scripts import auto_tldr
 from scripts.auto_tldr import extract_articles_from_html
 
 SAMPLE_HTML = """
@@ -51,3 +53,16 @@ def test_extract_articles_from_html():
     assert art2["url"] == "https://example.com/no-read-time"
     assert art2["read_time"] == "Unknown"
     assert "short update without" in art2["tldr_summary"]
+
+
+def test_ingest_saves_searchable_raw_note_without_ai(tmp_path, monkeypatch):
+    monkeypatch.setattr(auto_tldr, "ROOT", tmp_path)
+    monkeypatch.setattr(auto_tldr, "NEWS_DIR", tmp_path / "data/knowledge/news")
+    monkeypatch.setattr(auto_tldr.requests, "get", lambda *args, **kwargs: Mock(text=SAMPLE_HTML))
+    monkeypatch.setattr(auto_tldr, "get_clean_markdown", lambda html: "Newsletter text")
+    assert auto_tldr.ingest_newsletter(
+        "ai", "AI", "https://tldr.tech/ai/2026-06-04", "2026-06-04", Mock()
+    )
+    note = (tmp_path / "data/knowledge/news/tldr_ai_2026-06-04.md").read_text(encoding="utf-8")
+    assert "https://example.com/real-article" in note
+    assert "OpenAI surprised" in note
